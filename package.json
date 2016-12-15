@@ -1,0 +1,25 @@
+{
+  "name": "nyt-react-tracking",
+  "version": "0.8.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nytm/nyt-react-tracking.git"
+  },
+  "keywords": [
+    "nyt",
+    "react",
+    "declarative",
+    "tracking",
+    "metrics",
+    "layer"
+  ],
+  "homepage": "https://github.com/nytm/nyt-react-tracking",
+  "dependencies": {
+    "custom-event": "^1.0.1"
+  },
+  "peerDependencies": {
+    "react": "^15.0.0"
+  }
+}
