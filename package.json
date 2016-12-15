@@ -1,7 +1,7 @@
 {
   "name": "nyt-react-tracking",
   "version": "0.8.1",
-  "description": "",
+  "description": "Experimental \"tracking layer\" implementation for React. The core idea is to provide declarative way to add tracking for React applications.",
   "main": "index.js",
   "repository": {
     "type": "git",
