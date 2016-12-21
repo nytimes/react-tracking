@@ -7,6 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/nytm/nyt-react-tracking.git"
   },
+  "files": ["build"],
   "keywords": [
     "nyt",
     "react",
