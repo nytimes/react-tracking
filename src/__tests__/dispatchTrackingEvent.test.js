@@ -11,7 +11,7 @@ describe('dispatchTrackingEvent', () => {
         expect(typeof dispatchTrackingEvent).toBe('function');
     });
 
-    it('properly dispatches cusotm event', () => {
+    it('properly dispatches custom event', () => {
         const testEventData = {};
         dispatchTrackingEvent(testEventData);
 

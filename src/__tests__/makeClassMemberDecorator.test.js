@@ -27,18 +27,18 @@ describe('makeClassMemberDecorator', () => {
 
     it('properly decorates field syntax', () => {
         const mockDecorator = jest.fn(x => x);
-        const thingSpy = jest.fn();
+        const fieldSpy = jest.fn();
         class Test {
             @makeClassMemberDecorator(mockDecorator)
-            field = thingSpy
+            field = fieldSpy
         }
         const myTest = new Test();
 
-        expect(thingSpy).not.toHaveBeenCalled();
+        expect(fieldSpy).not.toHaveBeenCalled();
         expect(mockDecorator).not.toHaveBeenCalled();
         myTest.field();
         expect(mockDecorator).toHaveBeenCalledTimes(1);
-        expect(thingSpy).toHaveBeenCalledTimes(1);
+        expect(fieldSpy).toHaveBeenCalledTimes(1);
     });
 
     it('throws when called on unsupported descriptor', () => {
