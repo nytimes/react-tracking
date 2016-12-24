@@ -5,7 +5,8 @@ const mockDispatchEvent = jest.fn();
 global.document.dispatchEvent = mockDispatchEvent;
 
 describe('dispatchTrackingEvent', () => {
-  const dispatchTrackingEvent = require('../dispatchTrackingEvent').default;   // eslint-disable-line global-require
+  // eslint-disable-next-line global-require
+  const dispatchTrackingEvent = require('../dispatchTrackingEvent').default;
 
   it('exports a function', () => {
     expect(typeof dispatchTrackingEvent).toBe('function');
