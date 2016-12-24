@@ -14,8 +14,8 @@ export default function withTrackingComponentDecorator(trackingContext = {}) {
                 tracking: PropTypes.object
             };
 
-            constructor(props) {
-                super(props);
+            constructor(props, context) {
+                super(props, context);
                 this.trackEvent = this.trackEvent.bind(this);
             }
 
