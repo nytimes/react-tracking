@@ -1,0 +1,7 @@
+{
+    "parser": "babel-eslint",
+
+    "extends": [
+        "./node_modules/eslint-config-kyt/eslintrc.json"
+    ]
+}
