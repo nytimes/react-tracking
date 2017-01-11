@@ -110,6 +110,20 @@ export default class FooButton extends React.Component {
 }
 ```
 
+NOTE: That the above `trackEvent()` code utilizes some of the newer ES6 syntax. This is what it would look like in ES5:
+
+```js
+// ...
+  @trackEvent(function(props, args) {
+    const event = args[0];
+    return {
+      action: 'click',
+      label: event.currentTarget.title || event.currentTarget.textContent
+    };
+  })
+// ...
+```
+
 ### Tracking Data
 
 Note that there are no restrictions on the objects that are passed in to either `withTracking()` or `trackEvent()`.
