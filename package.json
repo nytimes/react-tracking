@@ -3,6 +3,28 @@
   "version": "0.8.2",
   "description": "Experimental \"tracking layer\" implementation for React. The core idea is to provide declarative way to add tracking for React applications.",
   "author": "The New York Times",
+  "contributors": [
+    {
+      "name": "Nicole Baram",
+      "email": "nicole.baram@nytimes.com",
+      "url": "https://github.com/nicolehollyNYT"
+    },
+    {
+      "name": "Oleh Ziniak",
+      "email": "oleh.ziniak@nytimes.com",
+      "url": "https://github.com/oziniak"
+    },
+    {
+      "name": "Ivan Kravchenko",
+      "email": "ivan@kravchenko.rocks",
+      "url": "https://github.com/ivankravchenko"
+    },
+    {
+      "name": "Jeremy Gayed",
+      "email": "jeremy.gayed@nytimes.com",
+      "url": "https://github.com/tizmagik"
+    }
+  ],
   "license": "Apache-2.0",
   "main": "build/index.js",
   "files": [
