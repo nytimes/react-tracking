@@ -132,7 +132,31 @@ Note that there are no restrictions on the objects that are passed in to either 
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
 
-### Roadmap
+> NOTE: There is one quasi-exception to this, see the next section.
+
+#### "Pageview" actions fired automatically
+
+There is a special case for the tracking data object when passed in to `withTracking()`. If the object contains a `page` property, then it is assumed that this is a `pageview` action and a tracking event will be fired immediately (in `componentDidMount()`).
+
+For example:
+
+```js
+@withTracking({ page: 'FooPage' })
+class FooPage extends Component { ... }
+```
+
+Will fire the following event (assuming no other tracking data in context from the rest of the app):
+
+```
+{
+  action: 'pageview',
+  page: 'FooPage'
+}
+```
+
+_This is only in affect for `withTracking()`, it does not happen in `trackEvent()`._
+
+## Roadmap
 
 - Figure out a way to have only one decorator (not `withTracking()` & `trackEvent()`, but just one)
 - Babel plugin ?
