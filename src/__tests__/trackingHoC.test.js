@@ -11,7 +11,7 @@ describe('tracking HoC', () => {
   const trackingHoC = require('../trackingHoC').default;
 
   it('detects a class', () => {
-    @trackingHoC('cls')
+    @trackingHoC({ testClass: true })
     class TestClass extends React.Component {} // eslint-disable-line
 
     new TestClass(); // eslint-disable-line no-new
@@ -21,7 +21,7 @@ describe('tracking HoC', () => {
 
   it('detects a class method', () => {
     class TestMethod {
-      @trackingHoC('mthd')
+      @trackingHoC({ testMethod: true })
       blah = () => {}
     }
 
