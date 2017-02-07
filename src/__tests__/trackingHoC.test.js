@@ -12,23 +12,35 @@ describe('tracking HoC', () => {
   const trackingHoC = require('../trackingHoC').default;
 
   it('detects a class', () => {
-    @trackingHoC({ testClass: true })
+    const testClass = { testClass: true };
+
+    @trackingHoC(testClass)
     class TestClass extends React.Component {} // eslint-disable-line
 
     new TestClass(); // eslint-disable-line no-new
 
-    expect(wTCDmock).toHaveBeenCalled();
+    expect(wTCDmock).toHaveBeenCalledWith(testClass);
   });
 
   it('detects a class method', () => {
+    const testMethod = { testMethod: true };
     class TestMethod {
-      @trackingHoC({ testMethod: true })
+      @trackingHoC(testMethod)
       blah = () => {}
     }
 
     const myTest = new TestMethod();
     myTest.blah();
 
-    expect(tEMDmock).toHaveBeenCalled();
+    expect(tEMDmock).toHaveBeenCalledWith(testMethod);
+  });
+
+  it('works on stateless functional components', () => {
+    const testStateless = { testStateless: true };
+    const TestComponent = () => <div />;
+
+    trackingHoC(testStateless)(TestComponent);
+
+    expect(wTCDmock).toHaveBeenCalledWith(testStateless);
   });
 });

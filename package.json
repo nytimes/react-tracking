@@ -60,7 +60,7 @@
     "babel-preset-stage-0": "^6.16.0",
     "eslint": "^3.12.2",
     "eslint-config-kyt": "^0.0.1",
-    "jest": "^18.0.0",
+    "jest": "^18.1.0",
     "react": "15.0.1"
   },
   "scripts": {
