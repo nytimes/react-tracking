@@ -1,10 +1,11 @@
 import React from 'react';
 
-const wTCDmock = jest.fn();
+const wTCDmock = jest.fn(() => () => {});
 jest.setMock('../withTrackingComponentDecorator', wTCDmock);
 
-const tEMDmock = jest.fn();
+const tEMDmock = jest.fn(() => () => {});
 jest.setMock('../trackEventMethodDecorator', tEMDmock);
+
 
 describe('tracking HoC', () => {
   // eslint-disable-next-line global-require
