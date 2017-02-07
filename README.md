@@ -6,7 +6,6 @@
 - Reduce development cost to add tracking to a codebase.
 - Expressive and declarative (as opposed to imperative) API to add tracking.
 
-
 ## Installation
 
 ```
@@ -19,19 +18,16 @@ npm install --save nytm/nyt-react-tracking#v0.8.2
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
-There are two decorator functions:
-  - `withTracking()` which works on React Classes, and
-  - `trackEvent()` which decorates methods within those classes.
-
+The decorator can be used on React Classes and on methods within those classes.
 
 ```js
 import React from 'react';
-import { withTracking, trackEvent } from 'nyt-react-tracking';
+import track from 'nyt-react-tracking';
 
-@withTracking({ page: 'FooPage' })
+@track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
 
-  @trackEvent({ action: 'click' })
+  @track({ action: 'click' })
   handleClick = () => {
     // ... other stuff
   }
@@ -48,10 +44,10 @@ export default class FooPage extends React.Component {
 
 ### Usage on Stateless Functional Components
 
-You can also track events by importing `withTracking()` and wrapping your stateless functional component, which will provide `props.trackEvent()` that you can call in your component like so:
+You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.trackEvent()` that you can call in your component like so:
 
 ```js
-import { withTracking } from 'nyt-react-tracking';
+import track from 'nyt-react-tracking';
 
 const FooPage = (props) => {
   return (
@@ -64,7 +60,7 @@ const FooPage = (props) => {
   )
 }
 
-export default withTracking({
+export default track({
   page: 'FooPage'
 })(FooComponent);
 ```
@@ -74,22 +70,22 @@ This is also how you would use this module without `@decorators`, although this 
 
 ### Advanced Usage
 
-Both `withTracking()` and `trackEvent()` also accept a function as an argument which allows for some advanced usage scenarios such as when your tracking data is a function of some runtime values, like so:
+You can also pass a function as an argument instead of an object literal, which allows for some advanced usage scenarios such as when your tracking data is a function of some runtime values, like so:
 
 ```js
 import React from 'react';
-import { withTracking, trackEvent } from 'nyt-react-tracking';
+import track from 'nyt-react-tracking';
 
 // In this case, the "page" tracking data
 // is a function of one of its props (isNew)
-@withTracking((props) => {
+@track((props) => {
   return { page: props.isNew ? 'new' : 'existing' }
 })
 export default class FooButton extends React.Component {
 
   // In this case the tracking data depends on
   // some unknown (until runtime) value
-  @trackEvent((props, [event]) => ({
+  @track((props, [event]) => ({
     action: 'click',
     label: event.currentTarget.title || event.currentTarget.textContent
   }))
@@ -110,11 +106,11 @@ export default class FooButton extends React.Component {
 }
 ```
 
-NOTE: That the above `trackEvent()` code utilizes some of the newer ES6 syntax. This is what it would look like in ES5:
+NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it would look like in ES5:
 
 ```js
 // ...
-  @trackEvent(function(props, args) {
+  @track(function(props, args) {
     const event = args[0];
     return {
       action: 'click',
@@ -126,7 +122,7 @@ NOTE: That the above `trackEvent()` code utilizes some of the newer ES6 syntax. 
 
 ### Tracking Data
 
-Note that there are no restrictions on the objects that are passed in to either `withTracking()` or `trackEvent()`.
+Note that there are no restrictions on the objects that are passed in to the decorator.
 
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
@@ -136,12 +132,12 @@ This library simply merges the tracking data objects together (as it flows throu
 
 #### "Pageview" actions fired automatically
 
-There is a special case for the tracking data object when passed in to `withTracking()`. If the object contains a `page` property, then it is assumed that this is a `pageview` action and a tracking event will be fired immediately (in `componentDidMount()`).
+There is a special case for the tracking data object when passed in to `track()`. If the object contains a `page` property, then it is assumed that this is a `pageview` action and a tracking event will be fired immediately (in `componentDidMount()`).
 
 For example:
 
 ```js
-@withTracking({ page: 'FooPage' })
+@track({ page: 'FooPage' })
 class FooPage extends Component { ... }
 ```
 
@@ -154,9 +150,10 @@ Will fire the following event (assuming no other tracking data in context from t
 }
 ```
 
-_This is only in affect for `withTracking()`, it does not happen in `trackEvent()`._
+_This is only in affect when decorating a Class, it does not happen when decorating methods._
 
 ## Roadmap
 
-- Figure out a way to have only one decorator (not `withTracking()` & `trackEvent()`, but just one)
+- Integration with [tracking-schema](https://github.com/nytm/tracking-schema) to provide developer warnings/errors on invalid data objects
+- DataLayer adapters (so that where the data goes can vary by app, e.g. to EventTracker or Google Analytics etc.)
 - Babel plugin ?
