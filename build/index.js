@@ -22,4 +22,13 @@ Object.defineProperty(exports, 'trackEvent', {
   }
 });
 
+var _trackingHoC = require('./trackingHoC');
+
+Object.defineProperty(exports, 'default', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_trackingHoC).default;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

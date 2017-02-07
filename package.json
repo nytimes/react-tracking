@@ -27,6 +27,7 @@
   ],
   "license": "Apache-2.0",
   "main": "build/index.js",
+  "module": "src/index.js",
   "files": [
     "build"
   ],
@@ -64,7 +65,7 @@
     "react": "15.0.1"
   },
   "scripts": {
-    "build": "babel --out-dir build src",
+    "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
     "lint": "eslint ./src"
   }
