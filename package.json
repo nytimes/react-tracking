@@ -1,7 +1,7 @@
 {
   "name": "nyt-react-tracking",
-  "version": "0.8.2",
-  "description": "Experimental \"tracking layer\" implementation for React. The core idea is to provide declarative way to add tracking for React applications.",
+  "version": "0.9.0",
+  "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
   "contributors": [
     {
