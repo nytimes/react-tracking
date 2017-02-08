@@ -1,7 +1,7 @@
 {
   "name": "nyt-react-tracking",
-  "version": "0.8.2",
-  "description": "Experimental \"tracking layer\" implementation for React. The core idea is to provide declarative way to add tracking for React applications.",
+  "version": "0.9.0",
+  "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
   "contributors": [
     {
@@ -27,6 +27,7 @@
   ],
   "license": "Apache-2.0",
   "main": "build/index.js",
+  "module": "src/index.js",
   "files": [
     "build"
   ],
@@ -64,7 +65,7 @@
     "react": "15.0.1"
   },
   "scripts": {
-    "build": "babel --out-dir build src",
+    "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
     "lint": "eslint ./src"
   }

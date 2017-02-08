@@ -9,10 +9,10 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v0.8.2
+npm install --save nytm/nyt-react-tracking#v0.9.0
 ```
 
-(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 0.8.2 as of this writing)
+(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 0.9.0 as of this writing)
 
 ## Usage
 
