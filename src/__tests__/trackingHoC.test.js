@@ -12,15 +12,11 @@ describe('tracking HoC', () => {
   // eslint-disable-next-line global-require
   const trackingHoC = require('../trackingHoC').default;
 
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-
   it('detects a class', () => {
     const testClass = { testClass: true };
     const options = {};
 
-    @trackingHoC(testClass)
+    @trackingHoC(testClass, options)
     class TestClass extends React.Component {} // eslint-disable-line
 
     new TestClass(); // eslint-disable-line no-new
@@ -44,9 +40,9 @@ describe('tracking HoC', () => {
   it('works on stateless functional components', () => {
     const testStateless = { testStateless: true };
     const options = {};
-    const TestComponent = () => <div />;
+    const TestComponent = () => <div/>;
 
-    trackingHoC(testStateless)(TestComponent);
+    trackingHoC(testStateless, options)(TestComponent);
 
     expect(wTCDmock).toHaveBeenCalledWith(testStateless, options);
   });
