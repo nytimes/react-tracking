@@ -40,7 +40,7 @@ describe('tracking HoC', () => {
   it('works on stateless functional components', () => {
     const testStateless = { testStateless: true };
     const options = {};
-    const TestComponent = () => <div/>;
+    const TestComponent = () => <div />;
 
     trackingHoC(testStateless, options)(TestComponent);
 
