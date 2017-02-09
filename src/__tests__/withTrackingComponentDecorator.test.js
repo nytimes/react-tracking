@@ -35,7 +35,7 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('calls trackingContext() in getChildContext', () => {
-      expect(myTC.getChildContext()).toEqual({ tracking: {} });
+      expect(myTC.getChildContext().tracking.data).toEqual({});
       expect(trackingContext).toHaveBeenCalledTimes(1);
     });
 
@@ -74,8 +74,9 @@ describe('withTrackingComponentDecorator', () => {
     // We'll only test what differs from the functional trackingContext variation
 
     it('returns the proper object in getChildContext', () => {
-      expect(myTC.getChildContext()).toEqual({
-        tracking: trackingContext,
+      expect(myTC.getChildContext().tracking).toEqual({
+        data: trackingContext,
+        dispatch: mockDispatchTrackingEvent,
       });
     });
 

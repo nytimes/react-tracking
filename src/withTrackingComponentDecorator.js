@@ -1,40 +1,58 @@
 import React, { Component, PropTypes } from 'react';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
-export default function withTrackingComponentDecorator(trackingContext = {}) {
+const TrackingPropType = PropTypes.shape({
+  data: PropTypes.object,
+  dispatch: PropTypes.func,
+});
+
+export default function withTrackingComponentDecorator(
+  trackingData = {},
+  options = { dispatch: dispatchTrackingEvent }
+) {
   return (DecoratedComponent) => {
     const decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
     return class WithTracking extends Component {
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
-        tracking: PropTypes.object,
+        tracking: TrackingPropType,
       };
       static childContextTypes = {
-        tracking: PropTypes.object,
+        tracking: TrackingPropType,
       };
 
       trackEvent = (data) => {
-        dispatchTrackingEvent({
-          ...this.getChildContext().tracking,
+        this.getTrackingDispatcher()({
+          ...this.getChildContext().tracking.data,
           ...data,
         });
       }
 
+      getTrackingDispatcher() {
+        return (this.context.tracking && this.context.tracking.dispatch) || options.dispatch;
+      }
+
       getChildContext() {
-        const thisTrackingContext = typeof trackingContext === 'function'
-                    ? trackingContext(this.props)
-                    : trackingContext;
+        const thisTrackingData = typeof trackingData === 'function'
+                    ? trackingData(this.props)
+                    : trackingData;
+
+        const contextData = (this.context.tracking && this.context.tracking.data) || {};
+
         return {
           tracking: {
-            ...this.context.tracking,
-            ...thisTrackingContext,
+            data: {
+              ...contextData,
+              ...thisTrackingData,
+            },
+            dispatch: this.getTrackingDispatcher(),
           },
         };
       }
 
       componentDidMount() {
-        if (trackingContext.page) {
+        if (trackingData.page) {
           this.trackEvent({
             action: 'pageview',
           });
