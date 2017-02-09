@@ -42,6 +42,26 @@ export default class FooPage extends React.Component {
 }
 ```
 
+### Custom `dispatch()` for tracking data
+
+By default, data tracking objects are dispatched as a CustomEvent on `document` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
+
+For example, to push objects to `window.dataLayer[]` (e.g. for Google Tag Manager) instead, you would decorate your top-level `<App />` component like this:
+
+```js
+import React, { Component } from 'react';
+import track from 'nyt-react-tracking';
+
+@track({}, { dispatch: (data) => window.dataLayer.push(data) })
+export default class App extends Component {
+  render() {
+    return this.props.children;
+  }
+}
+```
+
+NOTE: It is recommended to do this on some top-level component so that you only need to pass in the dispatch function once. Every child component from then on will use this dispatch function.
+
 ### Usage on Stateless Functional Components
 
 You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.trackEvent()` that you can call in your component like so:
