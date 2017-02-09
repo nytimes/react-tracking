@@ -1,7 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
-export default function withTrackingComponentDecorator(trackingContext = {}) {
+export default function withTrackingComponentDecorator(
+  trackingContext = {},
+  options = { dispatch: dispatchTrackingEvent }
+) {
   return (DecoratedComponent) => {
     const decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
@@ -9,16 +12,22 @@ export default function withTrackingComponentDecorator(trackingContext = {}) {
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
         tracking: PropTypes.object,
+        _trackingDispatcher: PropTypes.func,
       };
       static childContextTypes = {
         tracking: PropTypes.object,
+        _trackingDispatcher: PropTypes.func,
       };
 
       trackEvent = (data) => {
-        dispatchTrackingEvent({
+        this.getTrackingDispatcher()({
           ...this.getChildContext().tracking,
           ...data,
         });
+      }
+
+      getTrackingDispatcher() {
+        return this.context._trackingDispatcher || options.dispatch; // eslint-disable-line
       }
 
       getChildContext() {
@@ -30,6 +39,7 @@ export default function withTrackingComponentDecorator(trackingContext = {}) {
             ...this.context.tracking,
             ...thisTrackingContext,
           },
+          _trackingDispatcher: this.getTrackingDispatcher(),
         };
       }
 

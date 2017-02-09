@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React from 'react';
 
 const wTCDmock = jest.fn(() => () => {});
@@ -11,15 +12,20 @@ describe('tracking HoC', () => {
   // eslint-disable-next-line global-require
   const trackingHoC = require('../trackingHoC').default;
 
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('detects a class', () => {
     const testClass = { testClass: true };
+    const options = {};
 
     @trackingHoC(testClass)
     class TestClass extends React.Component {} // eslint-disable-line
 
     new TestClass(); // eslint-disable-line no-new
 
-    expect(wTCDmock).toHaveBeenCalledWith(testClass);
+    expect(wTCDmock).toHaveBeenCalledWith(testClass, options);
   });
 
   it('detects a class method', () => {
@@ -37,10 +43,11 @@ describe('tracking HoC', () => {
 
   it('works on stateless functional components', () => {
     const testStateless = { testStateless: true };
+    const options = {};
     const TestComponent = () => <div />;
 
     trackingHoC(testStateless)(TestComponent);
 
-    expect(wTCDmock).toHaveBeenCalledWith(testStateless);
+    expect(wTCDmock).toHaveBeenCalledWith(testStateless, options);
   });
 });
