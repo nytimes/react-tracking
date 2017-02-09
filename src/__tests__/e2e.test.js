@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
 
-const PAGEVIEW_ACTION = { action: 'pageview' };
+const PAGEVIEW_ACTION = { event: 'pageDataReady' };
 const testDataContext = { testDataContext: true };
 const testData = { testData: true };
 const dispatch = jest.fn();

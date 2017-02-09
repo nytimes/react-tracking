@@ -9,10 +9,10 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v0.9.0
+npm install --save nytm/nyt-react-tracking#v1.0.0
 ```
 
-(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 0.9.0 as of this writing)
+(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 1.0.0 as of this writing)
 
 ## Usage
 
@@ -149,9 +149,9 @@ This library simply merges the tracking data objects together (as it flows throu
 
 > NOTE: There is one quasi-exception to this, see the next section.
 
-#### "Pageview" actions fired automatically
+#### "pageDataReady" actions fired automatically
 
-There is a special case for the tracking data object when passed in to `track()`. If the object contains a `page` property, then it is assumed that this is a `pageview` action and a tracking event will be fired immediately (in `componentDidMount()`).
+There is a special case for the tracking data object when passed in to `track()`. If the object contains a `page` property, then it is assumed that this is a new page view (for SPAs) so an `{event: 'pageDataReady'}` tracking event will be fired immediately (in `componentDidMount()`).
 
 For example:
 
@@ -164,7 +164,7 @@ Will fire the following event (assuming no other tracking data in context from t
 
 ```
 {
-  action: 'pageview',
+  event: 'pageDataReady',
   page: 'FooPage'
 }
 ```

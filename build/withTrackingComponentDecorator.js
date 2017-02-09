@@ -97,7 +97,7 @@ function withTrackingComponentDecorator() {
         value: function componentDidMount() {
           if (trackingData.page) {
             this.trackEvent({
-              action: 'pageview'
+              event: 'pageDataReady'
             });
           }
         }

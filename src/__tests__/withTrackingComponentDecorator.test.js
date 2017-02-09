@@ -83,7 +83,7 @@ describe('withTrackingComponentDecorator', () => {
     it('dispatches event in componentDidMount', () => {
       myTC.componentDidMount();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        action: 'pageview',
+        event: 'pageDataReady',
         page: 1,
       });
     });
