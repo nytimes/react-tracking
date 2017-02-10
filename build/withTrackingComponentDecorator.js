@@ -128,7 +128,7 @@ function withTrackingComponentDecorator() {
       return WithTracking;
     }(_react.Component), _class.displayName = 'WithTracking(' + decoratedComponentName + ')', _class.contextTypes = {
       tracking: TrackingPropType,
-      getReferrer: _react.PropTypes.func.isRequired
+      getReferrer: _react.PropTypes.func
     }, _class.childContextTypes = {
       tracking: TrackingPropType
     }, _temp2;
