@@ -17,7 +17,7 @@ export default function withTrackingComponentDecorator(
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
         tracking: TrackingPropType,
-        getReferrer: PropTypes.func,
+        getReferrer: PropTypes.func.isRequired,
       };
       static childContextTypes = {
         tracking: TrackingPropType,
@@ -46,7 +46,9 @@ export default function withTrackingComponentDecorator(
         return {
           tracking: {
             data: {
-              referrer: contextReferer,
+              referrer: {
+                url: contextReferer
+              },
               ...contextData,
               ...thisTrackingData,
             },
