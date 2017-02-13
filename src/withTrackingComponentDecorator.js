@@ -17,7 +17,7 @@ export default function withTrackingComponentDecorator(
     return class WithTracking extends Component {
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
-        tracking: TrackingPropType        
+        tracking: TrackingPropType,
       };
       static childContextTypes = {
         tracking: TrackingPropType,
