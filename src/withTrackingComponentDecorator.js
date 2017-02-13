@@ -17,8 +17,7 @@ export default function withTrackingComponentDecorator(
     return class WithTracking extends Component {
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
-        tracking: TrackingPropType,
-        getReferrer: PropTypes.func,
+        tracking: TrackingPropType        
       };
       static childContextTypes = {
         tracking: TrackingPropType,
@@ -45,8 +44,6 @@ export default function withTrackingComponentDecorator(
                     : trackingData;
 
         const contextData = (this.context.tracking && this.context.tracking.data) || {};
-
-        const contextReferer = this.context.getReferrer && this.context.getReferrer() || '';
 
         return {
           tracking: {
