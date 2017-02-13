@@ -91,10 +91,9 @@ function withTrackingComponentDecorator() {
 
           var contextData = this.context.tracking && this.context.tracking.data || {};
 
-          var contextReferer = this.context.getReferrer && this.context.getReferrer() || '';
-
           return {
             tracking: {
+<<<<<<< HEAD
 <<<<<<< HEAD
               data: (0, _lodash2.default)({}, contextData, thisTrackingData),
 =======
@@ -104,6 +103,9 @@ function withTrackingComponentDecorator() {
                 }
               }, contextData, thisTrackingData),
 >>>>>>> build file
+=======
+              data: (0, _extends3.default)({}, contextData, thisTrackingData),
+>>>>>>> updated build files
               dispatch: this.getTrackingDispatcher()
             }
           };
@@ -127,8 +129,7 @@ function withTrackingComponentDecorator() {
       }]);
       return WithTracking;
     }(_react.Component), _class.displayName = 'WithTracking(' + decoratedComponentName + ')', _class.contextTypes = {
-      tracking: TrackingPropType,
-      getReferrer: _react.PropTypes.func
+      tracking: TrackingPropType
     }, _class.childContextTypes = {
       tracking: TrackingPropType
     }, _temp2;
