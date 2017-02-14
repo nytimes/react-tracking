@@ -15,6 +15,9 @@ npm install --save nytm/nyt-react-tracking#v1.0.0
 (Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 1.0.0 as of this writing)
 
 ## Usage
+@track() expects two arguments, trackingData and options.
+- trackingData represents the data to be tracked
+- options is an optional field that allows for page view to be fired and also custom dispatch methods to be passed.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -24,7 +27,11 @@ The decorator can be used on React Classes and on methods within those classes.
 import React from 'react';
 import track from 'nyt-react-tracking';
 
-@track({ page: 'FooPage' })
+@track({
+  presentation: {
+    pageType: 'FooPage'
+  },  
+}, { dispatchImmediately: true })
 export default class FooPage extends React.Component {
 
   @track({ action: 'click' })
