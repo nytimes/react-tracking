@@ -9,10 +9,10 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v1.0.0
+npm install --save nytm/nyt-react-tracking#v2.0.0
 ```
 
-(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 1.0.0 as of this writing)
+(Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 2.0.0 as of this writing)
 
 ## Usage
 @track() expects two arguments, `trackingData` and `options`.
@@ -92,7 +92,7 @@ export default class App extends Component {
 
 NOTE: It is recommended to do this on some top-level component so that you only need to pass in the dispatch function once. Every child component from then on will use this dispatch function.
 
-#### When to use `options.dispatchOnMount`
+### When to use `options.dispatchOnMount`
 
 To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `@track()`. This is useful for dispatching tracking data on "Page" components, for example.
 
