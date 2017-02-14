@@ -29,11 +29,7 @@ The decorator can be used on React Classes and on methods within those classes.
 import React from 'react';
 import track from 'nyt-react-tracking';
 
-@track({
-  presentation: {
-    pageType: 'FooPage'
-  },  
-}, { dispatchImmediately: true })
+@track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
 
   @track({ action: 'click' })
@@ -107,7 +103,7 @@ For example:
 class FooPage extends Component { ... }
 ```
 
-Will fire the following data (assuming no other tracking data in context from the rest of the app):
+Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
 
 ```
 {
