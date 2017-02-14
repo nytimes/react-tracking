@@ -35,13 +35,13 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _dispatchTrackingEvent = require('./dispatchTrackingEvent');
-
-var _dispatchTrackingEvent2 = _interopRequireDefault(_dispatchTrackingEvent);
-
 var _lodash = require('lodash.merge');
 
 var _lodash2 = _interopRequireDefault(_lodash);
+
+var _dispatchTrackingEvent = require('./dispatchTrackingEvent');
+
+var _dispatchTrackingEvent2 = _interopRequireDefault(_dispatchTrackingEvent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -52,7 +52,12 @@ var TrackingPropType = exports.TrackingPropType = _react.PropTypes.shape({
 
 function withTrackingComponentDecorator() {
   var trackingData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { dispatch: _dispatchTrackingEvent2.default };
+
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      _ref$dispatch = _ref.dispatch,
+      dispatch = _ref$dispatch === undefined ? _dispatchTrackingEvent2.default : _ref$dispatch,
+      _ref$dispatchOnMount = _ref.dispatchOnMount,
+      dispatchOnMount = _ref$dispatchOnMount === undefined ? false : _ref$dispatchOnMount;
 
   return function (DecoratedComponent) {
     var _class, _temp2;
@@ -63,7 +68,7 @@ function withTrackingComponentDecorator() {
       (0, _inherits3.default)(WithTracking, _Component);
 
       function WithTracking() {
-        var _ref;
+        var _ref2;
 
         var _temp, _this, _ret;
 
@@ -73,7 +78,7 @@ function withTrackingComponentDecorator() {
           args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref, [this].concat(args))), _this), _this.trackEvent = function (data) {
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref2, [this].concat(args))), _this), _this.trackEvent = function (data) {
           _this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
           (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data));
@@ -83,7 +88,7 @@ function withTrackingComponentDecorator() {
       (0, _createClass3.default)(WithTracking, [{
         key: 'getTrackingDispatcher',
         value: function getTrackingDispatcher() {
-          return this.context.tracking && this.context.tracking.dispatch || options.dispatch;
+          return this.context.tracking && this.context.tracking.dispatch || dispatch;
         }
       }, {
         key: 'getChildContext',
@@ -102,10 +107,8 @@ function withTrackingComponentDecorator() {
       }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-          if (trackingData.page) {
-            this.trackEvent({
-              event: 'pageDataReady'
-            });
+          if (dispatchOnMount === true) {
+            this.trackEvent();
           }
         }
       }, {

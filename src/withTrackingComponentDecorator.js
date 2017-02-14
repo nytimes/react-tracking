@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import dispatchTrackingEvent from './dispatchTrackingEvent';
 import merge from 'lodash.merge';
+import dispatchTrackingEvent from './dispatchTrackingEvent';
 
 export const TrackingPropType = PropTypes.shape({
   data: PropTypes.object,
@@ -9,7 +9,7 @@ export const TrackingPropType = PropTypes.shape({
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  options = { dispatch: dispatchTrackingEvent }
+  { dispatch = dispatchTrackingEvent, dispatchOnMount = false } = {}
 ) {
   return (DecoratedComponent) => {
     const decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
@@ -35,7 +35,7 @@ export default function withTrackingComponentDecorator(
       }
 
       getTrackingDispatcher() {
-        return (this.context.tracking && this.context.tracking.dispatch) || options.dispatch;
+        return (this.context.tracking && this.context.tracking.dispatch) || dispatch;
       }
 
       getChildContext() {
@@ -54,10 +54,8 @@ export default function withTrackingComponentDecorator(
       }
 
       componentDidMount() {
-        if (trackingData.page) {
-          this.trackEvent({
-            event: 'pageDataReady',
-          });
+        if (dispatchOnMount === true) {
+          this.trackEvent();
         }
       }
 

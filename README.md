@@ -15,6 +15,11 @@ npm install --save nytm/nyt-react-tracking#v1.0.0
 (Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 1.0.0 as of this writing)
 
 ## Usage
+@track() expects two arguments, `trackingData` and `options`.
+- `trackingData` represents the data to be tracked
+- `options` is an optional object that accepts two properties:
+  - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
+  - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -67,7 +72,7 @@ export default track({
 
 This is also how you would use this module without `@decorators`, although this is obviously awkward and the  decorator syntax is recommended.
 
-### Custom `dispatch()` for tracking data
+### Custom `options.dispatch()` for tracking data
 
 By default, data tracking objects are dispatched as a CustomEvent on `document` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
@@ -86,6 +91,29 @@ export default class App extends Component {
 ```
 
 NOTE: It is recommended to do this on some top-level component so that you only need to pass in the dispatch function once. Every child component from then on will use this dispatch function.
+
+#### When to use `options.dispatchOnMount`
+
+To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `@track()`. This is useful for dispatching tracking data on "Page" components, for example.
+
+For example:
+
+```js
+@track({ page: 'FooPage' }, { dispatchOnMount: true })
+class FooPage extends Component { ... }
+```
+
+Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
+
+```
+{
+  page: 'FooPage'
+}
+```
+
+Of course, you could have achieved this same behavior by just decorating the `componentDidMount()` lifecycle event yourself, but this convenience is here in case the component you're working with would otherwise be a stateless functional component or does not need to define this lifecycle method.
+
+_Note: this is only in affect when decorating a Class or stateless functional component. It is not necessary when decorating class methods since any invocations of those methods will immediately dispatch the tracking data, as expected._
 
 ### Advanced Usage
 
@@ -147,29 +175,6 @@ Note that there are no restrictions on the objects that are passed in to the dec
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
 
-> NOTE: There is one quasi-exception to this, see the next section.
-
-#### "pageDataReady" actions fired automatically
-
-There is a special case for the tracking data object when passed in to `track()`. If the object contains a `page` property, then it is assumed that this is a new page view (for SPAs) so an `{event: 'pageDataReady'}` tracking event will be fired immediately (in `componentDidMount()`).
-
-For example:
-
-```js
-@track({ page: 'FooPage' })
-class FooPage extends Component { ... }
-```
-
-Will fire the following event (assuming no other tracking data in context from the rest of the app):
-
-```
-{
-  event: 'pageDataReady',
-  page: 'FooPage'
-}
-```
-
-_This is only in affect when decorating a Class, it does not happen when decorating methods._
 
 ## Roadmap
 

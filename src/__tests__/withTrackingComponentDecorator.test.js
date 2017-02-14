@@ -60,7 +60,7 @@ describe('withTrackingComponentDecorator', () => {
     const context = { context: 1 };
     const trackingContext = { page: 1 };
 
-    @withTrackingComponentDecorator(trackingContext)
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount: true })
     class TestComponent {
       static displayName = 'TestComponent';
     }
@@ -82,10 +82,7 @@ describe('withTrackingComponentDecorator', () => {
 
     it('dispatches event in componentDidMount', () => {
       myTC.componentDidMount();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        event: 'pageDataReady',
-        page: 1,
-      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(trackingContext);
     });
   });
 });
