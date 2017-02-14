@@ -11,4 +11,10 @@ describe('nyt-react-tracking', () => {
   it('exports trackEvent', () => {
     expect(index.trackEvent).toBeDefined();
   });
+  it('exports TrackingPropType', () => {
+    expect(index.TrackingPropType).toBeDefined();
+  });
+  it('exports default function', () => {
+    expect(typeof index.default).toBe('function');
+  });
 });

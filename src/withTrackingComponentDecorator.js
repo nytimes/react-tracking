@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 import merge from 'lodash.merge';
 
-const TrackingPropType = PropTypes.shape({
+export const TrackingPropType = PropTypes.shape({
   data: PropTypes.object,
   dispatch: PropTypes.func,
 });

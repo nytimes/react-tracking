@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.TrackingPropType = undefined;
 
 var _extends2 = require('babel-runtime/helpers/extends');
 
@@ -44,7 +45,7 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var TrackingPropType = _react.PropTypes.shape({
+var TrackingPropType = exports.TrackingPropType = _react.PropTypes.shape({
   data: _react.PropTypes.object,
   dispatch: _react.PropTypes.func
 });
