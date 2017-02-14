@@ -113,7 +113,7 @@ function withTrackingComponentDecorator() {
       }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-          if (trackingData.page) {
+          if (options.fireInstantly) {
             this.trackEvent({
               event: 'pageDataReady'
             });

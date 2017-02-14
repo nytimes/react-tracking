@@ -54,7 +54,7 @@ export default function withTrackingComponentDecorator(
       }
 
       componentDidMount() {
-        if (trackingData.page) {
+        if (options.fireInstantly) {
           this.trackEvent({
             event: 'pageDataReady',
           });
