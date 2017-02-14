@@ -87,4 +87,31 @@ describe('e2e', () => {
       ...testChildData,
     });
   });
+
+  it('will deep-merge tracking data', () => {
+    const testData1 = { key: { x: 1, y: 1 } };
+    // TODO: Refactor this to use "dispatchImmediately" when https://github.com/nytm/nyt-react-tracking/issues/15 lands
+    const testData2 = { key: { x: 2, z: 2 }, page: true };
+
+    @track(testData1)
+    class TestData1 extends React.Component {
+      render() { return this.props.children; }
+    }
+
+    const TestData2 = track(testData2)(() => <div />);
+
+    mount(
+      <TestData1>
+        <TestData2 />
+      </TestData1>
+    );
+
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
+      ...PAGEVIEW_ACTION,
+      page: true,
+      key: {
+        x: 2, y: 1, z: 2,
+      },
+    });
+  });
 });
