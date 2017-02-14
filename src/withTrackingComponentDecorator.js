@@ -52,7 +52,7 @@ export default function withTrackingComponentDecorator(
       }
 
       componentDidMount() {
-        if (options.dispatchImmediately) {
+        if (options.dispatchOnMount) {
           this.trackEvent({
             event: 'pageDataReady',
           });

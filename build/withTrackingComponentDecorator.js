@@ -95,7 +95,7 @@ function withTrackingComponentDecorator() {
       }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-          if (options.dispatchImmediately) {
+          if (options.dispatchOnMount) {
             this.trackEvent({
               event: 'pageDataReady'
             });
