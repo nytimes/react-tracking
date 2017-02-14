@@ -38,6 +38,10 @@ var _dispatchTrackingEvent = require('./dispatchTrackingEvent');
 
 var _dispatchTrackingEvent2 = _interopRequireDefault(_dispatchTrackingEvent);
 
+var _lodash = require('lodash.merge');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var TrackingPropType = _react.PropTypes.shape({
@@ -69,7 +73,9 @@ function withTrackingComponentDecorator() {
         }
 
         return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref, [this].concat(args))), _this), _this.trackEvent = function (data) {
-          _this.getTrackingDispatcher()((0, _extends3.default)({}, _this.getChildContext().tracking.data, data));
+          _this.getTrackingDispatcher()(
+          // deep-merge tracking data from context and tracking data passed in here
+          (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data));
         }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
       }
 
@@ -87,7 +93,7 @@ function withTrackingComponentDecorator() {
 
           return {
             tracking: {
-              data: (0, _extends3.default)({}, contextData, thisTrackingData),
+              data: (0, _lodash2.default)({}, contextData, thisTrackingData),
               dispatch: this.getTrackingDispatcher()
             }
           };

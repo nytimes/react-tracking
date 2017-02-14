@@ -45,7 +45,8 @@
   ],
   "homepage": "https://github.com/nytm/nyt-react-tracking",
   "dependencies": {
-    "custom-event": "^1.0.1"
+    "custom-event": "^1.0.1",
+    "lodash.merge": "^4.6.0"
   },
   "peerDependencies": {
     "babel-runtime": "^6.20.0",

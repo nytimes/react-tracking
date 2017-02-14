@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
+import merge from 'lodash.merge';
 
 const TrackingPropType = PropTypes.shape({
   data: PropTypes.object,
@@ -23,10 +24,14 @@ export default function withTrackingComponentDecorator(
       };
 
       trackEvent = (data) => {
-        this.getTrackingDispatcher()({
-          ...this.getChildContext().tracking.data,
-          ...data,
-        });
+        this.getTrackingDispatcher()(
+          // deep-merge tracking data from context and tracking data passed in here
+          merge(
+            {},
+            this.getChildContext().tracking.data,
+            data
+          )
+        );
       }
 
       getTrackingDispatcher() {
@@ -42,10 +47,7 @@ export default function withTrackingComponentDecorator(
 
         return {
           tracking: {
-            data: {
-              ...contextData,
-              ...thisTrackingData,
-            },
+            data: merge({}, contextData, thisTrackingData),
             dispatch: this.getTrackingDispatcher(),
           },
         };
