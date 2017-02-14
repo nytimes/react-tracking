@@ -5,7 +5,6 @@ import { mount } from 'enzyme';
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
 
-const PAGEVIEW_ACTION = { event: 'pageDataReady' };
 const testDataContext = { testDataContext: true };
 const testData = { testData: true };
 const dispatch = jest.fn();
@@ -21,7 +20,7 @@ describe('e2e', () => {
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
     const testPageData = { page: 'TestPage' };
 
-    @track(testPageData)
+    @track(testPageData, { dispatchOnMount: true })
     class TestPage extends React.Component {
       render() {
         return null;
@@ -31,7 +30,6 @@ describe('e2e', () => {
     mount(<TestPage />);
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      ...PAGEVIEW_ACTION,
       ...testPageData,
     });
   });
@@ -68,7 +66,7 @@ describe('e2e', () => {
       }
     }
 
-    @track(testChildData)
+    @track(testChildData, { dispatchOnMount: true })
     class TestChild extends React.Component {
       render() {
         return <div />;
@@ -82,7 +80,6 @@ describe('e2e', () => {
     );
 
     expect(dispatch).toHaveBeenCalledWith({
-      ...PAGEVIEW_ACTION,
       ...testDataContext,
       ...testChildData,
     });
@@ -90,15 +87,14 @@ describe('e2e', () => {
 
   it('will deep-merge tracking data', () => {
     const testData1 = { key: { x: 1, y: 1 } };
-    // TODO: Refactor this to use "dispatchImmediately" when https://github.com/nytm/nyt-react-tracking/issues/15 lands
-    const testData2 = { key: { x: 2, z: 2 }, page: true };
+    const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
     @track(testData1)
     class TestData1 extends React.Component {
       render() { return this.props.children; }
     }
 
-    const TestData2 = track(testData2)(() => <div />);
+    const TestData2 = track(testData2, { dispatchOnMount: true })(() => <div />);
 
     mount(
       <TestData1>
@@ -107,8 +103,7 @@ describe('e2e', () => {
     );
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      ...PAGEVIEW_ACTION,
-      page: true,
+      page: 'TestDeepMerge',
       key: {
         x: 2, y: 1, z: 2,
       },
