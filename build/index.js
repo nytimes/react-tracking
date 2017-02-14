@@ -12,6 +12,12 @@ Object.defineProperty(exports, 'withTracking', {
     return _interopRequireDefault(_withTrackingComponentDecorator).default;
   }
 });
+Object.defineProperty(exports, 'TrackingPropType', {
+  enumerable: true,
+  get: function get() {
+    return _withTrackingComponentDecorator.TrackingPropType;
+  }
+});
 
 var _trackEventMethodDecorator = require('./trackEventMethodDecorator');
 
