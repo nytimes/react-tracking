@@ -100,8 +100,6 @@ You can pass in a second parameter to `@track`, `options.dispatchOnMount`. There
 
 To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `@track()`. This is useful for dispatching tracking data on "Page" components, for example.
 
-For example:
-
 ```js
 @track({ page: 'FooPage' }, { dispatchOnMount: true })
 class FooPage extends Component { ... }
