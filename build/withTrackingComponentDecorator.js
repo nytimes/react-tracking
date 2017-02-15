@@ -78,10 +78,12 @@ function withTrackingComponentDecorator() {
           args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref2, [this].concat(args))), _this), _this.trackEvent = function (data) {
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref2, [this].concat(args))), _this), _this.getTrackingData = function (data) {
+          return (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data);
+        }, _this.trackEvent = function (data) {
           _this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data));
+          _this.getTrackingData(data));
         }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
       }
 
@@ -109,6 +111,10 @@ function withTrackingComponentDecorator() {
         value: function componentDidMount() {
           if (dispatchOnMount === true) {
             this.trackEvent();
+          }
+
+          if (typeof dispatchOnMount === 'function') {
+            this.getTrackingDispatcher()(dispatchOnMount(this.getTrackingData()));
           }
         }
       }, {
