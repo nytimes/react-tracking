@@ -1,6 +1,6 @@
 {
   "name": "nyt-react-tracking",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
   "contributors": [

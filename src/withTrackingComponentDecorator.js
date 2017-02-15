@@ -23,14 +23,12 @@ export default function withTrackingComponentDecorator(
         tracking: TrackingPropType,
       };
 
+      getTrackingData = data => merge({}, this.getChildContext().tracking.data, data)
+
       trackEvent = (data) => {
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          merge(
-            {},
-            this.getChildContext().tracking.data,
-            data
-          )
+          this.getTrackingData(data)
         );
       }
 
@@ -56,6 +54,10 @@ export default function withTrackingComponentDecorator(
       componentDidMount() {
         if (dispatchOnMount === true) {
           this.trackEvent();
+        }
+
+        if (typeof dispatchOnMount === 'function') {
+          this.getTrackingDispatcher()(dispatchOnMount(this.getTrackingData()));
         }
       }
 

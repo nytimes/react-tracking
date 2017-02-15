@@ -109,4 +109,19 @@ describe('e2e', () => {
       },
     });
   });
+
+  it('will call dispatchOnMount as a function', () => {
+    const testDispatchOnMount = { test: true };
+    const dispatchOnMount = jest.fn(() => ({ dom: true }));
+
+    @track(testDispatchOnMount, { dispatch, dispatchOnMount })
+    class TestComponent extends React.Component {
+      render() { return null; }
+    }
+
+    mount(<TestComponent />);
+
+    expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
+    expect(dispatch).toHaveBeenCalledWith({ dom: true });
+  });
 });
