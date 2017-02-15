@@ -122,6 +122,6 @@ describe('e2e', () => {
     mount(<TestComponent />);
 
     expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
-    expect(dispatch).toHaveBeenCalledWith({ dom: true });
+    expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true });
   });
 });
