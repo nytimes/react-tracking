@@ -9,7 +9,7 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v2.1.0
+npm install --save nytm/nyt-react-tracking#v2.1.1
 ```
 
 (Or whatever is the [latest version](https://github.com/nytm/nyt-react-tracking/releases))
@@ -119,7 +119,9 @@ _Note: this is only in affect when decorating a Class or stateless functional co
 
 #### Using `options.dispatchOnMount` as a function
 
-If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. You do not have to use the app's context data, so you can explicitly define the entire shape of the tracking data to dispatch for a "page view" event, for example.
+If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. The object returned from this function call will be merged with the context data and then dispatched.
+
+A use case for this would be that you want to provide extra tracking data without adding it to the context.
 
 ```js
 @track({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) })
@@ -127,6 +129,7 @@ class FooPage extends Component { ... }
 ```
 
 Will dispatch the following data (notice, the `contextData` was ignored in the function we defined):
+
 
 ```
 {
