@@ -15,11 +15,11 @@ npm install --save nytm/nyt-react-tracking#v2.0.0
 (Or whatever is [latest](https://github.com/nytm/nyt-react-tracking/releases), it was 2.0.0 as of this writing)
 
 ## Usage
-@track() expects two arguments, `trackingData` and `options`.
+`@track()` expects two arguments, `trackingData` and `options`.
 - `trackingData` represents the data to be tracked
 - `options` is an optional object that accepts two properties:
   - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
-  - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM.
+  - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -94,6 +94,10 @@ NOTE: It is recommended to do this on some top-level component so that you only 
 
 ### When to use `options.dispatchOnMount`
 
+You can pass in a second parameter to `@track`, `options.dispatchOnMount`. There are two valid types for this, as a boolean or as a function. The use of the two is explained in the next sections:
+
+#### Using `options.dispatchOnMount` as a boolean
+
 To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `@track()`. This is useful for dispatching tracking data on "Page" components, for example.
 
 For example:
@@ -114,6 +118,23 @@ Will dispatch the following data (assuming no other tracking data in context fro
 Of course, you could have achieved this same behavior by just decorating the `componentDidMount()` lifecycle event yourself, but this convenience is here in case the component you're working with would otherwise be a stateless functional component or does not need to define this lifecycle method.
 
 _Note: this is only in affect when decorating a Class or stateless functional component. It is not necessary when decorating class methods since any invocations of those methods will immediately dispatch the tracking data, as expected._
+
+#### Using `options.dispatchOnMount` as a function
+
+If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. You do not have to use the app's context data, so you can explicitly define the entire shape of the tracking data to dispatch for a "page view" event, for example.
+
+```js
+@track({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) })
+class FooPage extends Component { ... }
+```
+
+Will dispatch the following data (notice, the `contextData` was ignored in the function we defined):
+
+```
+{
+  event: 'pageDataReady'
+}
+```
 
 ### Advanced Usage
 
