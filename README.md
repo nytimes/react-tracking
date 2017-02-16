@@ -128,7 +128,7 @@ A use case for this would be that you want to provide extra tracking data withou
 class FooPage extends Component { ... }
 ```
 
-Will dispatch the following data:
+Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
 
 
 ```
