@@ -57,7 +57,7 @@ export default function withTrackingComponentDecorator(
         }
 
         if (typeof dispatchOnMount === 'function') {
-          this.trackEvent()(dispatchOnMount(this.getTrackingData()));
+          this.trackEvent(dispatchOnMount(this.getTrackingData()));
         }
       }
 
