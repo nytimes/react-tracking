@@ -128,12 +128,13 @@ A use case for this would be that you want to provide extra tracking data withou
 class FooPage extends Component { ... }
 ```
 
-Will dispatch the following data (notice, the `contextData` was ignored in the function we defined):
+Will dispatch the following data:
 
 
 ```
 {
-  event: 'pageDataReady'
+  event: 'pageDataReady',
+  page: 'FooPage'
 }
 ```
 
