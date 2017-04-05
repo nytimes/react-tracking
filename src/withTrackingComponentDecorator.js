@@ -5,11 +5,16 @@ import dispatchTrackingEvent from './dispatchTrackingEvent';
 export const TrackingPropType = PropTypes.shape({
   data: PropTypes.object,
   dispatch: PropTypes.func,
+  process: PropTypes.func
 });
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  { dispatch = dispatchTrackingEvent, dispatchOnMount = false } = {}
+  {
+    dispatch = dispatchTrackingEvent,
+    dispatchOnMount = false,
+    process
+  } = {}
 ) {
   return (DecoratedComponent) => {
     const decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
@@ -47,17 +52,30 @@ export default function withTrackingComponentDecorator(
           tracking: {
             data: merge({}, contextData, thisTrackingData),
             dispatch: this.getTrackingDispatcher(),
+            process: (this.context.tracking && this.context.tracking.process) || process
           },
         };
       }
 
       componentDidMount() {
+        const trackingData = this.getTrackingData();
+        const process = this.context.tracking && this.context.tracking.process;
+        const typeofProcess = typeof process;
+
+        if (typeofProcess !== 'undefined' && typeofProcess !== 'function') {
+          throw new Error('options.process should be a method')
+        }
+
+        if (typeofProcess === 'function') {
+          this.trackEvent(process(trackingData));
+        }
+
         if (dispatchOnMount === true) {
           this.trackEvent();
         }
 
         if (typeof dispatchOnMount === 'function') {
-          this.trackEvent(dispatchOnMount(this.getTrackingData()));
+          this.trackEvent(dispatchOnMount(trackingData));
         }
       }
 
