@@ -1,5 +1,5 @@
 {
-  "name": "nyt-react-tracking",
+  "name": "@nyt/nyt-react-tracking",
   "version": "2.1.1",
   "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
@@ -71,6 +71,8 @@
   "scripts": {
     "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "prepublish": "npm run lint && npm run test && npm run build",
+    "publish": "npm --registry=https://artifactory.nyt.net/artifactory/api/npm/nyt-npm-local publish @nyt/nyt-react-tracking"
   }
 }
