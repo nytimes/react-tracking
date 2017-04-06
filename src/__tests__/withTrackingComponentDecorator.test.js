@@ -85,4 +85,55 @@ describe('withTrackingComponentDecorator', () => {
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(trackingContext);
     });
   });
+
+  describe('with process option', () => {
+    const props = { props: 1 };
+    const trackingContext = { page: 1 };
+    const process = jest.fn(() => ({ event: 'pageView' }));
+    const context = { context: 1, tracking: { process } };
+
+    @withTrackingComponentDecorator(trackingContext)
+    class TestComponent {
+      static displayName = 'TestComponent';
+    }
+
+    const myTC = new TestComponent(props, context);
+
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
+    it('process function gets called', () => {
+      myTC.componentDidMount();
+      expect(process).toHaveBeenCalled();
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView' });
+    });
+  });
+
+  describe('with process option from parent and dispatchOnMount option on component', () => {
+    const props = { props: 1 };
+    const trackingContext = { page: 1 };
+    const process = jest.fn(() => ({ event: 'pageView' }));
+    const context = { context: 1, tracking: { process } };
+    const dispatchOnMount = jest.fn(() => ({ specificEvent: true }));
+
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
+    class TestComponent {
+      static displayName = 'TestComponent';
+    }
+
+    const myTC = new TestComponent(props, context);
+
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
+    it('dispatches only once when process and dispatchOnMount functions are passed', () => {
+      myTC.componentDidMount();
+      expect(process).toHaveBeenCalled();
+      expect(dispatchOnMount).toHaveBeenCalled();
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView', specificEvent: true });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    });
+  });
 });
