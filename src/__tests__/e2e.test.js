@@ -184,6 +184,22 @@ describe('e2e', () => {
     });
   });
 
+  it('should not dispatch a pageview event on mount if there\'s no page property on tracking object', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: () => null,
+      },
+    )(RawApp);
+    const Page = track({ page: 'Page' })(() => <div>Page</div>);
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).not.toHaveBeenCalledWith();
+  });
+
   it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
     const RawApp = ({ children }) => <div>{children}</div>;
 
@@ -222,6 +238,7 @@ describe('e2e', () => {
     );
 
     expect(dispatch).toHaveBeenCalledTimes(2);
-    expect(dispatch).toHaveBeenCalledWith({ page: 'Page2', event: 'pageView', page2specific: true, topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({ page: 'Page1', event: 'pageView', topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({ page: 'Page2', event: 'pageView', topLevel: true, page2specific: true });
   });
 });

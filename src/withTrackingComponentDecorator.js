@@ -24,7 +24,7 @@ export default function withTrackingComponentDecorator(
         super(props, context);
 
         if (context.tracking && context.tracking.process && process) {
-          console.error('options.process should be used once on top level component');
+          console.error('[nyt-react-tracking] options.process should be used once on top level component');
         }
       }
 
@@ -76,7 +76,10 @@ export default function withTrackingComponentDecorator(
             dispatchOnMount(contextTrackingData)
           ));
         } else if (typeof contextProcess === 'function') {
-          this.trackEvent(contextProcess(contextTrackingData));
+          const processed = contextProcess(contextTrackingData);
+          if (processed) {
+            this.trackEvent(processed);
+          }
         } else if (typeof dispatchOnMount === 'function') {
           this.trackEvent(dispatchOnMount(contextTrackingData));
         } else if (dispatchOnMount === true) {
