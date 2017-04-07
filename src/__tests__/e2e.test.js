@@ -218,7 +218,7 @@ describe('e2e', () => {
 
     mount(<App><Page /></App>);
 
-    expect(dispatch).not.toHaveBeenCalledWith();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
