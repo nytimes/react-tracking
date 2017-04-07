@@ -124,4 +124,142 @@ describe('e2e', () => {
     expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
     expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true });
   });
+
+  it('will dispatch a pageview event on mount on class component', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return null;
+        },
+      }
+    )(RawApp);
+
+    @track({ page: 'Page' })
+    class Page extends React.Component {
+      render() {
+        return <div>Page</div>;
+      }
+    }
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).toHaveBeenCalledWith({
+      topLevel: true,
+      event: 'pageView',
+      page: 'Page',
+    });
+  });
+
+  it('will dispatch a pageview event on mount on functional component', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return null;
+        },
+      },
+    )(RawApp);
+
+    const Page = track({ page: 'Page' })(() => <div>Page</div>);
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).toHaveBeenCalledWith({
+      topLevel: true,
+      event: 'pageView',
+      page: 'Page',
+    });
+  });
+
+  it('should not dispatch a pageview event on mount if there\'s no page property on tracking object', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: () => null,
+      },
+    )(RawApp);
+    const Page = track({ page: 'Page' })(() => <div>Page</div>);
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it('should not dispatch a pageview event on mount if proccess returns falsy value', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return false;
+        },
+      },
+    )(RawApp);
+    const Page = track({})(() => <div>Page</div>);
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return null;
+        },
+      },
+    )(RawApp);
+
+    @track({ page: 'Page1' })
+    class Page1 extends React.Component {
+      render() {
+        return <div>Page</div>;
+      }
+    }
+
+    @track({ page: 'Page2' }, { dispatchOnMount: () => ({ page2specific: true }) })
+    class Page2 extends React.Component {
+      render() {
+        return <div>Page</div>;
+      }
+    }
+
+    mount(
+      <App>
+        <Page1 />
+        <Page2 />
+      </App>
+    );
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenCalledWith({ page: 'Page1', event: 'pageView', topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({ page: 'Page2', event: 'pageView', topLevel: true, page2specific: true });
+  });
 });

@@ -17,9 +17,10 @@ npm install --save nytm/nyt-react-tracking#v2.1.1
 ## Usage
 `@track()` expects two arguments, `trackingData` and `options`.
 - `trackingData` represents the data to be tracked
-- `options` is an optional object that accepts two properties:
+- `options` is an optional object that accepts three properties:
   - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
+  - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -137,6 +138,27 @@ Will dispatch the following data (assuming no other tracking data in context fro
   page: 'FooPage'
 }
 ```
+
+### Top level `options.process`
+
+When there's a need to implicitly dispatch an event with some data for *every* component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
+\n\n
+A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
+
+```js
+@track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null)
+class App extends Component {...}
+
+...
+
+@track({page: 'Page1'})
+class Page1 extends Component {...}
+
+@track({})
+class Page2 extends Component {...}
+```
+
+When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched. When `Page2` will be mounted nothing will be dispatched.
 
 ### Advanced Usage
 
