@@ -20,7 +20,7 @@ npm install --save nytm/nyt-react-tracking#v2.1.1
 - `options` is an optional object that accepts three properties:
   - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
-  - `process`, which is a function, that should be used once on top level component. Gets called with tracking data of components down a tree, and provides dispatch on mount with data returned from it, if it's not falsy.
+  - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -139,14 +139,15 @@ Will dispatch the following data (assuming no other tracking data in context fro
 }
 ```
 
-### Top level `options.process` ###
+### Top level `options.process`
 
-When there's a need to implicitly dispatch event with some data for *every* component, depending on its `trackingData`, you can add `process` option with a function that returns that data. **Should be used once on your top level component**. And should return falsy value (`false`, `null`, `undefined`...) when component shouldn't dispatch on mount.
-Here's the example how to dispatch `pageview` event for every page in application that has `page` property on its `trackingData`:
+When there's a need to implicitly dispatch an event with some data for *every* component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
+\n\n
+A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
 ```js
 @track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null)
-class Aoo extends Component {...}
+class App extends Component {...}
 
 ...
 
@@ -157,7 +158,7 @@ class Page1 extends Component {...}
 class Page2 extends Component {...}
 ```
 
-When `Page1` will be mounted, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched. When `Page2` will be mounted nothing will be dispatched.
+When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched. When `Page2` will be mounted nothing will be dispatched.
 
 ### Advanced Usage
 

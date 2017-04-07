@@ -197,7 +197,7 @@ describe('e2e', () => {
 
     mount(<App><Page /></App>);
 
-    expect(dispatch).not.toHaveBeenCalledWith();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it('should not dispatch a pageview event on mount if proccess returns falsy value', () => {
