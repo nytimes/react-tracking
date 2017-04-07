@@ -47,7 +47,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var TrackingPropType = exports.TrackingPropType = _react.PropTypes.shape({
   data: _react.PropTypes.object,
-  dispatch: _react.PropTypes.func
+  dispatch: _react.PropTypes.func,
+  process: _react.PropTypes.func
 });
 
 function withTrackingComponentDecorator() {
@@ -57,34 +58,36 @@ function withTrackingComponentDecorator() {
       _ref$dispatch = _ref.dispatch,
       dispatch = _ref$dispatch === undefined ? _dispatchTrackingEvent2.default : _ref$dispatch,
       _ref$dispatchOnMount = _ref.dispatchOnMount,
-      dispatchOnMount = _ref$dispatchOnMount === undefined ? false : _ref$dispatchOnMount;
+      dispatchOnMount = _ref$dispatchOnMount === undefined ? false : _ref$dispatchOnMount,
+      process = _ref.process;
 
   return function (DecoratedComponent) {
-    var _class, _temp2;
+    var _class, _temp;
 
     var decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    return _temp2 = _class = function (_Component) {
+    return _temp = _class = function (_Component) {
       (0, _inherits3.default)(WithTracking, _Component);
 
-      function WithTracking() {
-        var _ref2;
-
-        var _temp, _this, _ret;
-
+      function WithTracking(props, context) {
         (0, _classCallCheck3.default)(this, WithTracking);
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
+        var _this = (0, _possibleConstructorReturn3.default)(this, (WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call(this, props, context));
 
-        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call.apply(_ref2, [this].concat(args))), _this), _this.getTrackingData = function (data) {
+        _this.getTrackingData = function (data) {
           return (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data);
-        }, _this.trackEvent = function (data) {
+        };
+
+        _this.trackEvent = function (data) {
           _this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
           _this.getTrackingData(data));
-        }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+        };
+
+        if (context.tracking && context.tracking.process && process) {
+          console.error('[nyt-react-tracking] options.process should be used once on top level component');
+        }
+        return _this;
       }
 
       (0, _createClass3.default)(WithTracking, [{
@@ -102,19 +105,28 @@ function withTrackingComponentDecorator() {
           return {
             tracking: {
               data: (0, _lodash2.default)({}, contextData, thisTrackingData),
-              dispatch: this.getTrackingDispatcher()
+              dispatch: this.getTrackingDispatcher(),
+              process: this.context.tracking && this.context.tracking.process || process
             }
           };
         }
       }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-          if (dispatchOnMount === true) {
-            this.trackEvent();
-          }
+          var contextTrackingData = this.getTrackingData();
+          var contextProcess = this.context.tracking && this.context.tracking.process;
 
-          if (typeof dispatchOnMount === 'function') {
-            this.trackEvent(dispatchOnMount(this.getTrackingData()));
+          if (typeof contextProcess === 'function' && typeof dispatchOnMount === 'function') {
+            this.trackEvent((0, _lodash2.default)({}, contextProcess(contextTrackingData), dispatchOnMount(contextTrackingData)));
+          } else if (typeof contextProcess === 'function') {
+            var processed = contextProcess(contextTrackingData);
+            if (processed) {
+              this.trackEvent(processed);
+            }
+          } else if (typeof dispatchOnMount === 'function') {
+            this.trackEvent(dispatchOnMount(contextTrackingData));
+          } else if (dispatchOnMount === true) {
+            this.trackEvent();
           }
         }
       }, {
@@ -130,6 +142,6 @@ function withTrackingComponentDecorator() {
       tracking: TrackingPropType
     }, _class.childContextTypes = {
       tracking: TrackingPropType
-    }, _temp2;
+    }, _temp;
   };
 }

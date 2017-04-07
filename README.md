@@ -9,7 +9,7 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v2.1.1
+npm install --save nytm/nyt-react-tracking#v2.2.0
 ```
 
 (Or whatever is the [latest version](https://github.com/nytm/nyt-react-tracking/releases))
@@ -142,7 +142,7 @@ Will dispatch the following data (assuming no other tracking data in context fro
 ### Top level `options.process`
 
 When there's a need to implicitly dispatch an event with some data for *every* component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
-\n\n
+
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
 ```js
@@ -158,7 +158,8 @@ class Page1 extends Component {...}
 class Page2 extends Component {...}
 ```
 
-When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched. When `Page2` will be mounted nothing will be dispatched.
+When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
+When `Page2` mounts, nothing will be dispatched.
 
 ### Advanced Usage
 
