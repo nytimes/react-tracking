@@ -17,9 +17,10 @@ npm install --save nytm/nyt-react-tracking#v2.1.1
 ## Usage
 `@track()` expects two arguments, `trackingData` and `options`.
 - `trackingData` represents the data to be tracked
-- `options` is an optional object that accepts two properties:
+- `options` is an optional object that accepts three properties:
   - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
+  - `process`, which is a function, that should be used once on top level component. Gets called with tracking data of components down a tree, and provides dispatch on mount with data returned from it, if it's not falsy.
 
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
@@ -137,6 +138,26 @@ Will dispatch the following data (assuming no other tracking data in context fro
   page: 'FooPage'
 }
 ```
+
+### Top level `options.process` ###
+
+When there's a need to implicitly dispatch event with some data for *every* component, depending on its `trackingData`, you can add `process` option with a function that returns that data. **Should be used once on your top level component**. And should return falsy value (`false`, `null`, `undefined`...) when component shouldn't dispatch on mount.
+Here's the example how to dispatch `pageview` event for every page in application that has `page` property on its `trackingData`:
+
+```js
+@track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null)
+class Aoo extends Component {...}
+
+...
+
+@track({page: 'Page1'})
+class Page1 extends Component {...}
+
+@track({})
+class Page2 extends Component {...}
+```
+
+When `Page1` will be mounted, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched. When `Page2` will be mounted nothing will be dispatched.
 
 ### Advanced Usage
 
