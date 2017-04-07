@@ -200,6 +200,27 @@ describe('e2e', () => {
     expect(dispatch).not.toHaveBeenCalledWith();
   });
 
+  it('should not dispatch a pageview event on mount if proccess returns falsy value', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return false;
+        },
+      },
+    )(RawApp);
+    const Page = track({})(() => <div>Page</div>);
+
+    mount(<App><Page /></App>);
+
+    expect(dispatch).not.toHaveBeenCalledWith();
+  });
+
   it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
     const RawApp = ({ children }) => <div>{children}</div>;
 
