@@ -28,7 +28,7 @@ The decorator can be used on React Classes and on methods within those classes.
 
 ```js
 import React from 'react';
-import track from 'nyt-react-tracking';
+import track from '@nyt/nyt-react-tracking';
 
 @track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
@@ -53,7 +53,7 @@ export default class FooPage extends React.Component {
 You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.trackEvent()` that you can call in your component like so:
 
 ```js
-import track from 'nyt-react-tracking';
+import track from '@nyt/nyt-react-tracking';
 
 const FooPage = (props) => {
   return (
@@ -81,7 +81,7 @@ For example, to push objects to `window.dataLayer[]` (e.g. for Google Tag Manage
 
 ```js
 import React, { Component } from 'react';
-import track from 'nyt-react-tracking';
+import track from '@nyt/nyt-react-tracking';
 
 @track({}, { dispatch: (data) => window.dataLayer.push(data) })
 export default class App extends Component {
@@ -167,7 +167,7 @@ You can also pass a function as an argument instead of an object literal, which 
 
 ```js
 import React from 'react';
-import track from 'nyt-react-tracking';
+import track from '@nyt/nyt-react-tracking';
 
 // In this case, the "page" tracking data
 // is a function of one of its props (isNew)
