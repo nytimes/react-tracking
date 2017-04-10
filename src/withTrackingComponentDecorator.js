@@ -26,6 +26,12 @@ export default function withTrackingComponentDecorator(
         if (context.tracking && context.tracking.process && process) {
           console.error('[nyt-react-tracking] options.process should be used once on top level component');
         }
+
+        this.ownTrackingData = typeof trackingData === 'function'
+          ? trackingData(props)
+          : trackingData;
+        this.contextTrackingData = (this.context.tracking && this.context.tracking.data) || {};
+        this.trackingData = merge({}, this.ownTrackingData, this.contextTrackingData);
       }
 
       static displayName = `WithTracking(${decoratedComponentName})`;
@@ -41,7 +47,8 @@ export default function withTrackingComponentDecorator(
       trackEvent = (data) => {
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          this.getTrackingData(data)
+          // this.getTrackingData(data)
+          merge({}, this.trackingData, data)
         );
       }
 
@@ -50,15 +57,9 @@ export default function withTrackingComponentDecorator(
       }
 
       getChildContext() {
-        const thisTrackingData = typeof trackingData === 'function'
-                    ? trackingData(this.props)
-                    : trackingData;
-
-        const contextData = (this.context.tracking && this.context.tracking.data) || {};
-
         return {
           tracking: {
-            data: merge({}, contextData, thisTrackingData),
+            data: merge({}, this.contextTrackingData, this.ownTrackingData),
             dispatch: this.getTrackingDispatcher(),
             process: (this.context.tracking && this.context.tracking.process) || process,
           },
@@ -66,22 +67,21 @@ export default function withTrackingComponentDecorator(
       }
 
       componentDidMount() {
-        const contextTrackingData = this.getTrackingData();
         const contextProcess = this.context.tracking && this.context.tracking.process;
 
         if (typeof contextProcess === 'function' && typeof dispatchOnMount === 'function') {
           this.trackEvent(merge(
             {},
-            contextProcess(contextTrackingData),
-            dispatchOnMount(contextTrackingData)
+            contextProcess(this.ownTrackingData),
+            dispatchOnMount(this.trackingData)
           ));
         } else if (typeof contextProcess === 'function') {
-          const processed = contextProcess(contextTrackingData);
+          const processed = contextProcess(this.ownTrackingData);
           if (processed) {
             this.trackEvent(processed);
           }
         } else if (typeof dispatchOnMount === 'function') {
-          this.trackEvent(dispatchOnMount(contextTrackingData));
+          this.trackEvent(dispatchOnMount(this.trackingData));
         } else if (dispatchOnMount === true) {
           this.trackEvent();
         }
