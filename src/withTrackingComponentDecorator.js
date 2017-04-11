@@ -31,7 +31,7 @@ export default function withTrackingComponentDecorator(
           ? trackingData(props)
           : trackingData;
         this.contextTrackingData = (this.context.tracking && this.context.tracking.data) || {};
-        this.trackingData = merge({}, this.ownTrackingData, this.contextTrackingData);
+        this.trackingData = merge({}, this.contextTrackingData, this.ownTrackingData);
       }
 
       static displayName = `WithTracking(${decoratedComponentName})`;
