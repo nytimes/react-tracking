@@ -74,19 +74,19 @@ function withTrackingComponentDecorator() {
 
         var _this = (0, _possibleConstructorReturn3.default)(this, (WithTracking.__proto__ || (0, _getPrototypeOf2.default)(WithTracking)).call(this, props, context));
 
-        _this.getTrackingData = function (data) {
-          return (0, _lodash2.default)({}, _this.getChildContext().tracking.data, data);
-        };
-
         _this.trackEvent = function (data) {
           _this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          _this.getTrackingData(data));
+          (0, _lodash2.default)({}, _this.trackingData, data));
         };
 
         if (context.tracking && context.tracking.process && process) {
           console.error('[nyt-react-tracking] options.process should be used once on top level component');
         }
+
+        _this.ownTrackingData = typeof trackingData === 'function' ? trackingData(props) : trackingData;
+        _this.contextTrackingData = _this.context.tracking && _this.context.tracking.data || {};
+        _this.trackingData = (0, _lodash2.default)({}, _this.contextTrackingData, _this.ownTrackingData);
         return _this;
       }
 
@@ -98,13 +98,9 @@ function withTrackingComponentDecorator() {
       }, {
         key: 'getChildContext',
         value: function getChildContext() {
-          var thisTrackingData = typeof trackingData === 'function' ? trackingData(this.props) : trackingData;
-
-          var contextData = this.context.tracking && this.context.tracking.data || {};
-
           return {
             tracking: {
-              data: (0, _lodash2.default)({}, contextData, thisTrackingData),
+              data: (0, _lodash2.default)({}, this.contextTrackingData, this.ownTrackingData),
               dispatch: this.getTrackingDispatcher(),
               process: this.context.tracking && this.context.tracking.process || process
             }
@@ -113,18 +109,17 @@ function withTrackingComponentDecorator() {
       }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-          var contextTrackingData = this.getTrackingData();
           var contextProcess = this.context.tracking && this.context.tracking.process;
 
           if (typeof contextProcess === 'function' && typeof dispatchOnMount === 'function') {
-            this.trackEvent((0, _lodash2.default)({}, contextProcess(contextTrackingData), dispatchOnMount(contextTrackingData)));
+            this.trackEvent((0, _lodash2.default)({}, contextProcess(this.ownTrackingData), dispatchOnMount(this.trackingData)));
           } else if (typeof contextProcess === 'function') {
-            var processed = contextProcess(contextTrackingData);
+            var processed = contextProcess(this.ownTrackingData);
             if (processed) {
               this.trackEvent(processed);
             }
           } else if (typeof dispatchOnMount === 'function') {
-            this.trackEvent(dispatchOnMount(contextTrackingData));
+            this.trackEvent(dispatchOnMount(this.trackingData));
           } else if (dispatchOnMount === true) {
             this.trackEvent();
           }
