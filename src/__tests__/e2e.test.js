@@ -262,4 +262,103 @@ describe('e2e', () => {
     expect(dispatch).toHaveBeenCalledWith({ page: 'Page1', event: 'pageView', topLevel: true });
     expect(dispatch).toHaveBeenCalledWith({ page: 'Page2', event: 'pageView', topLevel: true, page2specific: true });
   });
+
+  it('process works with trackingData as a function', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return null;
+        },
+      },
+    )(RawApp);
+
+    @track(({ runtimeData }) => ({ page: 'Page', runtimeData }))
+    class Page extends React.Component {
+      render() {
+        return <div>Page</div>;
+      }
+    }
+
+    mount(
+      <App>
+        <Page runtimeData />
+      </App>
+    );
+
+    expect(dispatch).toHaveBeenCalledWith({ event: 'pageView', page: 'Page', runtimeData: true, topLevel: true });
+  });
+
+  it('doesn\'t dispatch pageview for nested components without page tracking data', () => {
+    const RawApp = ({ children }) => <div>{children}</div>;
+
+    const App = track(
+      { topLevel: true },
+      {
+        dispatch,
+        process: (data) => {
+          if (data.page) {
+            return { event: 'pageView' };
+          }
+          return null;
+        },
+      },
+    )(RawApp);
+
+    @track({ page: 'Page' })
+    class Page extends React.Component {
+      render() {
+        return <div>{this.props.children}</div>;
+      }
+    }
+
+    @track({ view: 'View' })
+    class Nested extends React.Component {
+      render() {
+        return <div>{this.props.children}</div>;
+      }
+    }
+
+    @track({ region: 'Button' })
+    class Button extends React.Component {
+      @track({ event: 'buttonClick' })
+      handleClick = jest.fn()
+
+      render() {
+        return (
+          <button onClick={this.handleClick}>
+            Click me!
+          </button>
+        );
+      }
+    }
+
+    const wrappedApp = mount(
+      <App>
+        <Page>
+          <Nested>
+            <Button />
+          </Nested>
+        </Page>
+      </App>
+    );
+    
+    wrappedApp.find('Button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledWith({ event: 'pageView', page: 'Page', topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({
+      event: 'buttonClick',
+      page: 'Page',
+      region: 'Button',
+      view: 'View',
+      topLevel: true,
+    });
+    expect(dispatch).toHaveBeenCalledTimes(2); // pageview event and simulated button click
+  });
 });
