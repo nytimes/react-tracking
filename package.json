@@ -1,6 +1,6 @@
 {
   "name": "@nyt/nyt-react-tracking",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
   "contributors": [
@@ -34,6 +34,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nytm/nyt-react-tracking.git"
+  },
+  "publishConfig": {
+    "registry": "https://artifactory.em.nytimes.com/artifactory/api/npm/nyt-npm-local"
   },
   "keywords": [
     "nyt",
