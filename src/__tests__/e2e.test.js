@@ -348,7 +348,7 @@ describe('e2e', () => {
         </Page>
       </App>
     );
-    
+
     wrappedApp.find('Button').simulate('click');
 
     expect(dispatch).toHaveBeenCalledWith({ event: 'pageView', page: 'Page', topLevel: true });

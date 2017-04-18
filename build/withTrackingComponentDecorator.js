@@ -35,6 +35,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _lodash = require('lodash.merge');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -45,10 +49,10 @@ var _dispatchTrackingEvent2 = _interopRequireDefault(_dispatchTrackingEvent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var TrackingPropType = exports.TrackingPropType = _react.PropTypes.shape({
-  data: _react.PropTypes.object,
-  dispatch: _react.PropTypes.func,
-  process: _react.PropTypes.func
+var TrackingPropType = exports.TrackingPropType = _propTypes2.default.shape({
+  data: _propTypes2.default.object,
+  dispatch: _propTypes2.default.func,
+  process: _propTypes2.default.func
 });
 
 function withTrackingComponentDecorator() {
