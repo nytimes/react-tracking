@@ -57,7 +57,7 @@ export default function withTrackingComponentDecorator(
       getChildContext() {
         return {
           tracking: {
-            data: merge({}, this.contextTrackingData, this.ownTrackingData),
+            data: this.trackingData,
             dispatch: this.getTrackingDispatcher(),
             process: (this.context.tracking && this.context.tracking.process) || process,
           },
@@ -90,6 +90,7 @@ export default function withTrackingComponentDecorator(
           <DecoratedComponent
             {...this.props}
             trackEvent={this.trackEvent}
+            trackingData={this.trackingData}
           />
         );
       }
