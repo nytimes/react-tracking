@@ -21,9 +21,9 @@ function trackEventMethodDecorator() {
 
   return (0, _makeClassMemberDecorator2.default)(function (decoratedFn) {
     return function decorateClassMember() {
-      if (this.props && typeof this.props.trackEvent === 'function') {
+      if (this.props && this.props.tracking && typeof this.props.tracking.trackEvent === 'function') {
         var thisTrackingData = typeof trackingData === 'function' ? trackingData(this.props, arguments) : trackingData;
-        this.props.trackEvent(thisTrackingData);
+        this.props.tracking.trackEvent(thisTrackingData);
       }
 
       return (0, _apply2.default)(decoratedFn, this, arguments);
