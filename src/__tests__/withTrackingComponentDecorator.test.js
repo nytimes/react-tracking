@@ -141,17 +141,11 @@ describe('withTrackingComponentDecorator', () => {
   });
 
   describe('with a prop called tracking that has two functions as keys', () => {
-    const props = { props: 1 };
-    const context = { context: 1 };
     const trackingContext = { page: 1 };
 
-    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount: true })
+    @withTrackingComponentDecorator(trackingContext)
     class TestComponent extends Component {
-      render() {
-        return (
-            <div>Noop</div>
-        )
-      }
+      static displayName = 'TestComponent';
     }
 
     const component = shallow(<TestComponent />)
