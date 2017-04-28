@@ -1,3 +1,6 @@
+import React, { Component } from 'react';
+import { shallow } from 'enzyme';
+
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
@@ -135,5 +138,39 @@ describe('withTrackingComponentDecorator', () => {
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView', specificEvent: true });
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
     });
+  });
+
+  describe('with a prop called tracking that has two functions as keys', () => {
+    const props = { props: 1 };
+    const context = { context: 1 };
+    const trackingContext = { page: 1 };
+
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount: true })
+    class TestComponent extends Component {
+      render() {
+        return (
+            <div>Noop</div>
+        )
+      }
+    }
+
+    const component = shallow(<TestComponent />)
+
+    it('prop is named tracking and has two keys, trackEvent and getTrackingData', () => {
+      expect(component.props().tracking).toBeDefined();
+      expect(component.props().tracking).toBeInstanceOf(Object);
+      expect(component.props().tracking).toHaveProperty('trackEvent');
+      expect(component.props().tracking).toHaveProperty('getTrackingData');
+    });
+
+    it('prop named trackEvent is a function', () => {
+      expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);  
+    });
+
+    it('prop named getTrackingData is a function and returns an object', () => {
+      expect(component.props().tracking.getTrackingData).toBeInstanceOf(Function);
+      expect(component.props().tracking.getTrackingData()).toMatchObject(trackingContext);
+    });
+
   });
 });
