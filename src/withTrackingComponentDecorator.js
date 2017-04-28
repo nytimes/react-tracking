@@ -55,11 +55,6 @@ export default function withTrackingComponentDecorator(
         return (this.context.tracking && this.context.tracking.dispatch) || dispatch;
       }
 
-      getTrackingProps = () => ({
-        trackEvent: this.trackEvent,
-        getTrackingData: (trackingDataProp) ? this.getTrackingData : null,
-      })
-
       getTrackingData = () => ({
         ...this.trackingData,
       })
@@ -99,7 +94,10 @@ export default function withTrackingComponentDecorator(
         return (
           <DecoratedComponent
             {...this.props}
-            tracking={this.getTrackingProps()}
+            tracking={{
+              trackEvent: this.trackEvent,
+              getTrackingData: (trackingDataProp) ? this.getTrackingData : null,
+            }}
           />
         );
       }
