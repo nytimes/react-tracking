@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { shallow } from 'enzyme';
 
 const mockDispatchTrackingEvent = jest.fn();
@@ -144,11 +144,11 @@ describe('withTrackingComponentDecorator', () => {
     const trackingContext = { page: 1 };
 
     @withTrackingComponentDecorator(trackingContext)
-    class TestComponent extends Component {
+    class TestComponent {
       static displayName = 'TestComponent';
     }
 
-    const component = shallow(<TestComponent />)
+    const component = shallow(<TestComponent />);
 
     it('prop is named tracking and has two keys, trackEvent and getTrackingData', () => {
       expect(component.props().tracking).toBeDefined();
@@ -158,13 +158,12 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('prop named trackEvent is a function', () => {
-      expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);  
+      expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);
     });
 
     it('prop named getTrackingData is a function and returns an object', () => {
       expect(component.props().tracking.getTrackingData).toBeInstanceOf(Function);
       expect(component.props().tracking.getTrackingData()).toMatchObject(trackingContext);
     });
-
   });
 });
