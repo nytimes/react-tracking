@@ -57,7 +57,7 @@ export default function withTrackingComponentDecorator(
       getChildContext() {
         return {
           tracking: {
-            data: this.trackingData,
+            data: merge({}, this.contextTrackingData, this.ownTrackingData),
             dispatch: this.getTrackingDispatcher(),
             process: (this.context.tracking && this.context.tracking.process) || process,
           },
