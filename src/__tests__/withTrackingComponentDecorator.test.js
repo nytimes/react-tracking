@@ -141,9 +141,9 @@ describe('withTrackingComponentDecorator', () => {
   });
 
   describe('with a prop called tracking that has two functions as keys', () => {
-    const trackingContext = { page: 1 };
+    const dummyData = { page: 1 };
 
-    @withTrackingComponentDecorator(trackingContext)
+    @withTrackingComponentDecorator(dummyData)
     class TestComponent {
       static displayName = 'TestComponent';
     }
@@ -161,9 +161,17 @@ describe('withTrackingComponentDecorator', () => {
       expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);
     });
 
-    it('prop named getTrackingData is a function and returns an object', () => {
+    it('when trackEvent is called, from props, it will dispatch event in trackEvent', () => {
+      component.props().tracking.trackEvent(dummyData);
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData);
+    });
+
+    it('prop named getTrackingData is a function', () => {
       expect(component.props().tracking.getTrackingData).toBeInstanceOf(Function);
-      expect(component.props().tracking.getTrackingData()).toMatchObject(trackingContext);
+    });
+
+    it('when getTrackingData is called, from props, it will return the data passed to the decorator', () => {
+      expect(component.props().tracking.getTrackingData()).toMatchObject(dummyData);
     });
   });
 });
