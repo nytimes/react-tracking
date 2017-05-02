@@ -86,13 +86,6 @@ function withTrackingComponentDecorator() {
           (0, _lodash2.default)({}, _this.trackingData, data));
         };
 
-        _this.getTrackingProps = function () {
-          return {
-            trackEvent: _this.trackEvent,
-            getTrackingData: trackingDataProp ? _this.getTrackingData : null
-          };
-        };
-
         _this.getTrackingData = function () {
           return (0, _extends3.default)({}, _this.trackingData);
         };
@@ -145,7 +138,10 @@ function withTrackingComponentDecorator() {
         key: 'render',
         value: function render() {
           return _react2.default.createElement(DecoratedComponent, (0, _extends3.default)({}, this.props, {
-            tracking: this.getTrackingProps()
+            tracking: {
+              trackEvent: this.trackEvent,
+              getTrackingData: trackingDataProp ? this.getTrackingData : null
+            }
           }));
         }
       }]);
