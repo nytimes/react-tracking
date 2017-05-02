@@ -150,6 +150,10 @@ describe('withTrackingComponentDecorator', () => {
 
     const component = shallow(<TestComponent />);
 
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
     it('prop is named tracking and has two keys, trackEvent and getTrackingData', () => {
       expect(component.props().tracking).toBeDefined();
       expect(component.props().tracking).toBeInstanceOf(Object);
@@ -162,6 +166,7 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('when trackEvent is called, from props, it will dispatch event in trackEvent', () => {
+      expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
       component.props().tracking.trackEvent(dummyData);
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData);
     });
