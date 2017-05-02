@@ -213,6 +213,45 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
 // ...
 ```
 
+### Using Data at Run Time
+Any data that is passed to the decorator can be accessed in the decorated component via its props. The component that is decorated will be returned with a prop called `tracking`. The prop `tracking` is an object that has a `getTrackingData` method attached to it. This method returns the results of the object or function that was passed into the decorator.
+
+```js
+import React from 'react';
+import track from '@nyt/nyt-react-tracking';
+
+// Pass a function to the decorator
+@track((props) => {
+  const randomId = Math.floor(Math.random() * 100);
+
+  return {
+    page_view_id: randomId
+  }
+})
+export default class AdComponent extends React.Component {
+  // The tracking object with getTrackingData is returned from the decorator and applied to this component via props
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    // access get tracking data anywhere in the component
+    this.trackingData = this.props.getTrackingData();
+  }
+
+  render() {
+    const { page_view_id } = this.trackingData;
+
+    return (
+      <Ad pageViewId={page_view_id} />
+    );
+  }
+
+}
+```
+
+####Example
+
 ### Tracking Data
 
 Note that there are no restrictions on the objects that are passed in to the decorator.
