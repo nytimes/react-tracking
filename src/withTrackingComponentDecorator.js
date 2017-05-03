@@ -85,14 +85,16 @@ export default function withTrackingComponentDecorator(
         }
       }
 
+      tracking = {
+        trackEvent: this.trackEvent,
+        getTrackingData : () => this.trackingData,
+      }
+
       render() {
         return (
           <DecoratedComponent
             {...this.props}
-            tracking={{
-              trackEvent: this.trackEvent,
-              getTrackingData : () => this.trackingData,
-            }}
+            tracking={this.tracking}
           />
         );
       }
