@@ -87,7 +87,7 @@ export default function withTrackingComponentDecorator(
 
       tracking = {
         trackEvent: this.trackEvent,
-        getTrackingData : () => this.trackingData,
+        getTrackingData: () => this.trackingData,
       }
 
       render() {
