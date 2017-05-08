@@ -1,3 +1,6 @@
+import React from 'react';
+import { shallow } from 'enzyme';
+
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
@@ -134,6 +137,46 @@ describe('withTrackingComponentDecorator', () => {
       expect(dispatchOnMount).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView', specificEvent: true });
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('with a prop called tracking that has two functions as keys', () => {
+    const dummyData = { page: 1 };
+
+    @withTrackingComponentDecorator(dummyData)
+    class TestComponent {
+      static displayName = 'TestComponent';
+    }
+
+    const component = shallow(<TestComponent />);
+
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
+    it('prop is named tracking and has two keys, trackEvent and getTrackingData', () => {
+      expect(component.props().tracking).toBeDefined();
+      expect(component.props().tracking).toBeInstanceOf(Object);
+      expect(component.props().tracking).toHaveProperty('trackEvent');
+      expect(component.props().tracking).toHaveProperty('getTrackingData');
+    });
+
+    it('prop named trackEvent is a function', () => {
+      expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);
+    });
+
+    it('when trackEvent is called, from props, it will dispatch event in trackEvent', () => {
+      expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
+      component.props().tracking.trackEvent(dummyData);
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData);
+    });
+
+    it('prop named getTrackingData is a function', () => {
+      expect(component.props().tracking.getTrackingData).toBeInstanceOf(Function);
+    });
+
+    it('when getTrackingData is called, from props, it will return the data passed to the decorator', () => {
+      expect(component.props().tracking.getTrackingData()).toMatchObject(dummyData);
     });
   });
 });

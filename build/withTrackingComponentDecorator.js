@@ -63,7 +63,9 @@ function withTrackingComponentDecorator() {
       dispatch = _ref$dispatch === undefined ? _dispatchTrackingEvent2.default : _ref$dispatch,
       _ref$dispatchOnMount = _ref.dispatchOnMount,
       dispatchOnMount = _ref$dispatchOnMount === undefined ? false : _ref$dispatchOnMount,
-      process = _ref.process;
+      process = _ref.process,
+      _ref$trackingDataProp = _ref.trackingDataProp,
+      trackingDataProp = _ref$trackingDataProp === undefined ? true : _ref$trackingDataProp;
 
   return function (DecoratedComponent) {
     var _class, _temp;
@@ -82,6 +84,10 @@ function withTrackingComponentDecorator() {
           _this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
           (0, _lodash2.default)({}, _this.trackingData, data));
+        };
+
+        _this.getTrackingData = function () {
+          return (0, _extends3.default)({}, _this.trackingData);
         };
 
         if (context.tracking && context.tracking.process && process) {
@@ -104,7 +110,7 @@ function withTrackingComponentDecorator() {
         value: function getChildContext() {
           return {
             tracking: {
-              data: (0, _lodash2.default)({}, this.contextTrackingData, this.ownTrackingData),
+              data: this.trackingData,
               dispatch: this.getTrackingDispatcher(),
               process: this.context.tracking && this.context.tracking.process || process
             }
@@ -132,7 +138,10 @@ function withTrackingComponentDecorator() {
         key: 'render',
         value: function render() {
           return _react2.default.createElement(DecoratedComponent, (0, _extends3.default)({}, this.props, {
-            trackEvent: this.trackEvent
+            tracking: {
+              trackEvent: this.trackEvent,
+              getTrackingData: trackingDataProp ? this.getTrackingData : null
+            }
           }));
         }
       }]);

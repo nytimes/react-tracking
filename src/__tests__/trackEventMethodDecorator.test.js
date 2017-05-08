@@ -17,7 +17,11 @@ describe('trackEventMethodDecorator', () => {
 
     class TestClass {
       constructor() {
-        this.props = { trackEvent };
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
       }
 
       @trackEventMethodDecorator(trackingData)
@@ -41,7 +45,11 @@ describe('trackEventMethodDecorator', () => {
 
     class TestClass {
       constructor() {
-        this.props = { trackEvent };
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
       }
 
       @trackEventMethodDecorator(trackingData)
