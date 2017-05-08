@@ -9,19 +9,37 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v2.2.1
+npm install --save nytm/nyt-react-tracking#v3.0.0
 ```
 
 (Or whatever is the [latest version](https://github.com/nytm/nyt-react-tracking/releases))
 
 ## Usage
 `@track()` expects two arguments, `trackingData` and `options`.
-- `trackingData` represents the data to be tracked
+- `trackingData` represents the data to be tracked (or a function returning that data)
 - `options` is an optional object that accepts three properties:
   - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
 
+#### Tracking `props`
+
+The `@track()` decorator will expose a `tracking` prop on the component it wraps, that looks like:
+
+```js
+{
+  // tracking prop provided by @track()
+  tracking: PropTypes.shape({
+    // function to call to dispatch tracking events
+    trackEvent: PropTypes.func,
+
+    // function to call to grab contextual tracking data
+    getTrackingData: PropTypes.func,
+  })
+}
+```
+
+### Usage as a Decorator
 `nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
 The decorator can be used on React Classes and on methods within those classes.
@@ -50,7 +68,7 @@ export default class FooPage extends React.Component {
 
 ### Usage on Stateless Functional Components
 
-You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.trackEvent()` that you can call in your component like so:
+You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.tracking.trackEvent()` that you can call in your component like so:
 
 ```js
 import track from '@nyt/nyt-react-tracking';
@@ -58,7 +76,7 @@ import track from '@nyt/nyt-react-tracking';
 const FooPage = (props) => {
   return (
     <div onClick={() => {
-        props.trackEvent({ action: 'click' });
+        props.tracking.trackEvent({ action: 'click' });
 
         // ... other stuff
       }}
@@ -213,15 +231,16 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
 // ...
 ```
 
-### Using Data at Run Time
-Any data that is passed to the decorator can be accessed in the decorated component via its props. The component that is decorated will be returned with a prop called `tracking`. The prop `tracking` is an object that has a `getTrackingData` method attached to it. This method returns the results of the object or function that was passed into the decorator.
+#### Example `props.tracking.getTrackingData()` usage
+
+Any data that is passed to the decorator can be accessed in the decorated component via its props. The component that is decorated will be returned with a prop called `tracking`. The `tracking` prop is an object that has a `getTrackingData()` method on it. This method returns all of the contextual tracking data up until this point in the component hierarchy.
 
 ```js
 import React from 'react';
 import track from '@nyt/nyt-react-tracking';
 
 // Pass a function to the decorator
-@track((props) => {
+@track(() => {
   const randomId = Math.floor(Math.random() * 100);
 
   return {
@@ -229,18 +248,8 @@ import track from '@nyt/nyt-react-tracking';
   }
 })
 export default class AdComponent extends React.Component {
-  // The tracking object with getTrackingData is returned from the decorator and applied to this component via props
-  constructor(props) {
-    super(props);
-  }
-
-  componentDidMount() {
-    // access get tracking data anywhere in the component
-    this.trackingData = this.props.getTrackingData();
-  }
-
   render() {
-    const { page_view_id } = this.trackingData;
+    const { page_view_id } = this.props.tracking.getTrackingData();
 
     return (
       <Ad pageViewId={page_view_id} />
@@ -249,8 +258,6 @@ export default class AdComponent extends React.Component {
 
 }
 ```
-
-####Example
 
 ### Tracking Data
 

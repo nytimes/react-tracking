@@ -63,9 +63,7 @@ function withTrackingComponentDecorator() {
       dispatch = _ref$dispatch === undefined ? _dispatchTrackingEvent2.default : _ref$dispatch,
       _ref$dispatchOnMount = _ref.dispatchOnMount,
       dispatchOnMount = _ref$dispatchOnMount === undefined ? false : _ref$dispatchOnMount,
-      process = _ref.process,
-      _ref$trackingDataProp = _ref.trackingDataProp,
-      trackingDataProp = _ref$trackingDataProp === undefined ? true : _ref$trackingDataProp;
+      process = _ref.process;
 
   return function (DecoratedComponent) {
     var _class, _temp;
@@ -86,9 +84,13 @@ function withTrackingComponentDecorator() {
           (0, _lodash2.default)({}, _this.trackingData, data));
         };
 
-        _this.getTrackingData = function () {
-          return (0, _extends3.default)({}, _this.trackingData);
+        _this.tracking = {
+          trackEvent: _this.trackEvent,
+          getTrackingData: function getTrackingData() {
+            return _this.trackingData;
+          }
         };
+
 
         if (context.tracking && context.tracking.process && process) {
           console.error('[nyt-react-tracking] options.process should be used once on top level component');
@@ -110,7 +112,7 @@ function withTrackingComponentDecorator() {
         value: function getChildContext() {
           return {
             tracking: {
-              data: this.trackingData,
+              data: (0, _lodash2.default)({}, this.contextTrackingData, this.ownTrackingData),
               dispatch: this.getTrackingDispatcher(),
               process: this.context.tracking && this.context.tracking.process || process
             }
@@ -138,10 +140,7 @@ function withTrackingComponentDecorator() {
         key: 'render',
         value: function render() {
           return _react2.default.createElement(DecoratedComponent, (0, _extends3.default)({}, this.props, {
-            tracking: {
-              trackEvent: this.trackEvent,
-              getTrackingData: trackingDataProp ? this.getTrackingData : null
-            }
+            tracking: this.tracking
           }));
         }
       }]);
