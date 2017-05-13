@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 import React from 'react';
-import { mount } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -360,5 +360,22 @@ describe('e2e', () => {
       topLevel: true,
     });
     expect(dispatch).toHaveBeenCalledTimes(2); // pageview event and simulated button click
+  });
+
+  it('logs a console error when there is already a process defined on context', () => {
+    global.console.error = jest.fn();
+    const process = () => {};
+    const context = { tracking: { process } };
+
+    @track({}, { process })
+    class TestComponent extends React.Component {
+      render() {
+        return <div />;
+      }
+    }
+
+    shallow(<TestComponent />, { context });
+
+    expect(global.console.error).toHaveBeenCalledTimes(1);
   });
 });
