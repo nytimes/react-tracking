@@ -266,10 +266,3 @@ Note that there are no restrictions on the objects that are passed in to the dec
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
-
-
-## Roadmap
-
-- Integration with [tracking-schema](https://github.com/nytm/tracking-schema) to provide developer warnings/errors on invalid data objects
-- DataLayer adapters (so that where the data goes can vary by app, e.g. to EventTracker or Google Analytics etc.)
-- Babel plugin ?
