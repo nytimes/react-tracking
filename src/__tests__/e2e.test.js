@@ -14,7 +14,7 @@ describe('e2e', () => {
   const track = require('../').default;
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
