@@ -32,7 +32,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nytm/nyt-react-tracking.git"
+    "url": "git+https://github.com/NYTimes/nyt-react-tracking.git"
   },
   "publishConfig": {
     "registry": "https://artifactory.em.nytimes.com/artifactory/api/npm/nyt-npm-local"
@@ -45,7 +45,7 @@
     "metrics",
     "layer"
   ],
-  "homepage": "https://github.com/nytm/nyt-react-tracking",
+  "homepage": "https://github.com/NYTimes/nyt-react-tracking",
   "dependencies": {
     "lodash.merge": "^4.6.0"
   },
@@ -71,10 +71,9 @@
     "react-test-renderer": "^15.5.4"
   },
   "scripts": {
+    "prepublish": "npm run lint && npm run test && npm run build",
     "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
-    "lint": "eslint ./src",
-    "prepublish": "npm run lint && npm run test && npm run build",
-    "publish": "npm --registry=https://artifactory.nyt.net/artifactory/api/npm/nyt-npm-local publish @nyt/nyt-react-tracking"
+    "lint": "eslint ./src"
   }
 }
