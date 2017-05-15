@@ -9,10 +9,10 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v4.0.0
+npm install --save NYTimes/nyt-react-tracking#v4.0.0
 ```
 
-(Or whatever is the [latest version](https://github.com/nytm/nyt-react-tracking/releases))
+(Or whatever is the [latest version](https://github.com/NYTimes/nyt-react-tracking/releases))
 
 ## Usage
 `@track()` expects two arguments, `trackingData` and `options`.
