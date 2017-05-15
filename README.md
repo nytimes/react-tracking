@@ -9,7 +9,7 @@
 ## Installation
 
 ```
-npm install --save nytm/nyt-react-tracking#v3.0.0
+npm install --save nytm/nyt-react-tracking#v4.0.0
 ```
 
 (Or whatever is the [latest version](https://github.com/nytm/nyt-react-tracking/releases))
@@ -18,7 +18,7 @@ npm install --save nytm/nyt-react-tracking#v3.0.0
 `@track()` expects two arguments, `trackingData` and `options`.
 - `trackingData` represents the data to be tracked (or a function returning that data)
 - `options` is an optional object that accepts three properties:
-  - `dispatch`, which is a function to use instead of the default CustomEvent dispatch behavior. See the section on custom `dispatch()` later in this document.
+  - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
 
@@ -93,9 +93,9 @@ This is also how you would use this module without `@decorators`, although this 
 
 ### Custom `options.dispatch()` for tracking data
 
-By default, data tracking objects are dispatched as a CustomEvent on `document` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
+By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). This is a good default if you use Google Tag Manager. You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
-For example, to push objects to `window.dataLayer[]` (e.g. for Google Tag Manager) instead, you would decorate your top-level `<App />` component like this:
+For example, to push objects to `window.myCustomDataLayer[]` (e.g. for Google Tag Manager) instead, you would decorate your top-level `<App />` component like this:
 
 ```js
 import React, { Component } from 'react';
@@ -266,10 +266,3 @@ Note that there are no restrictions on the objects that are passed in to the dec
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
-
-
-## Roadmap
-
-- Integration with [tracking-schema](https://github.com/nytm/tracking-schema) to provide developer warnings/errors on invalid data objects
-- DataLayer adapters (so that where the data goes can vary by app, e.g. to EventTracker or Google Analytics etc.)
-- Babel plugin ?
