@@ -34,9 +34,6 @@
     "type": "git",
     "url": "git+https://github.com/NYTimes/nyt-react-tracking.git"
   },
-  "publishConfig": {
-    "registry": "https://artifactory.em.nytimes.com/artifactory/api/npm/nyt-npm-local"
-  },
   "keywords": [
     "nyt",
     "react",
