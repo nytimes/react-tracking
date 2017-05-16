@@ -93,13 +93,13 @@ This is also how you would use this module without `@decorators`, although this 
 
 By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). This is a good default if you use Google Tag Manager. You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
-For example, to push objects to `window.myCustomDataLayer[]` (e.g. for Google Tag Manager) instead, you would decorate your top-level `<App />` component like this:
+For example, to push objects to `window.myCustomDataLayer[]` instead, you would decorate your top-level `<App />` component like this:
 
 ```js
 import React, { Component } from 'react';
 import track from 'react-tracking';
 
-@track({}, { dispatch: (data) => window.dataLayer.push(data) })
+@track({}, { dispatch: (data) => window.myCustomDataLayer.push(data) })
 export default class App extends Component {
   render() {
     return this.props.children;
