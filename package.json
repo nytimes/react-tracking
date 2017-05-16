@@ -1,5 +1,5 @@
 {
-  "name": "@nyt/nyt-react-tracking",
+  "name": "react-tracking",
   "version": "4.0.0",
   "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
