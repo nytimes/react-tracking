@@ -25,7 +25,7 @@ export default function withTrackingComponentDecorator(
         super(props, context);
 
         if (context.tracking && context.tracking.process && process) {
-          console.error('[nyt-react-tracking] options.process should be used once on top level component');
+          console.error('[react-tracking] options.process should be used once on top level component');
         }
 
         this.ownTrackingData = typeof trackingData === 'function'

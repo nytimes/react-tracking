@@ -1,4 +1,4 @@
-# nyt-react-tracking
+# react-tracking
 
 ## Motivation
 
@@ -9,10 +9,8 @@
 ## Installation
 
 ```
-npm install --save NYTimes/nyt-react-tracking#v4.0.0
+npm install --save react-tracking
 ```
-
-(Or whatever is the [latest version](https://github.com/NYTimes/nyt-react-tracking/releases))
 
 ## Usage
 `@track()` expects two arguments, `trackingData` and `options`.
@@ -40,13 +38,13 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 ```
 
 ### Usage as a Decorator
-`nyt-react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
+`react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
 The decorator can be used on React Classes and on methods within those classes.
 
 ```js
 import React from 'react';
-import track from '@nyt/nyt-react-tracking';
+import track from 'react-tracking';
 
 @track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
@@ -71,7 +69,7 @@ export default class FooPage extends React.Component {
 You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.tracking.trackEvent()` that you can call in your component like so:
 
 ```js
-import track from '@nyt/nyt-react-tracking';
+import track from 'react-tracking';
 
 const FooPage = (props) => {
   return (
@@ -99,7 +97,7 @@ For example, to push objects to `window.myCustomDataLayer[]` (e.g. for Google Ta
 
 ```js
 import React, { Component } from 'react';
-import track from '@nyt/nyt-react-tracking';
+import track from 'react-tracking';
 
 @track({}, { dispatch: (data) => window.dataLayer.push(data) })
 export default class App extends Component {
@@ -185,7 +183,7 @@ You can also pass a function as an argument instead of an object literal, which 
 
 ```js
 import React from 'react';
-import track from '@nyt/nyt-react-tracking';
+import track from 'react-tracking';
 
 // In this case, the "page" tracking data
 // is a function of one of its props (isNew)
@@ -237,7 +235,7 @@ Any data that is passed to the decorator can be accessed in the decorated compon
 
 ```js
 import React from 'react';
-import track from '@nyt/nyt-react-tracking';
+import track from 'react-tracking';
 
 // Pass a function to the decorator
 @track(() => {
