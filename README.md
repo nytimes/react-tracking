@@ -37,16 +37,19 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 }
 ```
 
-This PropTypes validation could be imported and used on decorated component
+This PropType is exported for use, if desired:
 
 ```js
-import {TrackingPropTypes} from 'react-tracking';
+import { TrackingPropType } from 'react-tracking';
+```
 
-const Foo = (props) => {...}
+Alternatively, if you just want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
 
-Foo.propTypes = {
-    // ... other props
-    tracking: TrackingPropTypes
+```json
+{
+  "rules": {
+    "react/prop-types" : ["error", { "ignore": ["tracking"] }]
+  }
 }
 ```
 

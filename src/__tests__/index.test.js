@@ -11,10 +11,10 @@ describe('react-tracking', () => {
   it('exports trackEvent', () => {
     expect(index.trackEvent).toBeDefined();
   });
-  it('exports TrackingPropType', () => {
+  it('exports TrackingContextType', () => {
     expect(index.TrackingContextType).toBeDefined();
   });
-  it('exports ExposedTrackingPropType', () => {
+  it('exports TrackingPropType', () => {
     expect(index.TrackingPropType).toBeDefined();
   });
   it('exports default function', () => {
