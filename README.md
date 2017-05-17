@@ -37,6 +37,19 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 }
 ```
 
+This PropTypes validation could be imported and used on decorated component
+
+```js
+import {ExposedTrackingPropTypes} from 'react-tracking';
+
+const Foo = (props) => {...}
+
+Foo.propTypes = {
+    // ... other props
+    tracking: ExposedTrackingPropTypes
+}
+```
+
 ### Usage as a Decorator
 `react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
