@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import merge from 'lodash.merge';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
-export const TrackingPropType = PropTypes.shape({
+export const TrackingContextType = PropTypes.shape({
   data: PropTypes.object,
   dispatch: PropTypes.func,
   process: PropTypes.func,
@@ -37,10 +37,10 @@ export default function withTrackingComponentDecorator(
 
       static displayName = `WithTracking(${decoratedComponentName})`;
       static contextTypes = {
-        tracking: TrackingPropType,
+        tracking: TrackingContextType,
       };
       static childContextTypes = {
-        tracking: TrackingPropType,
+        tracking: TrackingContextType,
       };
 
       trackEvent = (data) => {

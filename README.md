@@ -37,6 +37,22 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 }
 ```
 
+This PropType is exported for use, if desired:
+
+```js
+import { TrackingPropType } from 'react-tracking';
+```
+
+Alternatively, if you just want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
+
+```json
+{
+  "rules": {
+    "react/prop-types" : ["error", { "ignore": ["tracking"] }]
+  }
+}
+```
+
 ### Usage as a Decorator
 `react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
