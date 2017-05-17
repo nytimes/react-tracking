@@ -12,10 +12,10 @@ describe('react-tracking', () => {
     expect(index.trackEvent).toBeDefined();
   });
   it('exports TrackingPropType', () => {
-    expect(index.TrackingPropType).toBeDefined();
+    expect(index.TrackingContextType).toBeDefined();
   });
   it('exports ExposedTrackingPropType', () => {
-    expect(index.ExposedTrackingPropType).toBeDefined();
+    expect(index.TrackingPropType).toBeDefined();
   });
   it('exports default function', () => {
     expect(typeof index.default).toBe('function');
