@@ -32,7 +32,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NYTimes/nyt-react-tracking.git"
+    "url": "git+https://github.com/NYTimes/react-tracking"
   },
   "keywords": [
     "nyt",
@@ -42,7 +42,7 @@
     "metrics",
     "layer"
   ],
-  "homepage": "https://github.com/NYTimes/nyt-react-tracking",
+  "homepage": "https://github.com/NYTimes/react-tracking",
   "dependencies": {
     "lodash.merge": "^4.6.0"
   },
