@@ -1,4 +1,6 @@
-# react-tracking 🎯
+<p align="center"><img src="https://cdn-images-1.medium.com/max/1600/1*DKS5pYfsAz-H45myvnWWVw.gif" style="max-width:75%;"></p>
+
+<h1>react-tracking</h1>
 
 ## Motivation
 
@@ -6,6 +8,8 @@
 - Compartmentalize tracking concerns to individual components, avoid leaking across the entire app
 - Expressive and declarative (as opposed to imperative) API to add tracking to any React app
 - Analytics platform agnostic
+
+Read more in the [Times Open blog post](https://open.nytimes.com/introducing-react-tracking-declarative-tracking-for-react-apps-2c76706bb79a).
 
 ## Installation
 
