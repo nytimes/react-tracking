@@ -2,8 +2,6 @@
 
 <h1>react-tracking</h1>
 
-## Motivation
-
 - React specific tracking library, usable as a higher-order component (as `@decorator` or directly)
 - Compartmentalize tracking concerns to individual components, avoid leaking across the entire app
 - Expressive and declarative (as opposed to imperative) API to add tracking to any React app
