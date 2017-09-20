@@ -8,7 +8,7 @@ jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
 const testDataContext = { testDataContext: true };
 const testData = { testData: true };
 const dispatch = jest.fn();
-const testState = {booleanstate: true};
+const testState = { booleanstate: true };
 
 describe('e2e', () => {
   // eslint-disable-next-line global-require
@@ -367,7 +367,7 @@ describe('e2e', () => {
     @track(testDataContext, { dispatch })
     class TestOptions extends React.Component {
       constructor() {
-        super()
+        super();
         this.state = {
           booleanstate: true,
         };
@@ -389,7 +389,7 @@ describe('e2e', () => {
     expect(dispatch).toHaveBeenCalledWith({
       ...testDataContext,
       ...testState,
-    }); 
+    });
   });
 
   it('logs a console error when there is already a process defined on context', () => {
