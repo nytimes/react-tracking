@@ -59,7 +59,7 @@ Alternatively, if you just want to just silence proptype errors when using [esli
 ### Usage as a Decorator
 `react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
-The decorator can be used on React Classes and on methods within those classes.
+The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well. 
 
 ```js
 import React from 'react';
@@ -213,7 +213,7 @@ export default class FooButton extends React.Component {
 
   // In this case the tracking data depends on
   // some unknown (until runtime) value
-  @track((props, [event]) => ({
+  @track((props, state, [event]) => ({
     action: 'click',
     label: event.currentTarget.title || event.currentTarget.textContent
   }))
@@ -246,6 +246,20 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
     };
   })
 // ...
+```
+### Accessing data stored in the component's `props` and `state`
+
+Further runtime data, such as the component's `props` and `state`, are available as follows:
+
+```js
+  @track((props, state) => ({
+    action: state.following ? "unfollow clicked" : "follow clicked" 
+    name: props.name
+  }))
+  handleFollow = () => {
+     this.setState({ following: !this.state.following })
+    }
+  }
 ```
 
 #### Example `props.tracking.getTrackingData()` usage
