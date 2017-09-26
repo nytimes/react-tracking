@@ -91,13 +91,13 @@ describe('trackEventMethodDecorator', () => {
     myTC.handleTestEvent(dummyArgument);
 
     // Access the trackingData arguments
-    const trackingDataArguments = trackingData.mock.calls[0]
+    const trackingDataArguments = trackingData.mock.calls[0];
 
     expect(trackingData).toHaveBeenCalledTimes(1);
     expect(trackingDataArguments[0]).toEqual(myTC.props);
     expect(trackingDataArguments[1]).toEqual(myTC.state);
-    // We cannot compare the implicit arguments, as there is no constructor for objects of type argument
-    // Hence we make them explicit by turning them into arrays
+    // Here we have access to the raw `arguments` object, which is not an actual Array,
+    // so in order to compare, we convert the arguments to an array.
     expect(Array.from(trackingDataArguments[2])).toEqual([dummyArgument]);
 
     expect(trackEvent).toHaveBeenCalledWith(dummyData);
