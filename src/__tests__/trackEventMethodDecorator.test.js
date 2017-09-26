@@ -63,4 +63,44 @@ describe('trackEventMethodDecorator', () => {
     expect(trackEvent).toHaveBeenCalledWith(dummyData);
     expect(spyTestEvent).toHaveBeenCalledWith('x');
   });
+
+  it('properly passes through the correct arguments when trackingData is a function', () => {
+    const dummyData = {};
+    const trackingData = jest.fn(() => dummyData);
+    const trackEvent = jest.fn();
+    const spyTestEvent = jest.fn();
+    const dummyArgument = 'x';
+
+    class TestClass {
+      constructor() {
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
+        this.state = {
+          myState: "someState",
+        };
+      }
+
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent
+    }
+
+    const myTC = new TestClass();
+    myTC.handleTestEvent(dummyArgument);
+
+    // Access the trackingData arguments
+    const trackingDataArguments = trackingData.mock.calls[0]
+
+    expect(trackingData).toHaveBeenCalledTimes(1);
+    expect(trackingDataArguments[0]).toEqual(myTC.props);
+    expect(trackingDataArguments[1]).toEqual(myTC.state);
+    // We cannot compare the implicit arguments, as there is no constructor for objects of type argument
+    // Hence we make them explicit by turning them into arrays
+    expect(Array.from(trackingDataArguments[2])).toEqual([dummyArgument]);
+
+    expect(trackEvent).toHaveBeenCalledWith(dummyData);
+    expect(spyTestEvent).toHaveBeenCalledWith(dummyArgument);
+  });
 });

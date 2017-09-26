@@ -8,7 +8,7 @@ jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
 const testDataContext = { testDataContext: true };
 const testData = { testData: true };
 const dispatch = jest.fn();
-const testState = { booleanstate: true };
+const testState = { booleanState: true };
 
 describe('e2e', () => {
   // eslint-disable-next-line global-require
@@ -369,11 +369,11 @@ describe('e2e', () => {
       constructor() {
         super();
         this.state = {
-          booleanstate: true,
+          booleanState: true,
         };
       }
 
-      @track((props, state) => ({ booleanstate: state.booleanstate }))
+      @track((props, state) => ({ booleanState: state.booleanState }))
       exampleMethod = () => {}
 
       render() {
