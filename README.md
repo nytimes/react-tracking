@@ -1,6 +1,6 @@
 <p align="center"><img src="https://cdn-images-1.medium.com/max/1600/1*DKS5pYfsAz-H45myvnWWVw.gif" style="max-width:75%;"></p>
 
-<h1>react-tracking</h1>
+# react-tracking [![npm version](https://badge.fury.io/js/react-tracking.svg)](https://badge.fury.io/js/react-tracking) [![Build Status](https://travis-ci.org/NYTimes/react-tracking.svg?branch=master)](https://travis-ci.org/NYTimes/react-tracking)
 
 - React specific tracking library, usable as a higher-order component (as `@decorator` or directly)
 - Compartmentalize tracking concerns to individual components, avoid leaking across the entire app
@@ -238,7 +238,7 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
 
 ```js
 // ...
-  @track(function(props, args) {
+  @track(function(props, state, args) {
     const event = args[0];
     return {
       action: 'click',
