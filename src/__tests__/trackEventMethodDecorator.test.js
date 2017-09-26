@@ -79,7 +79,7 @@ describe('trackEventMethodDecorator', () => {
           },
         };
         this.state = {
-          myState: "someState",
+          myState: 'someState',
         };
       }
 
