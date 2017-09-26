@@ -1,6 +1,6 @@
 <p align="center"><img src="https://cdn-images-1.medium.com/max/1600/1*DKS5pYfsAz-H45myvnWWVw.gif" style="max-width:75%;"></p>
 
-# react-tracking [![npm version](https://badge.fury.io/js/react-tracking.svg)](https://badge.fury.io/js/react-tracking) [![Build Status](https://travis-ci.org/NYTimes/react-tracking.svg?branch=master)](https://travis-ci.org/NYTimes/react-tracking)
+# react-tracking [![npm version](https://badge.fury.io/js/react-tracking.svg)](https://badge.fury.io/js/react-tracking)
 
 - React specific tracking library, usable as a higher-order component (as `@decorator` or directly)
 - Compartmentalize tracking concerns to individual components, avoid leaking across the entire app
