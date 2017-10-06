@@ -69,7 +69,7 @@
     "react-test-renderer": "^15.5.4"
   },
   "scripts": {
-    "prepublish": "npm run lint && npm run test && npm run build",
+    "prepare": "npm run lint && npm run test && npm run build",
     "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
     "lint": "eslint ./src"

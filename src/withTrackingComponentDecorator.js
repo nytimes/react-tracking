@@ -25,6 +25,7 @@ export default function withTrackingComponentDecorator(
         super(props, context);
 
         if (context.tracking && context.tracking.process && process) {
+          // eslint-disable-next-line
           console.error('[react-tracking] options.process should be used once on top level component');
         }
 
