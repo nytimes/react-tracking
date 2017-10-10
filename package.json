@@ -66,7 +66,7 @@
   },
   "lint-staged": {
     "*.{js,json}": [
-      "prettier --write --config-precedence prefer-file",
+      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
       "git add"
     ]
   },
