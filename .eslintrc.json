@@ -1,6 +1,8 @@
 {
-    "parser": "babel-eslint",
-    "extends": [
-        "./node_modules/eslint-config-kyt/eslintrc.json"
-    ]
+  "parser": "babel-eslint",
+  "extends": ["./node_modules/eslint-config-kyt/eslintrc.json", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error"
+  }
 }
