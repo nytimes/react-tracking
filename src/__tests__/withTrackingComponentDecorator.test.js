@@ -200,17 +200,22 @@ describe('withTrackingComponentDecorator', () => {
     it("should hoist a class's static method when decorated", () => {
       @withTrackingComponentDecorator(dummyData)
       class StaticComponent {
-        static someMethod() {}
+        static someMethod() {
+          return 'test';
+        }
         static someVar = 'test';
       }
 
       expect(StaticComponent.someMethod).toBeDefined();
+      expect(StaticComponent.someMethod()).toEqual('test');
       expect(StaticComponent.someVar).toEqual('test');
     });
 
     it("should hoist a class's static method when wrapped via HoC", () => {
       class StaticComponent {
-        static someMethod() {}
+        static someMethod() {
+          return 'test';
+        }
         static someVar = 'test';
       }
 
@@ -219,6 +224,7 @@ describe('withTrackingComponentDecorator', () => {
       );
 
       expect(DecoratedComponent.someMethod).toBeDefined();
+      expect(DecoratedComponent.someMethod()).toEqual('test');
       expect(DecoratedComponent.someMethod).toEqual(StaticComponent.someMethod);
       expect(DecoratedComponent.someVar).toEqual('test');
     });
