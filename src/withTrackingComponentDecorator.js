@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import merge from 'lodash.merge';
+import hoistNonReactStatic from 'hoist-non-react-statics';
+
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
 export const TrackingContextType = PropTypes.shape({
@@ -17,7 +19,7 @@ export default function withTrackingComponentDecorator(
     const decoratedComponentName =
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    return class WithTracking extends Component {
+    class WithTracking extends Component {
       constructor(props, context) {
         super(props, context);
 
@@ -109,6 +111,10 @@ export default function withTrackingComponentDecorator(
       render() {
         return <DecoratedComponent {...this.props} tracking={this.tracking} />;
       }
-    };
+    }
+
+    hoistNonReactStatic(WithTracking, DecoratedComponent);
+
+    return WithTracking;
   };
 }

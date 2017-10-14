@@ -35,6 +35,7 @@
   "keywords": ["nyt", "react", "declarative", "tracking", "metrics", "layer"],
   "homepage": "https://github.com/NYTimes/react-tracking",
   "dependencies": {
+    "hoist-non-react-statics": "^2.3.1",
     "lodash.merge": "^4.6.0"
   },
   "peerDependencies": {
