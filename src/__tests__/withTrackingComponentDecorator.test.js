@@ -193,4 +193,40 @@ describe('withTrackingComponentDecorator', () => {
       );
     });
   });
+
+  describe('hoist non react statics', () => {
+    const dummyData = { page: 1 };
+
+    it("should hoist a class's static method when decorated", () => {
+      @withTrackingComponentDecorator(dummyData)
+      class StaticComponent {
+        static someMethod() {
+          return 'test';
+        }
+        static someVar = 'test';
+      }
+
+      expect(StaticComponent.someMethod).toBeDefined();
+      expect(StaticComponent.someMethod()).toEqual('test');
+      expect(StaticComponent.someVar).toEqual('test');
+    });
+
+    it("should hoist a class's static method when wrapped via HoC", () => {
+      class StaticComponent {
+        static someMethod() {
+          return 'test';
+        }
+        static someVar = 'test';
+      }
+
+      const DecoratedComponent = withTrackingComponentDecorator(dummyData)(
+        StaticComponent
+      );
+
+      expect(DecoratedComponent.someMethod).toBeDefined();
+      expect(DecoratedComponent.someMethod()).toEqual('test');
+      expect(DecoratedComponent.someMethod).toEqual(StaticComponent.someMethod);
+      expect(DecoratedComponent.someVar).toEqual('test');
+    });
+  });
 });
