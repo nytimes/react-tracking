@@ -6,7 +6,8 @@ jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
 describe('withTrackingComponentDecorator', () => {
   // eslint-disable-next-line global-require
-  const withTrackingComponentDecorator = require('../withTrackingComponentDecorator').default;
+  const withTrackingComponentDecorator = require('../withTrackingComponentDecorator')
+    .default;
 
   it('is a decorator (exports a function, that returns a function)', () => {
     expect(typeof withTrackingComponentDecorator).toBe('function');
@@ -63,7 +64,9 @@ describe('withTrackingComponentDecorator', () => {
     const context = { context: 1 };
     const trackingContext = { page: 1 };
 
-    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount: true })
+    @withTrackingComponentDecorator(trackingContext, {
+      dispatchOnMount: true,
+    })
     class TestComponent {
       static displayName = 'TestComponent';
     }
@@ -109,7 +112,10 @@ describe('withTrackingComponentDecorator', () => {
     it('process function gets called', () => {
       myTC.componentDidMount();
       expect(process).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView' });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+        page: 1,
+        event: 'pageView',
+      });
     });
   });
 
@@ -135,7 +141,11 @@ describe('withTrackingComponentDecorator', () => {
       myTC.componentDidMount();
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ page: 1, event: 'pageView', specificEvent: true });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+        page: 1,
+        event: 'pageView',
+        specificEvent: true,
+      });
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
     });
   });
@@ -172,11 +182,15 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('prop named getTrackingData is a function', () => {
-      expect(component.props().tracking.getTrackingData).toBeInstanceOf(Function);
+      expect(component.props().tracking.getTrackingData).toBeInstanceOf(
+        Function
+      );
     });
 
     it('when getTrackingData is called, from props, it will return the data passed to the decorator', () => {
-      expect(component.props().tracking.getTrackingData()).toMatchObject(dummyData);
+      expect(component.props().tracking.getTrackingData()).toMatchObject(
+        dummyData
+      );
     });
   });
 });

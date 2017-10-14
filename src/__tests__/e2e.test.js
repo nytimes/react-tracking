@@ -38,8 +38,7 @@ describe('e2e', () => {
   it('accepts a dispatch function in options', () => {
     @track(testDataContext, { dispatch })
     class TestOptions extends React.Component {
-      @track(testData)
-      blah = () => {}
+      @track(testData) blah = () => {};
 
       render() {
         this.blah();
@@ -48,7 +47,6 @@ describe('e2e', () => {
     }
 
     mount(<TestOptions />);
-
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({
@@ -92,10 +90,14 @@ describe('e2e', () => {
 
     @track(testData1)
     class TestData1 extends React.Component {
-      render() { return this.props.children; }
+      render() {
+        return this.props.children;
+      }
     }
 
-    const TestData2 = track(testData2, { dispatchOnMount: true })(() => <div />);
+    const TestData2 = track(testData2, { dispatchOnMount: true })(() => (
+      <div />
+    ));
 
     mount(
       <TestData1>
@@ -105,9 +107,7 @@ describe('e2e', () => {
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       page: 'TestDeepMerge',
-      key: {
-        x: 2, y: 1, z: 2,
-      },
+      key: { x: 2, y: 1, z: 2 },
     });
   });
 
@@ -117,7 +117,9 @@ describe('e2e', () => {
 
     @track(testDispatchOnMount, { dispatch, dispatchOnMount })
     class TestComponent extends React.Component {
-      render() { return null; }
+      render() {
+        return null;
+      }
     }
 
     mount(<TestComponent />);
@@ -133,7 +135,7 @@ describe('e2e', () => {
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
@@ -149,7 +151,11 @@ describe('e2e', () => {
       }
     }
 
-    mount(<App><Page /></App>);
+    mount(
+      <App>
+        <Page />
+      </App>
+    );
 
     expect(dispatch).toHaveBeenCalledWith({
       topLevel: true,
@@ -165,18 +171,22 @@ describe('e2e', () => {
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
           return null;
         },
-      },
+      }
     )(RawApp);
 
     const Page = track({ page: 'Page' })(() => <div>Page</div>);
 
-    mount(<App><Page /></App>);
+    mount(
+      <App>
+        <Page />
+      </App>
+    );
 
     expect(dispatch).toHaveBeenCalledWith({
       topLevel: true,
@@ -185,18 +195,22 @@ describe('e2e', () => {
     });
   });
 
-  it('should not dispatch a pageview event on mount if there\'s no page property on tracking object', () => {
+  it("should not dispatch a pageview event on mount if there's no page property on tracking object", () => {
     const RawApp = ({ children }) => <div>{children}</div>;
     const App = track(
       { topLevel: true },
       {
         dispatch,
         process: () => null,
-      },
+      }
     )(RawApp);
     const Page = track({ page: 'Page' })(() => <div>Page</div>);
 
-    mount(<App><Page /></App>);
+    mount(
+      <App>
+        <Page />
+      </App>
+    );
 
     expect(dispatch).not.toHaveBeenCalled();
   });
@@ -207,17 +221,21 @@ describe('e2e', () => {
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
           return false;
         },
-      },
+      }
     )(RawApp);
     const Page = track({})(() => <div>Page</div>);
 
-    mount(<App><Page /></App>);
+    mount(
+      <App>
+        <Page />
+      </App>
+    );
 
     expect(dispatch).not.toHaveBeenCalled();
   });
@@ -229,13 +247,13 @@ describe('e2e', () => {
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
           return null;
         },
-      },
+      }
     )(RawApp);
 
     @track({ page: 'Page1' })
@@ -245,7 +263,10 @@ describe('e2e', () => {
       }
     }
 
-    @track({ page: 'Page2' }, { dispatchOnMount: () => ({ page2specific: true }) })
+    @track(
+      { page: 'Page2' },
+      { dispatchOnMount: () => ({ page2specific: true }) }
+    )
     class Page2 extends React.Component {
       render() {
         return <div>Page</div>;
@@ -260,8 +281,17 @@ describe('e2e', () => {
     );
 
     expect(dispatch).toHaveBeenCalledTimes(2);
-    expect(dispatch).toHaveBeenCalledWith({ page: 'Page1', event: 'pageView', topLevel: true });
-    expect(dispatch).toHaveBeenCalledWith({ page: 'Page2', event: 'pageView', topLevel: true, page2specific: true });
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'Page1',
+      event: 'pageView',
+      topLevel: true,
+    });
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'Page2',
+      event: 'pageView',
+      topLevel: true,
+      page2specific: true,
+    });
   });
 
   it('process works with trackingData as a function', () => {
@@ -271,13 +301,13 @@ describe('e2e', () => {
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
           return null;
         },
-      },
+      }
     )(RawApp);
 
     @track(({ runtimeData }) => ({ page: 'Page', runtimeData }))
@@ -293,23 +323,28 @@ describe('e2e', () => {
       </App>
     );
 
-    expect(dispatch).toHaveBeenCalledWith({ event: 'pageView', page: 'Page', runtimeData: true, topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({
+      event: 'pageView',
+      page: 'Page',
+      runtimeData: true,
+      topLevel: true,
+    });
   });
 
-  it('doesn\'t dispatch pageview for nested components without page tracking data', () => {
+  it("doesn't dispatch pageview for nested components without page tracking data", () => {
     const RawApp = ({ children }) => <div>{children}</div>;
 
     const App = track(
       { topLevel: true },
       {
         dispatch,
-        process: (data) => {
+        process: data => {
           if (data.page) {
             return { event: 'pageView' };
           }
           return null;
         },
-      },
+      }
     )(RawApp);
 
     @track({ page: 'Page' })
@@ -329,14 +364,10 @@ describe('e2e', () => {
     @track({ region: 'Button' })
     class Button extends React.Component {
       @track({ event: 'buttonClick' })
-      handleClick = jest.fn()
+      handleClick = jest.fn();
 
       render() {
-        return (
-          <button onClick={this.handleClick}>
-            Click me!
-          </button>
-        );
+        return <button onClick={this.handleClick}>Click me!</button>;
       }
     }
 
@@ -352,7 +383,11 @@ describe('e2e', () => {
 
     wrappedApp.find('Button').simulate('click');
 
-    expect(dispatch).toHaveBeenCalledWith({ event: 'pageView', page: 'Page', topLevel: true });
+    expect(dispatch).toHaveBeenCalledWith({
+      event: 'pageView',
+      page: 'Page',
+      topLevel: true,
+    });
     expect(dispatch).toHaveBeenCalledWith({
       event: 'buttonClick',
       page: 'Page',
@@ -374,7 +409,7 @@ describe('e2e', () => {
       }
 
       @track((props, state) => ({ booleanState: state.booleanState }))
-      exampleMethod = () => {}
+      exampleMethod = () => {};
 
       render() {
         this.exampleMethod();
@@ -383,7 +418,6 @@ describe('e2e', () => {
     }
 
     mount(<TestOptions />);
-
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({

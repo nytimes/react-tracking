@@ -1,6 +1,7 @@
 describe('trackEventMethodDecorator', () => {
   // eslint-disable-next-line global-require
-  const trackEventMethodDecorator = require('../trackEventMethodDecorator').default;
+  const trackEventMethodDecorator = require('../trackEventMethodDecorator')
+    .default;
 
   it('is a decorator (exports a function, that returns a function)', () => {
     expect(typeof trackEventMethodDecorator).toBe('function');
@@ -25,7 +26,8 @@ describe('trackEventMethodDecorator', () => {
       }
 
       @trackEventMethodDecorator(trackingData)
-      handleTestEvent(x) { // eslint-disable-line class-methods-use-this
+      // eslint-disable-next-line class-methods-use-this
+      handleTestEvent(x) {
         spyTestEvent(x);
       }
     }
@@ -52,8 +54,7 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData)
-      handleTestEvent = spyTestEvent
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -83,8 +84,7 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData)
-      handleTestEvent = spyTestEvent
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();

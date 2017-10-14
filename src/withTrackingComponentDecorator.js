@@ -11,14 +11,11 @@ export const TrackingContextType = PropTypes.shape({
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  {
-    dispatch = dispatchTrackingEvent,
-    dispatchOnMount = false,
-    process,
-  } = {}
+  { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
 ) {
-  return (DecoratedComponent) => {
-    const decoratedComponentName = DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
+  return DecoratedComponent => {
+    const decoratedComponentName =
+      DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
     return class WithTracking extends Component {
       constructor(props, context) {
@@ -26,14 +23,22 @@ export default function withTrackingComponentDecorator(
 
         if (context.tracking && context.tracking.process && process) {
           // eslint-disable-next-line
-          console.error('[react-tracking] options.process should be used once on top level component');
+          console.error(
+            '[react-tracking] options.process should be used once on top level component'
+          );
         }
 
-        this.ownTrackingData = typeof trackingData === 'function'
-          ? trackingData(props)
-          : trackingData;
-        this.contextTrackingData = (this.context.tracking && this.context.tracking.data) || {};
-        this.trackingData = merge({}, this.contextTrackingData, this.ownTrackingData);
+        this.ownTrackingData =
+          typeof trackingData === 'function'
+            ? trackingData(props)
+            : trackingData;
+        this.contextTrackingData =
+          (this.context.tracking && this.context.tracking.data) || {};
+        this.trackingData = merge(
+          {},
+          this.contextTrackingData,
+          this.ownTrackingData
+        );
       }
 
       static displayName = `WithTracking(${decoratedComponentName})`;
@@ -44,15 +49,17 @@ export default function withTrackingComponentDecorator(
         tracking: TrackingContextType,
       };
 
-      trackEvent = (data) => {
+      trackEvent = data => {
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
           merge({}, this.trackingData, data)
         );
-      }
+      };
 
       getTrackingDispatcher() {
-        return (this.context.tracking && this.context.tracking.dispatch) || dispatch;
+        return (
+          (this.context.tracking && this.context.tracking.dispatch) || dispatch
+        );
       }
 
       getChildContext() {
@@ -60,20 +67,28 @@ export default function withTrackingComponentDecorator(
           tracking: {
             data: merge({}, this.contextTrackingData, this.ownTrackingData),
             dispatch: this.getTrackingDispatcher(),
-            process: (this.context.tracking && this.context.tracking.process) || process,
+            process:
+              (this.context.tracking && this.context.tracking.process) ||
+              process,
           },
         };
       }
 
       componentDidMount() {
-        const contextProcess = this.context.tracking && this.context.tracking.process;
+        const contextProcess =
+          this.context.tracking && this.context.tracking.process;
 
-        if (typeof contextProcess === 'function' && typeof dispatchOnMount === 'function') {
-          this.trackEvent(merge(
-            {},
-            contextProcess(this.ownTrackingData),
-            dispatchOnMount(this.trackingData)
-          ));
+        if (
+          typeof contextProcess === 'function' &&
+          typeof dispatchOnMount === 'function'
+        ) {
+          this.trackEvent(
+            merge(
+              {},
+              contextProcess(this.ownTrackingData),
+              dispatchOnMount(this.trackingData)
+            )
+          );
         } else if (typeof contextProcess === 'function') {
           const processed = contextProcess(this.ownTrackingData);
           if (processed) {
@@ -89,15 +104,10 @@ export default function withTrackingComponentDecorator(
       tracking = {
         trackEvent: this.trackEvent,
         getTrackingData: () => this.trackingData,
-      }
+      };
 
       render() {
-        return (
-          <DecoratedComponent
-            {...this.props}
-            tracking={this.tracking}
-          />
-        );
+        return <DecoratedComponent {...this.props} tracking={this.tracking} />;
       }
     };
   };

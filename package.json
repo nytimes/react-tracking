@@ -27,21 +27,12 @@
   ],
   "license": "Apache-2.0",
   "main": "build/index.js",
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NYTimes/react-tracking"
   },
-  "keywords": [
-    "nyt",
-    "react",
-    "declarative",
-    "tracking",
-    "metrics",
-    "layer"
-  ],
+  "keywords": ["nyt", "react", "declarative", "tracking", "metrics", "layer"],
   "homepage": "https://github.com/NYTimes/react-tracking",
   "dependencies": {
     "lodash.merge": "^4.6.0"
@@ -62,16 +53,28 @@
     "enzyme": "^2.8.2",
     "eslint": "^3.12.2",
     "eslint-config-kyt": "^0.0.1",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "husky": "^0.14.3",
     "jest": "^20.0.1",
+    "lint-staged": "^4.2.3",
+    "prettier": "^1.7.4",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-test-renderer": "^15.5.4"
   },
+  "lint-staged": {
+    "*.{js,json}": [
+      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
+      "git add"
+    ]
+  },
   "scripts": {
     "prepare": "npm run lint && npm run test && npm run build",
     "build": "babel --out-dir build src --ignore src/__tests__",
     "test": "jest",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "precommit": "lint-staged"
   }
 }

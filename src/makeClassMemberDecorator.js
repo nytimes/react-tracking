@@ -34,8 +34,8 @@ export default function makeClassMemberDecorator(decorate) {
           }
 
           const resolvedValue = initializer
-                        ? Reflect.apply(initializer, this, [])
-                        : Reflect.apply(get, this, []);
+            ? Reflect.apply(initializer, this, [])
+            : Reflect.apply(get, this, []);
           const decoratedValue = decorate(resolvedValue).bind(this);
 
           Reflect.defineProperty(this, name, {
@@ -49,6 +49,8 @@ export default function makeClassMemberDecorator(decorate) {
       };
     }
 
-    throw new Error('called makeClassMemberDecorator on unsupported descriptor');
+    throw new Error(
+      'called makeClassMemberDecorator on unsupported descriptor'
+    );
   };
 }
