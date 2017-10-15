@@ -442,4 +442,57 @@ describe('e2e', () => {
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
   });
+
+  it('will dispatch different data if props changed', () => {
+    @track(props => ({ data: props.data }))
+    class Top extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @track({ page: 'Page' })
+    class Page extends React.Component {
+      @track({ event: 'buttonClick' })
+      handleClick = jest.fn();
+      render() {
+        return <span onClick={this.handleClick}>Click Me</span>;
+      }
+    }
+
+    @track({}, { dispatch })
+    class App extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { data: 1 };
+      }
+      render() {
+        return (
+          <div>
+            <button onClick={() => this.setState({ data: 2 })} />
+            <Top data={this.state.data}>
+              <Page />
+            </Top>
+          </div>
+        );
+      }
+    }
+
+    const wrappedApp = mount(<App />);
+
+    wrappedApp.find('span').simulate('click');
+    expect(dispatch).toHaveBeenCalledWith({
+      data: 1,
+      event: 'buttonClick',
+      page: 'Page',
+    });
+
+    wrappedApp.find('button').simulate('click');
+    wrappedApp.find('span').simulate('click');
+    expect(dispatch).toHaveBeenCalledWith({
+      data: 2,
+      event: 'buttonClick',
+      page: 'Page',
+    });
+  });
 });
