@@ -442,4 +442,22 @@ describe('e2e', () => {
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
   });
+
+  it('will dispatch data even if the component is not wrapped with @track', () => {
+    class App extends React.Component {
+      @track({ event: 'buttonClick' }, { dispatch })
+      handleClick = jest.fn();
+
+      render() {
+        return <button onClick={this.handleClick} />;
+      }
+    }
+
+    const wrappedApp = mount(<App />);
+
+    wrappedApp.find('button').simulate('click');
+    expect(dispatch).toHaveBeenCalledWith({
+      event: 'buttonClick',
+    });
+  });
 });
