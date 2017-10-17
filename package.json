@@ -74,7 +74,9 @@
   "scripts": {
     "prepare": "npm run lint && npm run test && npm run build",
     "build": "babel --out-dir build src --ignore src/__tests__",
+    "build:watch": "npm run build -- --watch",
     "test": "jest",
+    "test:watch": "jest --watch",
     "lint": "eslint ./src",
     "precommit": "lint-staged"
   }
