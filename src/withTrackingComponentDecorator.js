@@ -30,17 +30,7 @@ export default function withTrackingComponentDecorator(
           );
         }
 
-        this.ownTrackingData =
-          typeof trackingData === 'function'
-            ? trackingData(props)
-            : trackingData;
-        this.contextTrackingData =
-          (this.context.tracking && this.context.tracking.data) || {};
-        this.trackingData = merge(
-          {},
-          this.contextTrackingData,
-          this.ownTrackingData
-        );
+        this.computeTrackingData(props, context);
       }
 
       static displayName = `WithTracking(${decoratedComponentName})`;
@@ -61,6 +51,20 @@ export default function withTrackingComponentDecorator(
       getTrackingDispatcher() {
         return (
           (this.context.tracking && this.context.tracking.dispatch) || dispatch
+        );
+      }
+
+      computeTrackingData(props, context) {
+        this.ownTrackingData =
+          typeof trackingData === 'function'
+            ? trackingData(props)
+            : trackingData;
+        this.contextTrackingData =
+          (context.tracking && context.tracking.data) || {};
+        this.trackingData = merge(
+          {},
+          this.contextTrackingData,
+          this.ownTrackingData
         );
       }
 
@@ -101,6 +105,10 @@ export default function withTrackingComponentDecorator(
         } else if (dispatchOnMount === true) {
           this.trackEvent();
         }
+      }
+
+      componentWillReceiveProps(nextProps, nextContext) {
+        this.computeTrackingData(nextProps, nextContext);
       }
 
       tracking = {
