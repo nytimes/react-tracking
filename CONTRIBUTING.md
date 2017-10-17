@@ -2,11 +2,15 @@
 
 First, thank you for contributing! 🎉
 
+## Local Development
+
 The local development workflow is fairly straightfowrad:
 
 1. Fork the repo and then git clone your fork locally (be sure to work on a new branch, not on your `master` branch)
 1. `npm install`
 1. `npm run test:watch` this will run the tests in watch mode
+
+## Testing against your own app
 
 If you'd like to test out a local version of `react-tracking` in an app you're using it in, you can:
 
