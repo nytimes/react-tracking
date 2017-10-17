@@ -454,9 +454,9 @@ describe('e2e', () => {
     @track({ page: 'Page' })
     class Page extends React.Component {
       @track({ event: 'buttonClick' })
-      handleClick = jest.fn(); // eslint-disable-line jsx-a11y/no-static-element-interactions
+      handleClick = jest.fn();
       render() {
-        return <span onClick={this.handleClick}>Click Me</span>;
+        return <span onClick={this.handleClick}>Click Me</span>; // eslint-disable-line jsx-a11y/no-static-element-interactions
       }
     }
 
