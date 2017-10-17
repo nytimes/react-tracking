@@ -453,6 +453,7 @@ describe('e2e', () => {
 
     @track({ page: 'Page' })
     class Page extends React.Component {
+      // eslint-disable-line jsx-a11y/no-static-element-interactions
       @track({ event: 'buttonClick' })
       handleClick = jest.fn();
       render() {
