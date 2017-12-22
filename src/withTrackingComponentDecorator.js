@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import merge from 'lodash.merge';
+import merge from 'deepmerge';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 
 import dispatchTrackingEvent from './dispatchTrackingEvent';
@@ -44,7 +44,7 @@ export default function withTrackingComponentDecorator(
       trackEvent = data => {
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          merge({}, this.trackingData, data)
+          merge(this.trackingData || {}, data || {})
         );
       };
 
@@ -62,16 +62,18 @@ export default function withTrackingComponentDecorator(
         this.contextTrackingData =
           (context.tracking && context.tracking.data) || {};
         this.trackingData = merge(
-          {},
-          this.contextTrackingData,
-          this.ownTrackingData
+          this.contextTrackingData || {},
+          this.ownTrackingData || {}
         );
       }
 
       getChildContext() {
         return {
           tracking: {
-            data: merge({}, this.contextTrackingData, this.ownTrackingData),
+            data: merge(
+              this.contextTrackingData || {},
+              this.ownTrackingData || {}
+            ),
             dispatch: this.getTrackingDispatcher(),
             process:
               (this.context.tracking && this.context.tracking.process) ||
@@ -90,9 +92,8 @@ export default function withTrackingComponentDecorator(
         ) {
           this.trackEvent(
             merge(
-              {},
-              contextProcess(this.ownTrackingData),
-              dispatchOnMount(this.trackingData)
+              contextProcess(this.ownTrackingData) || {},
+              dispatchOnMount(this.trackingData) || {}
             )
           );
         } else if (typeof contextProcess === 'function') {
