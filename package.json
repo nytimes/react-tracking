@@ -40,7 +40,8 @@
   },
   "peerDependencies": {
     "babel-runtime": "^6.20.0",
-    "react": "^15.0.0"
+    "react": "^15.0.0",
+    "prop-types": "^15.x"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
