@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 import React from 'react';
-import { shallow, mount } from './helpers/testSetup';
+import { shallow, mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);

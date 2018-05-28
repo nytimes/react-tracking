@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from './helpers/testSetup';
+import { shallow } from 'enzyme';
 
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
