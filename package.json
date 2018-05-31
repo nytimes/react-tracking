@@ -32,12 +32,21 @@
   ],
   "license": "Apache-2.0",
   "main": "build/index.js",
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NYTimes/react-tracking"
   },
-  "keywords": ["nyt", "react", "declarative", "tracking", "metrics", "layer"],
+  "keywords": [
+    "nyt",
+    "react",
+    "declarative",
+    "tracking",
+    "metrics",
+    "layer"
+  ],
   "homepage": "https://github.com/NYTimes/react-tracking",
   "dependencies": {
     "deepmerge": "^2.1.0",
@@ -64,9 +73,9 @@
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "husky": "^0.14.3",
-    "jest": "^20.0.1",
-    "lint-staged": "^4.3.0",
-    "prettier": "^1.11.1",
+    "jest": "^23.1.0",
+    "lint-staged": "^7.1.2",
+    "prettier": "^1.13.3",
     "prop-types": "^15.6.1",
     "raf-polyfill": "^1.0.0",
     "react": "^16.0.0",
