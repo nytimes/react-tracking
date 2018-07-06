@@ -46,7 +46,7 @@ This PropType is exported for use, if desired:
 import { TrackingPropType } from 'react-tracking';
 ```
 
-Alternatively, if you just want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
+Alternatively, if you want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
 
 ```json
 {
@@ -103,7 +103,7 @@ const FooPage = (props) => {
 
 export default track({
   page: 'FooPage'
-})(FooComponent);
+})(FooPage);
 ```
 
 This is also how you would use this module without `@decorators`, although this is obviously awkward and the  decorator syntax is recommended.
