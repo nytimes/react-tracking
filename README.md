@@ -297,3 +297,8 @@ Note that there are no restrictions on the objects that are passed in to the dec
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
+
+### TypeScript Support
+
+You can get the type definitions for React Tracking from DefinitelyTyped using `@types/react-tracking`. For an always up-to-date example of syntax, you should consult [the react-tracking type tests](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-tracking/test/react-tracking-with-types-tests.tsx).
+
