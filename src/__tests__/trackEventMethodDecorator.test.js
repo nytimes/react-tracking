@@ -103,4 +103,68 @@ describe('trackEventMethodDecorator', () => {
     expect(trackEvent).toHaveBeenCalledWith(dummyData);
     expect(spyTestEvent).toHaveBeenCalledWith(dummyArgument);
   });
+
+  it('properly calls trackData when an async method has resolved', async () => {
+    const dummyData = {};
+    const trackingData = jest.fn(() => dummyData);
+    const trackEvent = jest.fn();
+    let resolveTest;
+    const spyTestEvent = jest.fn(
+      () =>
+        new Promise(resolve => {
+          resolveTest = resolve;
+        })
+    );
+
+    class TestClass {
+      constructor() {
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
+      }
+
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+    }
+
+    const myTC = new TestClass();
+    myTC.handleTestEvent();
+
+    expect(trackEvent).not.toHaveBeenCalled();
+    await resolveTest();
+    expect(trackEvent).toHaveBeenCalledWith(dummyData);
+  });
+
+  it('calls tracking function when the async function rejects', async () => {
+    const dummyData = {};
+    const trackingData = jest.fn(() => dummyData);
+    const trackEvent = jest.fn();
+    let rejectTest;
+    const spyTestEvent = jest.fn(
+      () =>
+        new Promise((resolve, reject) => {
+          rejectTest = reject;
+        })
+    );
+
+    class TestClass {
+      constructor() {
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
+      }
+
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+    }
+
+    const myTC = new TestClass();
+    myTC.handleTestEvent();
+
+    expect(trackEvent).not.toHaveBeenCalled();
+    await rejectTest();
+    expect(trackEvent).toHaveBeenCalledWith(dummyData);
+  });
 });
