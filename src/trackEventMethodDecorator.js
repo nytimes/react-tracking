@@ -21,7 +21,10 @@ export default function trackEventMethodDecorator(trackingData = {}) {
 
         const fn = Reflect.apply(decoratedFn, this, arguments);
         if (Promise && Promise.resolve(fn) === fn) {
-          return fn.then(trackEvent.bind(this), trackEvent.bind(this));
+          return fn.then(trackEvent.bind(this)).catch(error => {
+            trackEvent();
+            throw error;
+          });
         }
         trackEvent();
         return fn;

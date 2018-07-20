@@ -136,15 +136,14 @@ describe('trackEventMethodDecorator', () => {
     expect(trackEvent).toHaveBeenCalledWith(dummyData);
   });
 
-  it('calls tracking function when the async function rejects', async () => {
+  it('calls tracking function when the async function throws and will rethrow the error', async () => {
     const dummyData = {};
     const trackingData = jest.fn(() => dummyData);
     const trackEvent = jest.fn();
-    let rejectTest;
     const spyTestEvent = jest.fn(
       () =>
-        new Promise((resolve, reject) => {
-          rejectTest = reject;
+        new Promise(() => {
+          throw new Error();
         })
     );
 
@@ -161,10 +160,12 @@ describe('trackEventMethodDecorator', () => {
     }
 
     const myTC = new TestClass();
-    myTC.handleTestEvent();
 
-    expect(trackEvent).not.toHaveBeenCalled();
-    await rejectTest();
-    expect(trackEvent).toHaveBeenCalledWith(dummyData);
+    try {
+      await myTC.handleTestEvent();
+    } catch (error) {
+      expect(trackEvent).toHaveBeenCalledWith(dummyData);
+      expect(error).toBeInstanceOf(Error);
+    }
   });
 });
