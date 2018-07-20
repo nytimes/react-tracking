@@ -168,4 +168,35 @@ describe('trackEventMethodDecorator', () => {
       expect(error).toBeInstanceOf(Error);
     }
   });
+
+  it('calls the tracking method before the tracking decorator function', async () => {
+    const dummyData = {};
+    const trackingData = jest.fn(() => dummyData);
+    const trackEvent = jest.fn();
+    const spyTestEvent = jest.fn(() => Promise.resolve());
+
+    class TestClass {
+      constructor() {
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
+      }
+
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+    }
+
+    const myTC = new TestClass();
+    myTC.handleTestEvent();
+
+    await myTC.handleTestEvent();
+
+    // all function calls should happen before all tracking calls
+    spyTestEvent.mock.invocationCallOrder.every(fnOrder =>
+      trackEvent.mock.invocationCallOrder.every(trackOrder =>
+        expect(fnOrder).toBeLessThan(trackOrder)
+      )
+    );
+  });
 });
