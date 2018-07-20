@@ -193,8 +193,8 @@ describe('trackEventMethodDecorator', () => {
     await myTC.handleTestEvent();
 
     // all function calls should happen before all tracking calls
-    spyTestEvent.mock.invocationCallOrder.every(fnOrder =>
-      trackEvent.mock.invocationCallOrder.every(trackOrder =>
+    spyTestEvent.mock.invocationCallOrder.forEach(fnOrder =>
+      trackEvent.mock.invocationCallOrder.forEach(trackOrder =>
         expect(fnOrder).toBeLessThan(trackOrder)
       )
     );
