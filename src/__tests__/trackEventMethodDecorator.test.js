@@ -104,6 +104,47 @@ describe('trackEventMethodDecorator', () => {
     expect(spyTestEvent).toHaveBeenCalledWith(dummyArgument);
   });
 
+  it('properly passes through the correct arguments when trackingData is a function and the decorated method returns a promise', async () => {
+    const dummyData = {};
+    const trackingData = jest.fn(() => dummyData);
+    const trackEvent = jest.fn();
+    const dummyResolve = 'res';
+    const spyTestEvent = jest.fn(() => Promise.resolve(dummyResolve));
+    const dummyArgument = 'x';
+
+    class TestClass {
+      constructor() {
+        this.props = {
+          tracking: {
+            trackEvent,
+          },
+        };
+        this.state = {
+          myState: 'someState',
+        };
+      }
+
+      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+    }
+
+    const myTC = new TestClass();
+    await myTC.handleTestEvent(dummyArgument);
+
+    // Access the trackingData arguments
+    const trackingDataArguments = trackingData.mock.calls[0];
+
+    expect(trackingData).toHaveBeenCalledTimes(1);
+    expect(trackingDataArguments[0]).toEqual(myTC.props);
+    expect(trackingDataArguments[1]).toEqual(myTC.state);
+    // Here we have access to the raw `arguments` object, which is not an actual Array,
+    // so in order to compare, we convert the arguments to an array.
+    expect(Array.from(trackingDataArguments[2])).toEqual([dummyArgument]);
+    expect(trackingDataArguments[3]).toEqual([dummyResolve]);
+
+    expect(trackEvent).toHaveBeenCalledWith(dummyData);
+    expect(spyTestEvent).toHaveBeenCalledWith(dummyArgument);
+  });
+
   it('properly calls trackData when an async method has resolved', async () => {
     const dummyData = {};
     const trackingData = jest.fn(() => dummyData);
@@ -165,6 +206,9 @@ describe('trackEventMethodDecorator', () => {
       await myTC.handleTestEvent();
     } catch (error) {
       expect(trackEvent).toHaveBeenCalledWith(dummyData);
+      const trackingDataArguments = trackingData.mock.calls[0];
+      // the resulting error should be passed to the tracking data
+      expect(trackingDataArguments[3]).toEqual([null, error]);
       expect(error).toBeInstanceOf(Error);
     }
   });

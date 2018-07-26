@@ -5,7 +5,7 @@ export default function trackEventMethodDecorator(trackingData = {}) {
   return makeClassMemberDecorator(
     decoratedFn =>
       function decorateClassMember() {
-        const trackEvent = () => {
+        const trackEvent = (...promiseArguments) => {
           if (
             this.props &&
             this.props.tracking &&
@@ -13,7 +13,12 @@ export default function trackEventMethodDecorator(trackingData = {}) {
           ) {
             const thisTrackingData =
               typeof trackingData === 'function'
-                ? trackingData(this.props, this.state, arguments)
+                ? trackingData(
+                    this.props,
+                    this.state,
+                    arguments,
+                    promiseArguments
+                  )
                 : trackingData;
             this.props.tracking.trackEvent(thisTrackingData);
           }
@@ -22,7 +27,7 @@ export default function trackEventMethodDecorator(trackingData = {}) {
         const fn = Reflect.apply(decoratedFn, this, arguments);
         if (Promise && Promise.resolve(fn) === fn) {
           return fn.then(trackEvent.bind(this)).catch(error => {
-            trackEvent();
+            trackEvent(null, error);
             throw error;
           });
         }

@@ -211,12 +211,13 @@ Asynchronous methods (methods that return promises) can also be tracked when the
 
 Or without async/await syntax:
 
-````js
+```js
 // ...
   @track()
   handleEvent() {
     return asyncCall(); // returns a promise
   }
+```
 
 ### Advanced Usage
 
@@ -269,6 +270,32 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
   })
 // ...
 ```
+
+When tracking asynchronous methods, you can also receive the resolved or rejected data from the returned promise in the fourth argument of the function passed in for tracking:
+
+```js
+// ...
+  @track((props, state, methodArgs, [{ value }, err]) => {
+    if (err) { // promise was rejected
+      return {
+        label: 'async action',
+        status: 'error',
+        value: err
+      };
+    }
+    return {
+      label: 'async action',
+      status: 'success',
+      value // value is "test"
+    };
+  })
+  handleAsyncAction(data) {
+    // ...
+    return Promise.resolve({ value: 'test' });
+  }
+// ...
+```
+
 ### Accessing data stored in the component's `props` and `state`
 
 Further runtime data, such as the component's `props` and `state`, are available as follows:
