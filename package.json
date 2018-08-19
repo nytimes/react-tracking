@@ -49,8 +49,8 @@
   ],
   "homepage": "https://github.com/NYTimes/react-tracking",
   "dependencies": {
-    "deepmerge": "^2.1.0",
-    "hoist-non-react-statics": "^2.5.0"
+    "deepmerge": "^2.1.1",
+    "hoist-non-react-statics": "^3.0.1"
   },
   "peerDependencies": {
     "babel-runtime": "^6.20.0",
