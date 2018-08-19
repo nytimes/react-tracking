@@ -16,9 +16,7 @@ npm install --save react-tracking
 ```
 
 ## Usage
-
 `@track()` expects two arguments, `trackingData` and `options`.
-
 - `trackingData` represents the data to be tracked (or a function returning that data)
 - `options` is an optional object that accepts three properties:
   - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` later in this document.
@@ -38,7 +36,7 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 
     // function to call to grab contextual tracking data
     getTrackingData: PropTypes.func,
-  });
+  })
 }
 ```
 
@@ -53,16 +51,15 @@ Alternatively, if you want to just silence proptype errors when using [eslint re
 ```json
 {
   "rules": {
-    "react/prop-types": ["error", { "ignore": ["tracking"] }]
+    "react/prop-types" : ["error", { "ignore": ["tracking"] }]
   }
 }
 ```
 
 ### Usage as a Decorator
-
 `react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
-The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well.
+The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well. 
 
 ```js
 import React from 'react';
@@ -70,13 +67,18 @@ import track from 'react-tracking';
 
 @track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
+
   @track({ action: 'click' })
   handleClick = () => {
     // ... other stuff
-  };
+  }
 
   render() {
-    return <button onClick={this.handleClick}>Click Me!</button>;
+    return (
+      <button onClick={this.handleClick}>
+        Click Me!
+      </button>
+    );
   }
 }
 ```
@@ -88,24 +90,23 @@ You can also track events by importing `track()` and wrapping your stateless fun
 ```js
 import track from 'react-tracking';
 
-const FooPage = props => {
+const FooPage = (props) => {
   return (
-    <div
-      onClick={() => {
+    <div onClick={() => {
         props.tracking.trackEvent({ action: 'click' });
 
         // ... other stuff
       }}
     />
-  );
-};
+  )
+}
 
 export default track({
-  page: 'FooPage',
+  page: 'FooPage'
 })(FooPage);
 ```
 
-This is also how you would use this module without `@decorators`, although this is obviously awkward and the decorator syntax is recommended.
+This is also how you would use this module without `@decorators`, although this is obviously awkward and the  decorator syntax is recommended.
 
 ### Custom `options.dispatch()` for tracking data
 
@@ -117,7 +118,7 @@ For example, to push objects to `window.myCustomDataLayer[]` instead, you would 
 import React, { Component } from 'react';
 import track from 'react-tracking';
 
-@track({}, { dispatch: data => window.myCustomDataLayer.push(data) })
+@track({}, { dispatch: (data) => window.myCustomDataLayer.push(data) })
 export default class App extends Component {
   render() {
     return this.props.children;
@@ -165,6 +166,7 @@ class FooPage extends Component { ... }
 
 Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
 
+
 ```
 {
   event: 'pageDataReady',
@@ -174,7 +176,7 @@ Will dispatch the following data (assuming no other tracking data in context fro
 
 ### Top level `options.process`
 
-When there's a need to implicitly dispatch an event with some data for _every_ component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
+When there's a need to implicitly dispatch an event with some data for *every* component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
 
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
@@ -196,13 +198,13 @@ When `Page2` mounts, nothing will be dispatched.
 
 ### Tracking Asynchronous Methods
 
-Asynchronous methods (methods that return promises) can also be tracked when the method has resolved or rejects a promise. This is handled transparently, so simply decorating an asynchronous method the same way as a normal method will make the tracking call _after_ the promise is resolved or rejected.
+Asynchronous methods (methods that return promises) can also be tracked when the method has resolved or rejects a promise. This is handled transparently, so simply decorating a asynchronous method the same way as a normal method will make the tracking call _after_ the promise is resolved or rejected.
 
 ```js
 // ...
   @track()
   async handleEvent() {
-    return await asyncCall(); // returns a promise
+    await asyncCall(); // returns a promise
   }
 // ...
 ```
@@ -227,25 +229,31 @@ import track from 'react-tracking';
 
 // In this case, the "page" tracking data
 // is a function of one of its props (isNew)
-@track(props => {
-  return { page: props.isNew ? 'new' : 'existing' };
+@track((props) => {
+  return { page: props.isNew ? 'new' : 'existing' }
 })
 export default class FooButton extends React.Component {
+
   // In this case the tracking data depends on
   // some unknown (until runtime) value
   @track((props, state, [event]) => ({
     action: 'click',
-    label: event.currentTarget.title || event.currentTarget.textContent,
+    label: event.currentTarget.title || event.currentTarget.textContent
   }))
-  handleClick = event => {
+  handleClick = (event) => {
     if (this.props.onClick) {
       this.props.onClick(event);
     }
-  };
+  }
 
   render() {
-    return <button onClick={this.handleClick}>{this.props.children}</button>;
+    return (
+      <button onClick={this.handleClick}>
+        {this.props.children}
+      </button>
+    );
   }
+
 }
 ```
 
@@ -294,7 +302,7 @@ Further runtime data, such as the component's `props` and `state`, are available
 
 ```js
   @track((props, state) => ({
-    action: state.following ? "unfollow clicked" : "follow clicked"
+    action: state.following ? "unfollow clicked" : "follow clicked" 
     name: props.name
   }))
   handleFollow = () => {
@@ -316,15 +324,18 @@ import track from 'react-tracking';
   const randomId = Math.floor(Math.random() * 100);
 
   return {
-    page_view_id: randomId,
-  };
+    page_view_id: randomId
+  }
 })
 export default class AdComponent extends React.Component {
   render() {
     const { page_view_id } = this.props.tracking.getTrackingData();
 
-    return <Ad pageViewId={page_view_id} />;
+    return (
+      <Ad pageViewId={page_view_id} />
+    );
   }
+
 }
 ```
 
@@ -339,3 +350,4 @@ This library simply merges the tracking data objects together (as it flows throu
 ### TypeScript Support
 
 You can get the type definitions for React Tracking from DefinitelyTyped using `@types/react-tracking`. For an always up-to-date example of syntax, you should consult [the react-tracking type tests](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-tracking/test/react-tracking-with-types-tests.tsx).
+
