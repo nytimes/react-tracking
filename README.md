@@ -196,6 +196,29 @@ class Page2 extends Component {...}
 When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
 When `Page2` mounts, nothing will be dispatched.
 
+### Tracking Asynchronous Methods
+
+Asynchronous methods (methods that return promises) can also be tracked when the method has resolved or rejects a promise. This is handled transparently, so simply decorating a asynchronous method the same way as a normal method will make the tracking call _after_ the promise is resolved or rejected.
+
+```js
+// ...
+  @track()
+  async handleEvent() {
+    await asyncCall(); // returns a promise
+  }
+// ...
+```
+
+Or without async/await syntax:
+
+```js
+// ...
+  @track()
+  handleEvent() {
+    return asyncCall(); // returns a promise
+  }
+```
+
 ### Advanced Usage
 
 You can also pass a function as an argument instead of an object literal, which allows for some advanced usage scenarios such as when your tracking data is a function of some runtime values, like so:
@@ -247,6 +270,32 @@ NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it
   })
 // ...
 ```
+
+When tracking asynchronous methods, you can also receive the resolved or rejected data from the returned promise in the fourth argument of the function passed in for tracking:
+
+```js
+// ...
+  @track((props, state, methodArgs, [{ value }, err]) => {
+    if (err) { // promise was rejected
+      return {
+        label: 'async action',
+        status: 'error',
+        value: err
+      };
+    }
+    return {
+      label: 'async action',
+      status: 'success',
+      value // value is "test"
+    };
+  })
+  handleAsyncAction(data) {
+    // ...
+    return Promise.resolve({ value: 'test' });
+  }
+// ...
+```
+
 ### Accessing data stored in the component's `props` and `state`
 
 Further runtime data, such as the component's `props` and `state`, are available as follows:
