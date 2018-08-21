@@ -203,6 +203,7 @@ describe('withTrackingComponentDecorator', () => {
         static someMethod() {
           return 'test';
         }
+
         static someVar = 'test';
       }
 
@@ -216,6 +217,7 @@ describe('withTrackingComponentDecorator', () => {
         static someMethod() {
           return 'test';
         }
+
         static someVar = 'test';
       }
 
