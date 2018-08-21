@@ -26,7 +26,8 @@ describe('tracking HoC', () => {
   it('detects a class method', () => {
     const testMethod = { testMethod: true };
     class TestMethod {
-      @trackingHoC(testMethod) blah = () => {};
+      @trackingHoC(testMethod)
+      blah = () => {};
     }
 
     const myTest = new TestMethod();

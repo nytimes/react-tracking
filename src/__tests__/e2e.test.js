@@ -38,7 +38,8 @@ describe('e2e', () => {
   it('accepts a dispatch function in options', () => {
     @track(testDataContext, { dispatch })
     class TestOptions extends React.Component {
-      @track(testData) blah = () => {};
+      @track(testData)
+      blah = () => {};
 
       render() {
         this.blah();

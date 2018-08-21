@@ -85,6 +85,11 @@
     "react-dom": "^16.4.2",
     "react-test-renderer": "^16.4.2"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "*.{js,json}": [
       "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
@@ -97,7 +102,6 @@
     "build:watch": "npm run build -- --watch",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint ./src",
-    "precommit": "lint-staged"
+    "lint": "eslint ./src"
   }
 }
