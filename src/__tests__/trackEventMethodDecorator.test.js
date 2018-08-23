@@ -54,7 +54,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -84,7 +85,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -124,7 +126,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -166,7 +169,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -197,7 +201,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();
@@ -228,7 +233,8 @@ describe('trackEventMethodDecorator', () => {
         };
       }
 
-      @trackEventMethodDecorator(trackingData) handleTestEvent = spyTestEvent;
+      @trackEventMethodDecorator(trackingData)
+      handleTestEvent = spyTestEvent;
     }
 
     const myTC = new TestClass();

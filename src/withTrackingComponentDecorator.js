@@ -20,6 +20,16 @@ export default function withTrackingComponentDecorator(
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
     class WithTracking extends Component {
+      static displayName = `WithTracking(${decoratedComponentName})`;
+
+      static contextTypes = {
+        tracking: TrackingContextType,
+      };
+
+      static childContextTypes = {
+        tracking: TrackingContextType,
+      };
+
       constructor(props, context) {
         super(props, context);
 
@@ -31,43 +41,14 @@ export default function withTrackingComponentDecorator(
         }
 
         this.computeTrackingData(props, context);
-      }
-
-      static displayName = `WithTracking(${decoratedComponentName})`;
-      static contextTypes = {
-        tracking: TrackingContextType,
-      };
-      static childContextTypes = {
-        tracking: TrackingContextType,
-      };
-
-      trackEvent = data => {
-        this.getTrackingDispatcher()(
-          // deep-merge tracking data from context and tracking data passed in here
-          merge(this.trackingData || {}, data || {})
-        );
-      };
-
-      getTrackingDispatcher() {
-        return (
-          (this.context.tracking && this.context.tracking.dispatch) || dispatch
-        );
-      }
-
-      computeTrackingData(props, context) {
-        this.ownTrackingData =
-          typeof trackingData === 'function'
-            ? trackingData(props)
-            : trackingData;
-        this.contextTrackingData =
-          (context.tracking && context.tracking.data) || {};
-        this.trackingData = merge(
-          this.contextTrackingData || {},
-          this.ownTrackingData || {}
-        );
+        this.tracking = {
+          trackEvent: this.trackEvent,
+          getTrackingData: () => this.trackingData,
+        };
       }
 
       getChildContext() {
+        const { tracking } = this.context;
         return {
           tracking: {
             data: merge(
@@ -75,16 +56,14 @@ export default function withTrackingComponentDecorator(
               this.ownTrackingData || {}
             ),
             dispatch: this.getTrackingDispatcher(),
-            process:
-              (this.context.tracking && this.context.tracking.process) ||
-              process,
+            process: (tracking && tracking.process) || process,
           },
         };
       }
 
       componentDidMount() {
-        const contextProcess =
-          this.context.tracking && this.context.tracking.process;
+        const { tracking } = this.context;
+        const contextProcess = tracking && tracking.process;
 
         if (
           typeof contextProcess === 'function' &&
@@ -112,10 +91,30 @@ export default function withTrackingComponentDecorator(
         this.computeTrackingData(nextProps, nextContext);
       }
 
-      tracking = {
-        trackEvent: this.trackEvent,
-        getTrackingData: () => this.trackingData,
+      getTrackingDispatcher() {
+        const { tracking } = this.context;
+        return (tracking && tracking.dispatch) || dispatch;
+      }
+
+      trackEvent = data => {
+        this.getTrackingDispatcher()(
+          // deep-merge tracking data from context and tracking data passed in here
+          merge(this.trackingData || {}, data || {})
+        );
       };
+
+      computeTrackingData(props, context) {
+        this.ownTrackingData =
+          typeof trackingData === 'function'
+            ? trackingData(props)
+            : trackingData;
+        this.contextTrackingData =
+          (context.tracking && context.tracking.data) || {};
+        this.trackingData = merge(
+          this.contextTrackingData || {},
+          this.ownTrackingData || {}
+        );
+      }
 
       render() {
         return <DecoratedComponent {...this.props} tracking={this.tracking} />;

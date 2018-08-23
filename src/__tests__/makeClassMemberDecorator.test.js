@@ -30,7 +30,8 @@ describe('makeClassMemberDecorator', () => {
     const mockDecorator = jest.fn(x => x);
     const fieldSpy = jest.fn();
     class Test {
-      @makeClassMemberDecorator(mockDecorator) field = fieldSpy;
+      @makeClassMemberDecorator(mockDecorator)
+      field = fieldSpy;
     }
     const myTest = new Test();
 

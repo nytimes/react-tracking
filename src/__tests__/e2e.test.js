@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
+/* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
@@ -38,7 +38,8 @@ describe('e2e', () => {
   it('accepts a dispatch function in options', () => {
     @track(testDataContext, { dispatch })
     class TestOptions extends React.Component {
-      @track(testData) blah = () => {};
+      @track(testData)
+      blah = () => {};
 
       render() {
         this.blah();
@@ -367,7 +368,11 @@ describe('e2e', () => {
       handleClick = jest.fn();
 
       render() {
-        return <button onClick={this.handleClick}>Click me!</button>;
+        return (
+          <button type="button" onClick={this.handleClick}>
+            Click me!
+          </button>
+        );
       }
     }
 
@@ -404,7 +409,7 @@ describe('e2e', () => {
       constructor() {
         super();
         this.state = {
-          booleanState: true,
+          booleanState: true, // eslint-disable-line react/no-unused-state
         };
       }
 
@@ -455,8 +460,9 @@ describe('e2e', () => {
     class Page extends React.Component {
       @track({ event: 'buttonClick' })
       handleClick = jest.fn();
+
       render() {
-        return <span onClick={this.handleClick}>Click Me</span>; // eslint-disable-line jsx-a11y/no-static-element-interactions
+        return <span onClick={this.handleClick}>Click Me</span>; // eslint-disable-line
       }
     }
 
@@ -466,10 +472,11 @@ describe('e2e', () => {
         super(props);
         this.state = { data: 1 };
       }
+
       render() {
         return (
           <div>
-            <button onClick={() => this.setState({ data: 2 })} />
+            <button type="button" onClick={() => this.setState({ data: 2 })} />
             <Top data={this.state.data}>
               <Page />
             </Top>
