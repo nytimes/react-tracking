@@ -28,4 +28,14 @@ describe('dispatchTrackingEvent', () => {
     dispatchTrackingEvent(testEventData);
     expect(window.dataLayer).toEqual([testEventData, testEventData]);
   });
+
+  it('will not push to window.dataLayer[] if the event data is empty', () => {
+    expect(window.dataLayer).not.toBeDefined();
+
+    dispatchTrackingEvent(testEventData);
+    expect(window.dataLayer).toEqual([testEventData]);
+
+    dispatchTrackingEvent({});
+    expect(window.dataLayer).toEqual([testEventData]);
+  });
 });
