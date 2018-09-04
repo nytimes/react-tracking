@@ -179,7 +179,7 @@ When there's a need to implicitly dispatch an event with some data for _every_ c
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
 ```js
-@track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null)
+@track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null })
 class App extends Component {...}
 
 ...
