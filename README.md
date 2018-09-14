@@ -328,6 +328,16 @@ export default class AdComponent extends React.Component {
 }
 ```
 
+### Other Gotchas
+1. Make sure to decorate the `class` declaration as well in order for the decorators inside the class to work. Eg. 
+```
+@track() // required
+class Product extends Component {
+  @track({ event: 'clicked' })
+  handleClick = () => {}
+}
+```
+
 ### Tracking Data
 
 Note that there are no restrictions on the objects that are passed in to the decorator.
