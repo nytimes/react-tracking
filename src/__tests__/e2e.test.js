@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { shallow, render, mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -434,18 +434,37 @@ describe('e2e', () => {
   it('logs a console error when there is already a process defined on context', () => {
     global.console.error = jest.fn();
     const process = () => {};
-    const context = { tracking: { process } };
 
     @track({}, { process })
-    class TestComponent extends React.Component {
+    class NestedComponent extends React.Component {
       render() {
         return <div />;
       }
     }
 
-    shallow(<TestComponent />, { context });
+    const Intermediate = () => (
+      <div>
+        <NestedComponent />
+      </div>
+    );
+
+    @track({}, { process })
+    class TestComponent extends React.Component {
+      render() {
+        return (
+          <div>
+            <Intermediate />
+          </div>
+        );
+      }
+    }
+
+    mount(<TestComponent />);
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
+    expect(global.console.error).toHaveBeenCalledWith(
+      '[react-tracking] options.process should be used once on top level component'
+    );
   });
 
   it('will dispatch different data if props changed', () => {
