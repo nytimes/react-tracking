@@ -19,9 +19,9 @@ export default function withTrackingComponentDecorator(
     const decoratedComponentName =
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    class WithTracking extends Component {
-      static displayName = `WithTracking(${decoratedComponentName})`;
+    const displayName = `WithTracking(${decoratedComponentName})`;
 
+    class WithTracking extends Component {
       static contextTypes = {
         tracking: TrackingContextType,
       };
@@ -104,12 +104,16 @@ export default function withTrackingComponentDecorator(
       };
 
       computeTrackingData(props, context) {
+        const { rtFwdRef, ...rest } = props;
+
         this.ownTrackingData =
           typeof trackingData === 'function'
-            ? trackingData(props)
+            ? trackingData(rest)
             : trackingData;
+
         this.contextTrackingData =
           (context.tracking && context.tracking.data) || {};
+
         this.trackingData = merge(
           this.contextTrackingData || {},
           this.ownTrackingData || {}
@@ -117,12 +121,25 @@ export default function withTrackingComponentDecorator(
       }
 
       render() {
-        return <DecoratedComponent {...this.props} tracking={this.tracking} />;
+        const { rtFwdRef, ...rest } = this.props;
+        return (
+          <DecoratedComponent
+            ref={rtFwdRef}
+            {...rest}
+            tracking={this.tracking}
+          />
+        );
       }
     }
 
-    hoistNonReactStatic(WithTracking, DecoratedComponent);
+    const forwardRef = (props, ref) => (
+      <WithTracking {...props} rtFwdRef={ref} />
+    );
 
-    return WithTracking;
+    const comp = React.forwardRef(forwardRef);
+    forwardRef.displayName = displayName;
+
+    hoistNonReactStatic(comp, DecoratedComponent);
+    return comp;
   };
 }
