@@ -9,6 +9,10 @@
 
 Read more in the [Times Open blog post](https://open.nytimes.com/introducing-react-tracking-declarative-tracking-for-react-apps-2c76706bb79a).
 
+If you just want a quick sandbox to play around with:
+
+[![Edit qk30j4x1zj](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/qk30j4x1zj)
+
 ## Installation
 
 ```
