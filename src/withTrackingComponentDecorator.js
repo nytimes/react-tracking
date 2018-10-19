@@ -77,7 +77,7 @@ export default function withTrackingComponentDecorator(
           );
         } else if (typeof contextProcess === 'function') {
           const processed = contextProcess(this.ownTrackingData);
-          if (processed) {
+          if (processed || dispatchOnMount === true) {
             this.trackEvent(processed);
           }
         } else if (typeof dispatchOnMount === 'function') {
