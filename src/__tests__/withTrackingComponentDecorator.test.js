@@ -150,6 +150,34 @@ describe('withTrackingComponentDecorator', () => {
     });
   });
 
+  describe('with process option from parent is falsey and dispatchOnMount option is true', () => {
+    const props = { props: 1 };
+    const trackingContext = { page: 1 };
+    const process = jest.fn(() => null);
+    const context = { context: 1, tracking: { process } };
+    const dispatchOnMount = true;
+
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
+    class TestComponent {
+      static displayName = 'TestComponent';
+    }
+
+    const myTC = new TestComponent(props, context);
+
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
+    it('dispatches only once when process and dispatchOnMount functions are passed', () => {
+      myTC.componentDidMount();
+      expect(process).toHaveBeenCalled();
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+        page: 1,
+      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('with a prop called tracking that has two functions as keys', () => {
     const dummyData = { page: 1 };
 
