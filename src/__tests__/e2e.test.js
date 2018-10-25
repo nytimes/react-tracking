@@ -437,15 +437,35 @@ describe('e2e', () => {
     const context = { tracking: { process, data: {}, dispatch: jest.fn() } };
 
     @track({}, { process })
-    class TestComponent extends React.Component {
+    class NestedComponent extends React.Component {
       render() {
         return <div />;
       }
     }
 
-    mount(<TestComponent />, { context });
+    const Intermediate = () => (
+      <div>
+        <NestedComponent />
+      </div>
+    );
+
+    @track({}, { process })
+    class TestComponent extends React.Component {
+      render() {
+        return (
+          <div>
+            <Intermediate />
+          </div>
+        );
+      }
+    }
+
+    mount(<TestComponent />);
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
+    expect(global.console.error).toHaveBeenCalledWith(
+      '[react-tracking] options.process should be used once on top level component'
+    );
   });
 
   it('will dispatch different data if props changed', () => {
