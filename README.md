@@ -292,6 +292,8 @@ When tracking asynchronous methods, you can also receive the resolved or rejecte
 // ...
 ```
 
+If the function returns a falsy value (e.g. `false`, `null` or `undefined`) then the tracking call will not be made.
+
 ### Accessing data stored in the component's `props` and `state`
 
 Further runtime data, such as the component's `props` and `state`, are available as follows:
