@@ -14,7 +14,9 @@ export default function trackEventMethodDecorator(trackingData = {}) {
               typeof trackingData === 'function'
                 ? trackingData(this.props, this.state, args, promiseArguments)
                 : trackingData;
-            this.props.tracking.trackEvent(thisTrackingData);
+            if (thisTrackingData) {
+              this.props.tracking.trackEvent(thisTrackingData);
+            }
           }
         };
 
