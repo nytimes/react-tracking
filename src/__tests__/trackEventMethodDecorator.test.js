@@ -148,6 +148,34 @@ describe('trackEventMethodDecorator', () => {
     expect(spyTestEvent).toHaveBeenCalledWith(dummyArgument);
   });
 
+  [null, undefined].forEach(value => {
+    it(`does not call trackEvent if the data is ${value}`, () => {
+      const trackingData = jest.fn(() => value);
+      const trackEvent = jest.fn();
+      const spyTestEvent = jest.fn();
+
+      class TestClass {
+        constructor() {
+          this.props = {
+            tracking: {
+              trackEvent,
+            },
+          };
+        }
+
+        @trackEventMethodDecorator(trackingData)
+        handleTestEvent = spyTestEvent;
+      }
+
+      const myTC = new TestClass();
+      myTC.handleTestEvent('x');
+
+      expect(trackingData).toHaveBeenCalledTimes(1);
+      expect(trackEvent).not.toHaveBeenCalled();
+      expect(spyTestEvent).toHaveBeenCalledWith('x');
+    });
+  });
+
   it('properly calls trackData when an async method has resolved', async () => {
     const dummyData = {};
     const trackingData = jest.fn(() => dummyData);
