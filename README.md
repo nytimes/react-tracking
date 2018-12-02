@@ -62,58 +62,98 @@ Alternatively, if you want to just silence proptype errors when using [eslint re
 }
 ```
 
-### Usage as a Decorator
-
-`react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
-
-The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well.
+#### Common patterns
+Let's say we have a top-level component **App**.Component **Page** works as class component and nests function component **Tabs** which only contains ui logic.                     
+It's easy to track whole application to use `track` as **decorator** or **HOC**.
 
 ```js
 import React from 'react';
+import ReactDOM from 'react-dom';
 import track from 'react-tracking';
+const dependencies = ['react', 'react-dom', 'react-tracing'];
+const Tabs = (clickHander = () => {}) => (
+  <ul>
+    {
+      dependencies.map((lib, index) =>
+        <li
+          key={index}
+          onClick={() => {clickHandler(index);}}>
+        {lib}
+        </li>
+      )
+    }
+  </ul>
+);
 
-@track({ page: 'FooPage' })
-export default class FooPage extends React.Component {
-  @track({ action: 'click' })
-  handleClick = () => {
-    // ... other stuff
-  };
+/**
+ * Use track as class decorator for class component.
+ * You must decorate class if you want to decorate a class method!
+ */
+@track({ page: 'decorator-page' })
+class Page extends Component {
+  state = {
+    index: 0,
+    count: 0,
+  }
+  /**
+   * Use track to decorate class method.
+   * TrackingData works as function type.
+   */
+  @track((props, state) => ({
+    event: 'click-me',
+    count: state.count + 1,
+  }))
+  updateClickMeCounts() {
+    this.setState({ count: this.state.count + 1 });
+  }
+
+  // Use arguments passed to class method.
+  @track((props, state, methodArgs) =>({
+    event: 'click-depencies-tabs',
+    lastIndex: state.index,
+    currentIndex: methodArgs[0],
+  })
+  clickTab(index) {
+    this.setState({ index: index });
+  }
 
   render() {
-    return <button onClick={this.handleClick}>Click Me!</button>;
+    return (
+      <section>
+        <button onClick={this.updateClickMeCounts}>Click Me</button>
+        <Tabs clickHander={this.clickTab.bind(this)} />
+      </section>
+    );
   }
 }
+
+const App = () => (
+  <div>
+    <Page />
+  </div>
+);
+// Use track as HOC for stateless function component.
+const TrackedApp = track({ app: 'my-app' })(App);
+
+ReactDOM.render(<TrackedApp />, document.getElementById('root'));
 ```
 
-### Usage on Stateless Functional Components
-
-You can also track events by importing `track()` and wrapping your stateless functional component, which will provide `props.tracking.trackEvent()` that you can call in your component like so:
-
+When react-traking tab first clicked, we will get tracking data objects shapes like:
 ```js
-import track from 'react-tracking';
-
-const FooPage = props => {
-  return (
-    <div
-      onClick={() => {
-        props.tracking.trackEvent({ action: 'click' });
-
-        // ... other stuff
-      }}
-    />
-  );
-};
-
-export default track({
-  page: 'FooPage',
-})(FooPage);
+{
+  app: 'my-app',
+  page: 'decorator-page',
+  event: 'click-depencies-tabs',
+  lastIndex: 0,
+  currentIndex: 2,
+}
 ```
+NOTE: 
+- Tracking data objects pushed to `window.dataLayer[]` in default(see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)).This is a good default if you use Google Tag Manager.
+- Decorate class if you want to decorate class method!                                 
 
-This is also how you would use this module without `@decorators`, although this is obviously awkward and the decorator syntax is recommended.
-
-### Custom `options.dispatch()` for tracking data
-
-By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). This is a good default if you use Google Tag Manager. You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
+#### Custom `options.dispatch()` for tracking data
+ You can make own dipatch method by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
 For example, to push objects to `window.myCustomDataLayer[]` instead, you would decorate your top-level `<App />` component like this:
 
@@ -131,7 +171,7 @@ export default class App extends Component {
 
 NOTE: It is recommended to do this on some top-level component so that you only need to pass in the dispatch function once. Every child component from then on will use this dispatch function.
 
-### When to use `options.dispatchOnMount`
+#### When to use `options.dispatchOnMount`
 
 You can pass in a second parameter to `@track`, `options.dispatchOnMount`. There are two valid types for this, as a boolean or as a function. The use of the two is explained in the next sections:
 
@@ -222,51 +262,6 @@ Or without async/await syntax:
 ```
 
 ### Advanced Usage
-
-You can also pass a function as an argument instead of an object literal, which allows for some advanced usage scenarios such as when your tracking data is a function of some runtime values, like so:
-
-```js
-import React from 'react';
-import track from 'react-tracking';
-
-// In this case, the "page" tracking data
-// is a function of one of its props (isNew)
-@track(props => {
-  return { page: props.isNew ? 'new' : 'existing' };
-})
-export default class FooButton extends React.Component {
-  // In this case the tracking data depends on
-  // some unknown (until runtime) value
-  @track((props, state, [event]) => ({
-    action: 'click',
-    label: event.currentTarget.title || event.currentTarget.textContent,
-  }))
-  handleClick = event => {
-    if (this.props.onClick) {
-      this.props.onClick(event);
-    }
-  };
-
-  render() {
-    return <button onClick={this.handleClick}>{this.props.children}</button>;
-  }
-}
-```
-
-NOTE: That the above code utilizes some of the newer ES6 syntax. This is what it would look like in ES5:
-
-```js
-// ...
-  @track(function(props, state, args) {
-    const event = args[0];
-    return {
-      action: 'click',
-      label: event.currentTarget.title || event.currentTarget.textContent
-    };
-  })
-// ...
-```
-
 When tracking asynchronous methods, you can also receive the resolved or rejected data from the returned promise in the fourth argument of the function passed in for tracking:
 
 ```js
@@ -293,21 +288,6 @@ When tracking asynchronous methods, you can also receive the resolved or rejecte
 ```
 
 If the function returns a falsy value (e.g. `false`, `null` or `undefined`) then the tracking call will not be made.
-
-### Accessing data stored in the component's `props` and `state`
-
-Further runtime data, such as the component's `props` and `state`, are available as follows:
-
-```js
-  @track((props, state) => ({
-    action: state.following ? "unfollow clicked" : "follow clicked",
-    name: props.name
-  }))
-  handleFollow = () => {
-     this.setState({ following: !this.state.following })
-    }
-  }
-```
 
 #### Example `props.tracking.getTrackingData()` usage
 
