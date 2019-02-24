@@ -4,4 +4,5 @@ export {
 } from './withTrackingComponentDecorator';
 export { default as trackEvent } from './trackEventMethodDecorator';
 export { default as TrackingPropType } from './TrackingPropType';
+export { default as withMockTrackingProvider } from './withMockTrackingProvider';
 export { default } from './trackingHoC';
