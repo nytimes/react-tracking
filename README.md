@@ -342,6 +342,24 @@ Note that there are no restrictions on the objects that are passed in to the dec
 
 This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
 
+### Testing
+
+To mock your tracking whilst testing, this library exports `withMockTrackingProvider`. This uses a simplifed API which allows you to provide a mock dispatch to your test subject so that it can be easily asserted on.
+
+```js
+import { withMockTrackingProvider } from 'react-tracking';
+import ComponentUnderTest from './ComponentUnderTest';
+
+const mockDispatch = jest.fn();
+const TrackedComponent = withMockTrackingProvider(mockDispatch)(ComponentUnderTest);
+
+// render TrackedComponent and fire tracking
+
+it('calls tracking dispatch method with tracking data', () => {
+  expect(mockDispatch).toHaveBeenCalledWith( /* expected data object */ );
+});
+```
+
 ### TypeScript Support
 
 You can get the type definitions for React Tracking from DefinitelyTyped using `@types/react-tracking`. For an always up-to-date example of syntax, you should consult [the react-tracking type tests](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-tracking/test/react-tracking-with-types-tests.tsx).
