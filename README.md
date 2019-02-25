@@ -334,6 +334,32 @@ export default class AdComponent extends React.Component {
 }
 ```
 
+### Testing
+
+One way to test that events are being tracked is to pass a mocked `tracking` object into your component. Here is an example using Jest and Enzyme:
+
+```js
+import ComponentToTest from './ComponentToTest';
+import { shallow } from 'enzyme';
+
+const trackEvent = jest.fn();
+
+shallow(
+  <ComponentToTest
+    tracking={{
+      trackEvent
+    }}
+  />
+);
+
+test('tracking is called with arguments', () => {
+  expect(trackEvent).toHaveBeenCalledWith({
+    event: 'pageDataReady',
+    page: 'FooPage'
+  });
+});
+```
+
 ### Tracking Data
 
 Note that there are no restrictions on the objects that are passed in to the decorator.
