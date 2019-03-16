@@ -11,6 +11,8 @@ export const TrackingContextType = PropTypes.shape({
   process: PropTypes.func,
 });
 
+export const ReactTrackingContext = React.createContext({});
+
 export default function withTrackingComponentDecorator(
   trackingData = {},
   { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
@@ -22,13 +24,7 @@ export default function withTrackingComponentDecorator(
     class WithTracking extends Component {
       static displayName = `WithTracking(${decoratedComponentName})`;
 
-      static contextTypes = {
-        tracking: TrackingContextType,
-      };
-
-      static childContextTypes = {
-        tracking: TrackingContextType,
-      };
+      static contextType = ReactTrackingContext;
 
       constructor(props, context) {
         super(props, context);
@@ -44,20 +40,6 @@ export default function withTrackingComponentDecorator(
         this.tracking = {
           trackEvent: this.trackEvent,
           getTrackingData: () => this.trackingData,
-        };
-      }
-
-      getChildContext() {
-        const { tracking } = this.context;
-        return {
-          tracking: {
-            data: merge(
-              this.contextTrackingData || {},
-              this.ownTrackingData || {}
-            ),
-            dispatch: this.getTrackingDispatcher(),
-            process: (tracking && tracking.process) || process,
-          },
         };
       }
 
@@ -91,6 +73,20 @@ export default function withTrackingComponentDecorator(
         this.computeTrackingData(nextProps, nextContext);
       }
 
+      getContextForProvider() {
+        const { tracking } = this.context;
+        return {
+          tracking: {
+            data: merge(
+              this.contextTrackingData || {},
+              this.ownTrackingData || {}
+            ),
+            dispatch: this.getTrackingDispatcher(),
+            process: (tracking && tracking.process) || process,
+          },
+        };
+      }
+
       getTrackingDispatcher() {
         const { tracking } = this.context;
         return (tracking && tracking.dispatch) || dispatch;
@@ -117,7 +113,11 @@ export default function withTrackingComponentDecorator(
       }
 
       render() {
-        return <DecoratedComponent {...this.props} tracking={this.tracking} />;
+        return (
+          <ReactTrackingContext.Provider value={this.getContextForProvider()}>
+            <DecoratedComponent {...this.props} tracking={this.tracking} />
+          </ReactTrackingContext.Provider>
+        );
       }
     }
 

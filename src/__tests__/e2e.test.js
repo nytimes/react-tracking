@@ -18,6 +18,35 @@ describe('e2e', () => {
     jest.clearAllMocks();
   });
 
+  it('defaults moslty everything', () => {
+    @track(null, { process: () => null })
+    class TestDefaults extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @track()
+    class Child extends React.Component {
+      componentDidMount() {
+        this.props.tracking.trackEvent({ test: true });
+      }
+
+      render() {
+        return 'hi';
+      }
+    }
+
+    mount(
+      <TestDefaults>
+        <Child />
+      </TestDefaults>
+    );
+
+    expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({ test: true });
+  });
+
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
     const testPageData = { page: 'TestPage' };
 
@@ -429,6 +458,40 @@ describe('e2e', () => {
       ...testDataContext,
       ...testState,
     });
+  });
+
+  it('can read tracking data from props.tracking.getTrackingData()', () => {
+    const mockReader = jest.fn();
+
+    @track(({ onProps }) => ({ onProps, ...testDataContext }))
+    class TestOptions extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @track({ child: true })
+    class TestChild extends React.Component {
+      render() {
+        mockReader(this.props.tracking.getTrackingData());
+        return 'hi';
+      }
+    }
+
+    mount(
+      <TestOptions onProps="yes">
+        <TestChild />
+      </TestOptions>
+    );
+
+    expect(mockReader).toHaveBeenCalledTimes(1);
+    expect(mockReader).toHaveBeenCalledWith({
+      child: true,
+      onProps: 'yes',
+      ...testDataContext,
+    });
+
+    expect(dispatchTrackingEvent).not.toHaveBeenCalled();
   });
 
   it('logs a console error when there is already a process defined on context', () => {

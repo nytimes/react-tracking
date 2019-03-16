@@ -104,6 +104,7 @@
     "build:watch": "npm run build -- --watch",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint ./src"
   }
 }
