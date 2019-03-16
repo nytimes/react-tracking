@@ -526,7 +526,7 @@ describe('e2e', () => {
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
     expect(global.console.error).toHaveBeenCalledWith(
-      '[react-tracking] options.process should be used once on top level component'
+      '[react-tracking] options.process should be defined once on a top-level component'
     );
   });
 

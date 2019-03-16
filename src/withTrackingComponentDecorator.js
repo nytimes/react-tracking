@@ -32,7 +32,7 @@ export default function withTrackingComponentDecorator(
         if (context.tracking && context.tracking.process && process) {
           // eslint-disable-next-line
           console.error(
-            '[react-tracking] options.process should be used once on top level component'
+            '[react-tracking] options.process should be defined once on a top-level component'
           );
         }
 
@@ -77,10 +77,7 @@ export default function withTrackingComponentDecorator(
         const { tracking } = this.context;
         return {
           tracking: {
-            data: merge(
-              this.contextTrackingData || {},
-              this.ownTrackingData || {}
-            ),
+            data: this.trackingData,
             dispatch: this.getTrackingDispatcher(),
             process: (tracking && tracking.process) || process,
           },
@@ -110,11 +107,13 @@ export default function withTrackingComponentDecorator(
           this.contextTrackingData || {},
           this.ownTrackingData || {}
         );
+
+        this.contextForProvider = this.getContextForProvider();
       }
 
       render() {
         return (
-          <ReactTrackingContext.Provider value={this.getContextForProvider()}>
+          <ReactTrackingContext.Provider value={this.contextForProvider}>
             <DecoratedComponent {...this.props} tracking={this.tracking} />
           </ReactTrackingContext.Provider>
         );
