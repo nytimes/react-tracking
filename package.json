@@ -1,6 +1,6 @@
 {
   "name": "react-tracking",
-  "version": "5.7.0",
+  "version": "6.0.0-0",
   "description": "Declarative tracking for React apps.",
   "author": "The New York Times",
   "contributors": [
@@ -54,7 +54,7 @@
   },
   "peerDependencies": {
     "core-js": "2.x",
-    "react": "^15.0.0 || ^16.0.0",
+    "react": "^16.3",
     "prop-types": "^15.x"
   },
   "devDependencies": {
@@ -104,6 +104,7 @@
     "build:watch": "npm run build -- --watch",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint ./src"
   }
 }

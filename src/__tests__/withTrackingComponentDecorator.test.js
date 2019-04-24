@@ -34,12 +34,11 @@ describe('withTrackingComponentDecorator', () => {
 
     it('defines the expected static properties', () => {
       expect(TestComponent.displayName).toBe('WithTracking(TestComponent)');
-      expect(TestComponent.contextTypes.tracking).toBeDefined();
-      expect(TestComponent.childContextTypes.tracking).toBeDefined();
+      expect(TestComponent.contextType).toBeDefined();
     });
 
-    it('calls trackingContext() in getChildContext', () => {
-      expect(myTC.getChildContext().tracking.data).toEqual({});
+    it('calls trackingContext() in getContextForProvider', () => {
+      expect(myTC.getContextForProvider().tracking.data).toEqual({});
       expect(trackingContext).toHaveBeenCalledTimes(1);
     });
 
@@ -79,8 +78,8 @@ describe('withTrackingComponentDecorator', () => {
 
     // We'll only test what differs from the functional trackingContext variation
 
-    it('returns the proper object in getChildContext', () => {
-      expect(myTC.getChildContext().tracking).toEqual({
+    it('returns the proper object in getContextForProvider', () => {
+      expect(myTC.getContextForProvider().tracking).toEqual({
         data: trackingContext,
         dispatch: mockDispatchTrackingEvent,
       });
@@ -186,7 +185,7 @@ describe('withTrackingComponentDecorator', () => {
       static displayName = 'TestComponent';
     }
 
-    const component = shallow(<TestComponent />);
+    const component = shallow(<TestComponent />).children();
 
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
