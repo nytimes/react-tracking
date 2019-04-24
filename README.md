@@ -68,6 +68,8 @@ Alternatively, if you want to just silence proptype errors when using [eslint re
 
 The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well.
 
+_**Note:** In order to decorate class property methods within a class, as shown in the example below, you will need to enable [loose mode](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties#loose) in the [babel class properties plugin](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties)._
+
 ```js
 import React from 'react';
 import track from 'react-tracking';
