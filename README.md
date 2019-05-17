@@ -111,6 +111,24 @@ export default track({
 })(FooPage);
 ```
 
+### Usage with React Hooks
+
+Following the example above, once a component is wrapped with `track` we can access a `tracking` object via the `useTracking` hook from anywhere in the sub-tree:
+
+```js
+import { useTracking } from 'react-tracking'
+
+const SomeChild = props => {
+  const tracking = useTracking()
+
+  <div
+    onClick={() => {
+      tracking.trackEvent({ action: 'click' });
+    }}
+  />
+}
+```
+
 This is also how you would use this module without `@decorators`, although this is obviously awkward and the decorator syntax is recommended.
 
 ### Custom `options.dispatch()` for tracking data
