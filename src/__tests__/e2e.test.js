@@ -1,5 +1,5 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -12,13 +12,13 @@ const testState = { booleanState: true };
 
 describe('e2e', () => {
   // eslint-disable-next-line global-require
-  const track = require('../').default;
+  const { default: track, useTracking, ReactTrackingContext } = require('../');
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('defaults moslty everything', () => {
+  it('defaults mostly everything', () => {
     @track(null, { process: () => null })
     class TestDefaults extends React.Component {
       render() {
@@ -582,6 +582,62 @@ describe('e2e', () => {
       data: 2,
       event: 'buttonClick',
       page: 'Page',
+    });
+  });
+
+  it('root context items are accessible to children', () => {
+    const App = track()(() => {
+      return <Child />;
+    });
+
+    const Child = () => {
+      const trackingContext = useContext(ReactTrackingContext);
+      expect(Object.keys(trackingContext.tracking)).toEqual([
+        'data',
+        'dispatch',
+        'process',
+      ]);
+      return <div />;
+    };
+
+    mount(<App />);
+  });
+
+  it('dispatches tracking events from a useTracking hook tracking object', () => {
+    const outerTrackingData = {
+      page: 'Page',
+    };
+
+    const Page = track(outerTrackingData, { dispatch })(props => {
+      return props.children;
+    });
+
+    const Child = () => {
+      const tracking = useTracking();
+
+      expect(tracking.getTrackingData()).toEqual(outerTrackingData);
+
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            tracking.trackEvent({ event: 'buttonClick' });
+          }}
+        />
+      );
+    };
+
+    const wrappedApp = mount(
+      <Page>
+        <Child />
+      </Page>
+    );
+
+    wrappedApp.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledWith({
+      ...outerTrackingData,
+      event: 'buttonClick',
     });
   });
 });
