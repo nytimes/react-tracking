@@ -2,9 +2,9 @@
 
 # react-tracking [![npm version](https://badge.fury.io/js/react-tracking.svg)](https://badge.fury.io/js/react-tracking)
 
-- React specific tracking library, usable as a higher-order component (as `@decorator` or directly)
+- React specific tracking library, usable as a higher-order component (as `@decorator` or directly), or as a React Hook
 - Compartmentalize tracking concerns to individual components, avoid leaking across the entire app
-- Expressive and declarative (as opposed to imperative) API to add tracking to any React app
+- Expressive and declarative (in addition to imperative) API to add tracking to any React app
 - Analytics platform agnostic
 
 Read more in the [Times Open blog post](https://open.nytimes.com/introducing-react-tracking-declarative-tracking-for-react-apps-2c76706bb79a).
@@ -21,6 +21,10 @@ npm install --save react-tracking
 
 ## Usage
 
+```js
+import track, { useTracking } from 'react-tracking';
+```
+
 `@track()` expects two arguments, `trackingData` and `options`.
 
 - `trackingData` represents the data to be tracked (or a function returning that data)
@@ -29,7 +33,7 @@ npm install --save react-tracking
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
 
-#### Tracking `props`
+#### `tracking` prop
 
 The `@track()` decorator will expose a `tracking` prop on the component it wraps, that looks like:
 
@@ -46,21 +50,7 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 }
 ```
 
-This PropType is exported for use, if desired:
-
-```js
-import { TrackingPropType } from 'react-tracking';
-```
-
-Alternatively, if you want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
-
-```json
-{
-  "rules": {
-    "react/prop-types": ["error", { "ignore": ["tracking"] }]
-  }
-}
-```
+The `useTracking` hook returns an object with this same shape.
 
 ### Usage as a Decorator
 
@@ -111,25 +101,31 @@ export default track({
 })(FooPage);
 ```
 
+_This is also how you would use this module without `@decorator` syntax, although this is obviously awkward and the decorator syntax is recommended._
+
 ### Usage with React Hooks
 
-Following the example above, once a component is wrapped with `track` we can access a `tracking` object via the `useTracking` hook from anywhere in the sub-tree:
+Following the example above, once at least one component is wrapped with `track` we can access a `tracking` object via the `useTracking` hook from anywhere in the sub-tree:
 
 ```js
-import { useTracking } from 'react-tracking'
+import { useTracking } from 'react-tracking';
 
-const SomeChild = props => {
-  const tracking = useTracking()
+const SomeChild = () => {
+  const tracking = useTracking();
 
-  <div
-    onClick={() => {
-      tracking.trackEvent({ action: 'click' });
-    }}
-  />
-}
+  return (
+    <div
+      onClick={() => {
+        tracking.trackEvent({ action: 'click' });
+      }}
+    />
+  );
+};
 ```
 
-This is also how you would use this module without `@decorators`, although this is obviously awkward and the decorator syntax is recommended.
+`useTracking()` returns an object with the same `getTrackingData()` and `trackEvent()` methods that's provided as `props.tracking` when wrapping with the `@track()` decorator/HoC.
+
+> Note that if you need to add more contextual tracking data, you still need to wrap your component with `@track()`. The `useTracking` hook does not (yet) provide a way to add to the tracking context.
 
 ### Custom `options.dispatch()` for tracking data
 
@@ -365,3 +361,21 @@ This library simply merges the tracking data objects together (as it flows throu
 ### TypeScript Support
 
 You can get the type definitions for React Tracking from DefinitelyTyped using `@types/react-tracking`. For an always up-to-date example of syntax, you should consult [the react-tracking type tests](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-tracking/test/react-tracking-with-types-tests.tsx).
+
+### PropType support
+
+The `props.tracking` PropType is exported for use, if desired:
+
+```js
+import { TrackingPropType } from 'react-tracking';
+```
+
+Alternatively, if you want to just silence proptype errors when using [eslint react/prop-types](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md), you can add this to your eslintrc:
+
+```json
+{
+  "rules": {
+    "react/prop-types": ["error", { "ignore": ["tracking"] }]
+  }
+}
+```
