@@ -105,7 +105,7 @@ _This is also how you would use this module without `@decorator` syntax, althoug
 
 ### Usage with React Hooks
 
-Following the example above, once at least one component is wrapped with `track` we can access a `tracking` object via the `useTracking` hook from anywhere in the sub-tree:
+Following the example above, once at least one component is wrapped with `@track()` we can access a `tracking` object via the `useTracking` hook from anywhere in the sub-tree:
 
 ```js
 import { useTracking } from 'react-tracking';
@@ -123,7 +123,7 @@ const SomeChild = () => {
 };
 ```
 
-`useTracking()` returns an object with the same `getTrackingData()` and `trackEvent()` methods that's provided as `props.tracking` when wrapping with the `@track()` decorator/HoC.
+The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that's provided as `props.tracking` when wrapping with the `@track()` decorator/HoC.
 
 > Note that if you need to add more contextual tracking data, you still need to wrap your component with `@track()`. The `useTracking` hook does not (yet) provide a way to add to the tracking context.
 
@@ -356,7 +356,7 @@ Note that there are no restrictions on the objects that are passed in to the dec
 
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
-This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking library.
+This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking agent (such as Google Tag Manager).
 
 ### TypeScript Support
 
