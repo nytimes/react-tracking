@@ -47,6 +47,7 @@
   "files": [
     "build"
   ],
+  "sideEffects": false,
   "main": "build/index.js",
   "scripts": {
     "build": "babel --out-dir build src --ignore src/__tests__",
