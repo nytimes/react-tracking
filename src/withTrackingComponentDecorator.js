@@ -89,12 +89,11 @@ export default function withTrackingComponentDecorator(
         return (tracking && tracking.dispatch) || dispatch;
       }
 
-      trackEvent = data => {
+      trackEvent = data =>
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
           merge(this.trackingData || {}, data || {})
         );
-      };
 
       computeTrackingData(props, context) {
         this.ownTrackingData =
