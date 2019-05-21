@@ -1,8 +1,22 @@
 {
   "name": "react-tracking",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Declarative tracking for React apps.",
-  "author": "The New York Times",
+  "keywords": [
+    "declarative",
+    "layer",
+    "metrics",
+    "nyt",
+    "react",
+    "tracking"
+  ],
+  "homepage": "https://github.com/nytimes/react-tracking",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nytimes/react-tracking"
+  },
+  "license": "Apache-2.0",
+  "author": "Jeremy Gayed <https://github.com/tizmagik>",
   "contributors": [
     {
       "name": "Nicole Baram",
@@ -21,7 +35,7 @@
     },
     {
       "name": "Jeremy Gayed",
-      "email": "jeremy.gayed@nytimes.com",
+      "email": "jeremy.gayed@gmail.com",
       "url": "https://github.com/tizmagik"
     },
     {
@@ -30,32 +44,34 @@
       "url": "https://github.com/lszm"
     }
   ],
-  "license": "Apache-2.0",
-  "main": "build/index.js",
   "files": [
     "build"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NYTimes/react-tracking"
+  "main": "build/index.js",
+  "scripts": {
+    "build": "babel --out-dir build src --ignore src/__tests__",
+    "build:watch": "npm run build -- --watch",
+    "lint": "eslint ./src",
+    "prepare": "npm run lint && npm run test && npm run build",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
   },
-  "keywords": [
-    "nyt",
-    "react",
-    "declarative",
-    "tracking",
-    "metrics",
-    "layer"
-  ],
-  "homepage": "https://github.com/NYTimes/react-tracking",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json}": [
+      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
+      "git add"
+    ]
+  },
   "dependencies": {
+    "core-js": "^3.1.1",
     "deepmerge": "^3.2.0",
     "hoist-non-react-statics": "^3.3.0"
-  },
-  "peerDependencies": {
-    "core-js": "3.x",
-    "react": "^16.8",
-    "prop-types": "^15.x"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -68,7 +84,6 @@
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
-    "core-js": "^3.1.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "eslint": "^5.15.2",
@@ -88,24 +103,8 @@
     "react-dom": "^16.8.4",
     "react-test-renderer": "^16.8.4"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,json}": [
-      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
-      "git add"
-    ]
-  },
-  "scripts": {
-    "prepare": "npm run lint && npm run test && npm run build",
-    "build": "babel --out-dir build src --ignore src/__tests__",
-    "build:watch": "npm run build -- --watch",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint ./src"
+  "peerDependencies": {
+    "prop-types": "^15.x",
+    "react": "^16.8"
   }
 }
