@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import merge from 'deepmerge';
+import deepmerge from 'deepmerge';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 
 import dispatchTrackingEvent from './dispatchTrackingEvent';
@@ -9,13 +9,19 @@ export const TrackingContextType = PropTypes.shape({
   data: PropTypes.object,
   dispatch: PropTypes.func,
   process: PropTypes.func,
+  merge: PropTypes.func,
 });
 
 export const ReactTrackingContext = React.createContext({});
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
+  {
+    dispatch = dispatchTrackingEvent,
+    dispatchOnMount = false,
+    process,
+    merge,
+  } = {}
 ) {
   return DecoratedComponent => {
     const decoratedComponentName =
@@ -36,6 +42,13 @@ export default function withTrackingComponentDecorator(
           );
         }
 
+        if (context.tracking && context.tracking.merge && merge) {
+          // eslint-disable-next-line
+          console.error(
+            '[react-tracking] options.merge should be defined once on a top-level component'
+          );
+        }
+
         this.computeTrackingData(props, context);
         this.tracking = {
           trackEvent: this.trackEvent,
@@ -46,13 +59,13 @@ export default function withTrackingComponentDecorator(
       componentDidMount() {
         const { tracking } = this.context;
         const contextProcess = tracking && tracking.process;
-
+        const contextMerge = (tracking && tracking.merge) || deepmerge;
         if (
           typeof contextProcess === 'function' &&
           typeof dispatchOnMount === 'function'
         ) {
           this.trackEvent(
-            merge(
+            contextMerge(
               contextProcess(this.ownTrackingData) || {},
               dispatchOnMount(this.trackingData) || {}
             )
@@ -80,6 +93,7 @@ export default function withTrackingComponentDecorator(
             data: this.trackingData,
             dispatch: this.getTrackingDispatcher(),
             process: (tracking && tracking.process) || process,
+            merge: this.getTrackingMerge(),
           },
         };
       }
@@ -89,21 +103,29 @@ export default function withTrackingComponentDecorator(
         return (tracking && tracking.dispatch) || dispatch;
       }
 
+      getTrackingMerge() {
+        const { tracking } = this.context;
+        return (tracking && tracking.merge) || merge;
+      }
+
       trackEvent = data => {
         this.getTrackingDispatcher()(
           // deep-merge tracking data from context and tracking data passed in here
-          merge(this.trackingData || {}, data || {})
+          deepmerge(this.trackingData || {}, data || {})
         );
       };
 
       computeTrackingData(props, context) {
+        const { tracking } = context;
+        const contextMerge = (tracking && tracking.merge) || deepmerge;
+
         this.ownTrackingData =
           typeof trackingData === 'function'
             ? trackingData(props)
             : trackingData;
         this.contextTrackingData =
           (context.tracking && context.tracking.data) || {};
-        this.trackingData = merge(
+        this.trackingData = contextMerge(
           this.contextTrackingData || {},
           this.ownTrackingData || {}
         );

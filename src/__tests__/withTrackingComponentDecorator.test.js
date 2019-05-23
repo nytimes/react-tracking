@@ -82,6 +82,7 @@ describe('withTrackingComponentDecorator', () => {
       expect(myTC.getContextForProvider().tracking).toEqual({
         data: trackingContext,
         dispatch: mockDispatchTrackingEvent,
+        merge: undefined,
       });
     });
 

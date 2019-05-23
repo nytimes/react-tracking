@@ -1,6 +1,7 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 import React, { useContext } from 'react';
 import { mount } from 'enzyme';
+import appendMerge from '../appendMerge';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -138,6 +139,34 @@ describe('e2e', () => {
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       page: 'TestDeepMerge',
       key: { x: 2, y: 1, z: 2 },
+    });
+  });
+
+  it('will append-merge tracking data', () => {
+    const testData1 = { key: { x: 1, y: 1 } };
+    const testData2 = { key: { x: 2, z: 2 }, page: 'TestAppendMerge' };
+
+    @track(testData1, { merge: appendMerge })
+    class TestData1 extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    const TestData2 = track(testData2, {
+      dispatchOnMount: true,
+      merge: appendMerge,
+    })(() => <div />);
+
+    mount(
+      <TestData1>
+        <TestData2 />
+      </TestData1>
+    );
+
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
+      page: ['TestAppendMerge'],
+      key: [{ x: 1, y: 1 }, { x: 2, z: 2 }],
     });
   });
 
@@ -530,6 +559,42 @@ describe('e2e', () => {
     );
   });
 
+  it('logs a console error when there is already a merge defined on context', () => {
+    global.console.error = jest.fn();
+    const merge = () => appendMerge;
+
+    @track({}, { merge })
+    class NestedComponent extends React.Component {
+      render() {
+        return <div />;
+      }
+    }
+
+    const Intermediate = () => (
+      <div>
+        <NestedComponent />
+      </div>
+    );
+
+    @track({}, { merge })
+    class TestComponent extends React.Component {
+      render() {
+        return (
+          <div>
+            <Intermediate />
+          </div>
+        );
+      }
+    }
+
+    mount(<TestComponent />);
+
+    expect(global.console.error).toHaveBeenCalledTimes(1);
+    expect(global.console.error).toHaveBeenCalledWith(
+      '[react-tracking] options.merge should be defined once on a top-level component'
+    );
+  });
+
   it('will dispatch different data if props changed', () => {
     @track(props => ({ data: props.data }))
     class Top extends React.Component {
@@ -596,6 +661,7 @@ describe('e2e', () => {
         'data',
         'dispatch',
         'process',
+        'merge',
       ]);
       return <div />;
     };
