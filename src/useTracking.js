@@ -1,4 +1,3 @@
-import merge from 'deepmerge';
 import { useContext, useMemo } from 'react';
 import { ReactTrackingContext } from './withTrackingComponentDecorator';
 
@@ -15,12 +14,12 @@ export default function useTracking() {
 
   return useMemo(
     () => ({
-      getTrackingData: () => trackingContext.tracking.data,
-      trackEvent: data =>
-        trackingContext.tracking.dispatch(
-          merge(trackingContext.tracking.data, data)
-        ),
+      getTrackingData: () => trackingContext.tracking.getTrackingData(),
+      trackEvent: data => trackingContext.tracking.dispatch(data),
     }),
-    [trackingContext.tracking.data]
+    [
+      trackingContext.tracking.getTrackingData,
+      trackingContext.tracking.dispatch,
+    ]
   );
 }

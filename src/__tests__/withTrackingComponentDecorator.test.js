@@ -38,7 +38,9 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('calls trackingContext() in getContextForProvider', () => {
-      expect(myTC.getContextForProvider().tracking.data).toEqual({});
+      expect(myTC.contextValueForProvider.tracking.getTrackingData()).toEqual(
+        {}
+      );
       expect(trackingContext).toHaveBeenCalledTimes(1);
     });
 
@@ -79,10 +81,11 @@ describe('withTrackingComponentDecorator', () => {
     // We'll only test what differs from the functional trackingContext variation
 
     it('returns the proper object in getContextForProvider', () => {
-      expect(myTC.getContextForProvider().tracking).toEqual({
-        data: trackingContext,
-        dispatch: mockDispatchTrackingEvent,
-      });
+      expect(Object.keys(myTC.contextValueForProvider.tracking)).toEqual([
+        'dispatch',
+        'getTrackingData',
+        'process',
+      ]);
     });
 
     it('dispatches event in componentDidMount', () => {
