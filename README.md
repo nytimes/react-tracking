@@ -11,7 +11,7 @@ Read more in the [Times Open blog post](https://open.nytimes.com/introducing-rea
 
 If you just want a quick sandbox to play around with:
 
-[![Edit qk30j4x1zj](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/qk30j4x1zj)
+[![Edit react-tracking example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/reacttracking-example-qk30j4x1zj)
 
 ## Installation
 
