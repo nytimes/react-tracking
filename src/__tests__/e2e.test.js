@@ -125,9 +125,11 @@ describe('e2e', () => {
       }
     }
 
-    const TestData2 = track(testData2, { dispatchOnMount: true })(() => (
-      <div />
-    ));
+    const TestData3 = track({ key: { x: 3, y: 3 } }, { dispatchOnMount: true })(
+      () => <div />
+    );
+
+    const TestData2 = track(testData2)(() => <TestData3 />);
 
     mount(
       <TestData1>
@@ -137,7 +139,7 @@ describe('e2e', () => {
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       page: 'TestDeepMerge',
-      key: { x: 2, y: 1, z: 2 },
+      key: { x: 3, y: 3, z: 2 },
     });
   });
 
@@ -585,6 +587,51 @@ describe('e2e', () => {
     });
   });
 
+  it('does not cause unnecessary updates due to context changes', () => {
+    let innerRenderCount = 0;
+
+    const OuterComponent = track()(props => props.children);
+
+    const MiddleComponent = track()(
+      React.memo(
+        props => props.children,
+        (props, prevProps) => props.middleProp === prevProps.middleProp
+      )
+    );
+
+    const InnerComponent = track()(() => {
+      innerRenderCount += 1;
+      return null;
+    });
+
+    const App = track()(() => {
+      const [state, setState] = React.useState({});
+
+      return (
+        <div className="App">
+          <h1>Extra renders of InnerComponent caused by new context API</h1>
+          <button
+            onClick={() => setState({ count: state.count + 1 })}
+            type="button"
+          >
+            Update Props
+          </button>
+          <OuterComponent trackedProp={state}>
+            <MiddleComponent middleProp={1}>
+              <InnerComponent innerProps="a" />
+            </MiddleComponent>
+          </OuterComponent>
+        </div>
+      );
+    });
+
+    const wrapper = mount(<App />);
+
+    wrapper.find('button').simulate('click');
+
+    expect(innerRenderCount).toEqual(1);
+  });
+
   it('root context items are accessible to children', () => {
     const App = track()(() => {
       return <Child />;
@@ -593,8 +640,8 @@ describe('e2e', () => {
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
       expect(Object.keys(trackingContext.tracking)).toEqual([
-        'data',
         'dispatch',
+        'getTrackingData',
         'process',
       ]);
       return <div />;

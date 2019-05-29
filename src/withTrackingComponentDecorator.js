@@ -29,23 +29,29 @@ export default function withTrackingComponentDecorator(
       constructor(props, context) {
         super(props, context);
 
-        if (context.tracking && context.tracking.process && process) {
+        if (this.getProcessFn() && process) {
           // eslint-disable-next-line
           console.error(
             '[react-tracking] options.process should be defined once on a top-level component'
           );
         }
 
-        this.computeTrackingData(props, context);
         this.tracking = {
           trackEvent: this.trackEvent,
-          getTrackingData: () => this.trackingData,
+          getTrackingData: this.getTrackingDataFn(),
+        };
+
+        this.contextValueForProvider = {
+          tracking: {
+            dispatch: this.getTrackingDispatcher(),
+            getTrackingData: this.getTrackingDataFn(),
+            process: this.getProcessFn() || process,
+          },
         };
       }
 
       componentDidMount() {
-        const { tracking } = this.context;
-        const contextProcess = tracking && tracking.process;
+        const contextProcess = this.getProcessFn();
 
         if (
           typeof contextProcess === 'function' &&
@@ -53,67 +59,60 @@ export default function withTrackingComponentDecorator(
         ) {
           this.trackEvent(
             merge(
-              contextProcess(this.ownTrackingData) || {},
-              dispatchOnMount(this.trackingData) || {}
+              contextProcess(this.getOwnTrackingData()) || {},
+              dispatchOnMount(this.tracking.getTrackingData()) || {}
             )
           );
         } else if (typeof contextProcess === 'function') {
-          const processed = contextProcess(this.ownTrackingData);
+          const processed = contextProcess(this.getOwnTrackingData());
           if (processed || dispatchOnMount === true) {
             this.trackEvent(processed);
           }
         } else if (typeof dispatchOnMount === 'function') {
-          this.trackEvent(dispatchOnMount(this.trackingData));
+          this.trackEvent(dispatchOnMount(this.tracking.getTrackingData()));
         } else if (dispatchOnMount === true) {
           this.trackEvent();
         }
       }
 
-      componentWillReceiveProps(nextProps, nextContext) {
-        this.computeTrackingData(nextProps, nextContext);
-      }
-
-      getContextForProvider() {
+      getProcessFn = () => {
         const { tracking } = this.context;
-        return {
-          tracking: {
-            data: this.trackingData,
-            dispatch: this.getTrackingDispatcher(),
-            process: (tracking && tracking.process) || process,
-          },
-        };
-      }
-
-      getTrackingDispatcher() {
-        const { tracking } = this.context;
-        return (tracking && tracking.dispatch) || dispatch;
-      }
-
-      trackEvent = data => {
-        this.getTrackingDispatcher()(
-          // deep-merge tracking data from context and tracking data passed in here
-          merge(this.trackingData || {}, data || {})
-        );
+        return tracking && tracking.process;
       };
 
-      computeTrackingData(props, context) {
-        this.ownTrackingData =
+      getOwnTrackingData = () => {
+        const ownTrackingData =
           typeof trackingData === 'function'
-            ? trackingData(props)
+            ? trackingData(this.props)
             : trackingData;
-        this.contextTrackingData =
-          (context.tracking && context.tracking.data) || {};
-        this.trackingData = merge(
-          this.contextTrackingData || {},
-          this.ownTrackingData || {}
-        );
+        return ownTrackingData || {};
+      };
 
-        this.contextForProvider = this.getContextForProvider();
-      }
+      getTrackingDataFn = () => {
+        const { tracking } = this.context;
+        const contextGetTrackingData =
+          (tracking && tracking.getTrackingData) || this.getOwnTrackingData;
+
+        return () =>
+          contextGetTrackingData === this.getOwnTrackingData
+            ? this.getOwnTrackingData()
+            : merge(contextGetTrackingData(), this.getOwnTrackingData());
+      };
+
+      getTrackingDispatcher = () => {
+        const { tracking } = this.context;
+        const contextDispatch = (tracking && tracking.dispatch) || dispatch;
+        return data =>
+          contextDispatch(merge(this.getOwnTrackingData(), data || {}));
+      };
+
+      trackEvent = (data = {}) => {
+        this.contextValueForProvider.tracking.dispatch(data);
+      };
 
       render() {
         return (
-          <ReactTrackingContext.Provider value={this.contextForProvider}>
+          <ReactTrackingContext.Provider value={this.contextValueForProvider}>
             <DecoratedComponent {...this.props} tracking={this.tracking} />
           </ReactTrackingContext.Provider>
         );
