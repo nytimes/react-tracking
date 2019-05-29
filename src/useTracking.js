@@ -14,8 +14,8 @@ export default function useTracking() {
 
   return useMemo(
     () => ({
-      getTrackingData: () => trackingContext.tracking.getTrackingData(),
-      trackEvent: data => trackingContext.tracking.dispatch(data),
+      getTrackingData: trackingContext.tracking.getTrackingData,
+      trackEvent: trackingContext.tracking.dispatch,
     }),
     [
       trackingContext.tracking.getTrackingData,

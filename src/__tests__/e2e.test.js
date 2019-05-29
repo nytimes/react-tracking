@@ -605,18 +605,18 @@ describe('e2e', () => {
     });
 
     const App = track()(() => {
-      const [props, setProps] = React.useState({});
+      const [state, setState] = React.useState({});
 
       return (
         <div className="App">
           <h1>Extra renders of InnerComponent caused by new context API</h1>
           <button
-            onClick={() => setProps({ count: props.count + 1 })}
+            onClick={() => setState({ count: state.count + 1 })}
             type="button"
           >
             Update Props
           </button>
-          <OuterComponent trackedProp={props}>
+          <OuterComponent trackedProp={state}>
             <MiddleComponent middleProp={1}>
               <InnerComponent innerProps="a" />
             </MiddleComponent>

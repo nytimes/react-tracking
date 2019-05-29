@@ -38,13 +38,13 @@ export default function withTrackingComponentDecorator(
 
         this.tracking = {
           trackEvent: this.trackEvent,
-          getTrackingData: this.getTrackingData(),
+          getTrackingData: this.getTrackingDataFn(),
         };
 
         this.contextValueForProvider = {
           tracking: {
             dispatch: this.getTrackingDispatcher(),
-            getTrackingData: this.getTrackingData(),
+            getTrackingData: this.getTrackingDataFn(),
             process: this.getProcessFn() || process,
           },
         };
@@ -88,7 +88,7 @@ export default function withTrackingComponentDecorator(
         return ownTrackingData || {};
       };
 
-      getTrackingData = () => {
+      getTrackingDataFn = () => {
         const { tracking } = this.context;
         const contextGetTrackingData =
           (tracking && tracking.getTrackingData) || this.getOwnTrackingData;
