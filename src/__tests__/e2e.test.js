@@ -12,7 +12,7 @@ const testState = { booleanState: true };
 
 describe('e2e', () => {
   // eslint-disable-next-line global-require
-  const { default: track, useTracking, ReactTrackingContext } = require('../');
+  const { default: track, useTracking } = require('../');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -633,6 +633,10 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
+    const {
+      ReactTrackingContext,
+    } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
+
     const App = track()(() => {
       return <Child />;
     });
