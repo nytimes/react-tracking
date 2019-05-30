@@ -17,7 +17,13 @@ describe('react-tracking', () => {
   it('exports TrackingPropType', () => {
     expect(index.TrackingPropType).toBeDefined();
   });
+  it('exports track', () => {
+    expect(index.track).toBeDefined();
+  });
   it('exports default function', () => {
     expect(typeof index.default).toBe('function');
+  });
+  it('track and default export are the same', () => {
+    expect(index.track).toBe(index.default);
   });
 });
