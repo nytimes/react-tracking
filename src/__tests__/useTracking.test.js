@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import { mount } from 'enzyme';
 import React from 'react';
 import { renderToString } from 'react-dom/server';

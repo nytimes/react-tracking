@@ -1,0 +1,7 @@
+module.exports = {
+  extends: ['../../.eslintrc.js'],
+  rules: {
+    'max-classes-per-file': 0,
+    'react/static-property-placement': 0,
+  },
+};
