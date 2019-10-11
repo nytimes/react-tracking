@@ -1,4 +1,5 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
 import { mount } from 'enzyme';
 

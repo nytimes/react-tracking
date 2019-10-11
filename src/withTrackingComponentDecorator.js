@@ -1,3 +1,4 @@
+/* eslint-disable react/static-property-placement, react/sort-comp, react/jsx-props-no-spreading */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import merge from 'deepmerge';
