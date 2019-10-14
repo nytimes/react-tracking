@@ -644,7 +644,7 @@ describe('e2e', () => {
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
-      expect(Object.keys(trackingContext.tracking)).toEqual([
+      expect(Object.keys(trackingContext)).toEqual([
         'dispatch',
         'getTrackingData',
         'process',

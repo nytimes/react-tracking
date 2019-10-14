@@ -1,5 +1,5 @@
-/* eslint-disable react/static-property-placement, react/sort-comp, react/jsx-props-no-spreading */
-import React, { Component } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import hoistNonReactStatic from 'hoist-non-react-statics';
@@ -22,103 +22,102 @@ export default function withTrackingComponentDecorator(
     const decoratedComponentName =
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    class WithTracking extends Component {
-      static displayName = `WithTracking(${decoratedComponentName})`;
+    function WithTracking(props) {
+      const tracking = useContext(ReactTrackingContext);
 
-      static contextType = ReactTrackingContext;
+      const getProcessFn = useCallback(() => tracking && tracking.process, []);
 
-      constructor(props, context) {
-        super(props, context);
+      const getOwnTrackingData = useCallback(() => {
+        const ownTrackingData =
+          typeof trackingData === 'function'
+            ? trackingData(props)
+            : trackingData;
+        return ownTrackingData || {};
+      }, [trackingData, props]);
 
-        if (this.getProcessFn() && process) {
+      const getTrackingDataFn = useCallback(() => {
+        const contextGetTrackingData =
+          (tracking && tracking.getTrackingData) || getOwnTrackingData;
+
+        return () =>
+          contextGetTrackingData === getOwnTrackingData
+            ? getOwnTrackingData()
+            : merge(contextGetTrackingData(), getOwnTrackingData());
+      }, [getOwnTrackingData]);
+
+      const getTrackingDispatcher = useCallback(() => {
+        const contextDispatch = (tracking && tracking.dispatch) || dispatch;
+        return data => contextDispatch(merge(getOwnTrackingData(), data || {}));
+      }, [dispatch, getOwnTrackingData]);
+
+      const trackEvent = useCallback(
+        (data = {}) => {
+          getTrackingDispatcher()(data);
+        },
+        [getTrackingDispatcher]
+      );
+
+      useEffect(() => {
+        const contextProcess = getProcessFn();
+        const getTrackingData = getTrackingDataFn();
+
+        if (getProcessFn() && process) {
           // eslint-disable-next-line
           console.error(
             '[react-tracking] options.process should be defined once on a top-level component'
           );
         }
 
-        this.tracking = {
-          trackEvent: this.trackEvent,
-          getTrackingData: this.getTrackingDataFn(),
-        };
-
-        this.contextValueForProvider = {
-          tracking: {
-            dispatch: this.getTrackingDispatcher(),
-            getTrackingData: this.getTrackingDataFn(),
-            process: this.getProcessFn() || process,
-          },
-        };
-      }
-
-      componentDidMount() {
-        const contextProcess = this.getProcessFn();
-
         if (
           typeof contextProcess === 'function' &&
           typeof dispatchOnMount === 'function'
         ) {
-          this.trackEvent(
+          trackEvent(
             merge(
-              contextProcess(this.getOwnTrackingData()) || {},
-              dispatchOnMount(this.tracking.getTrackingData()) || {}
+              contextProcess(getOwnTrackingData()) || {},
+              dispatchOnMount(getTrackingData()) || {}
             )
           );
         } else if (typeof contextProcess === 'function') {
-          const processed = contextProcess(this.getOwnTrackingData());
+          const processed = contextProcess(getOwnTrackingData());
           if (processed || dispatchOnMount === true) {
-            this.trackEvent(processed);
+            trackEvent(processed);
           }
         } else if (typeof dispatchOnMount === 'function') {
-          this.trackEvent(dispatchOnMount(this.tracking.getTrackingData()));
+          trackEvent(dispatchOnMount(getTrackingData()));
         } else if (dispatchOnMount === true) {
-          this.trackEvent();
+          trackEvent();
         }
-      }
+      }, []);
 
-      getProcessFn = () => {
-        const { tracking } = this.context;
-        return tracking && tracking.process;
-      };
+      const trackingProp = useMemo(
+        () => ({
+          trackEvent,
+          getTrackingData: getTrackingDataFn(),
+        }),
+        [trackEvent, getTrackingDataFn]
+      );
 
-      getOwnTrackingData = () => {
-        const ownTrackingData =
-          typeof trackingData === 'function'
-            ? trackingData(this.props)
-            : trackingData;
-        return ownTrackingData || {};
-      };
+      const contextValue = useMemo(
+        () => ({
+          dispatch: getTrackingDispatcher(),
+          getTrackingData: getTrackingDataFn(),
+          process: getProcessFn() || process,
+        }),
+        [getTrackingDispatcher, getTrackingDataFn, getProcessFn, process]
+      );
 
-      getTrackingDataFn = () => {
-        const { tracking } = this.context;
-        const contextGetTrackingData =
-          (tracking && tracking.getTrackingData) || this.getOwnTrackingData;
-
-        return () =>
-          contextGetTrackingData === this.getOwnTrackingData
-            ? this.getOwnTrackingData()
-            : merge(contextGetTrackingData(), this.getOwnTrackingData());
-      };
-
-      getTrackingDispatcher = () => {
-        const { tracking } = this.context;
-        const contextDispatch = (tracking && tracking.dispatch) || dispatch;
-        return data =>
-          contextDispatch(merge(this.getOwnTrackingData(), data || {}));
-      };
-
-      trackEvent = (data = {}) => {
-        this.contextValueForProvider.tracking.dispatch(data);
-      };
-
-      render() {
-        return (
-          <ReactTrackingContext.Provider value={this.contextValueForProvider}>
-            <DecoratedComponent {...this.props} tracking={this.tracking} />
+      return useMemo(
+        () => (
+          <ReactTrackingContext.Provider value={contextValue}>
+            <DecoratedComponent {...props} tracking={trackingProp} />
           </ReactTrackingContext.Provider>
-        );
-      }
+        ),
+        [contextValue, trackingProp]
+      );
     }
+
+    WithTracking.displayName = `WithTracking(${decoratedComponentName})`;
 
     hoistNonReactStatic(WithTracking, DecoratedComponent);
 

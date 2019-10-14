@@ -2,9 +2,9 @@ import { useContext, useMemo } from 'react';
 import { ReactTrackingContext } from './withTrackingComponentDecorator';
 
 export default function useTracking() {
-  const trackingContext = useContext(ReactTrackingContext);
+  const { dispatch, getTrackingData } = useContext(ReactTrackingContext);
 
-  if (!(trackingContext && trackingContext.tracking)) {
+  if (!dispatch) {
     throw new Error(
       'Attempting to call `useTracking` ' +
         'without a ReactTrackingContext present. Did you forget to wrap the top of ' +
@@ -14,12 +14,9 @@ export default function useTracking() {
 
   return useMemo(
     () => ({
-      getTrackingData: trackingContext.tracking.getTrackingData,
-      trackEvent: trackingContext.tracking.dispatch,
+      getTrackingData,
+      trackEvent: dispatch,
     }),
-    [
-      trackingContext.tracking.getTrackingData,
-      trackingContext.tracking.dispatch,
-    ]
+    [getTrackingData, dispatch]
   );
 }
