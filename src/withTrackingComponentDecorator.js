@@ -23,7 +23,7 @@ export default function withTrackingComponentDecorator(
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
     function WithTracking(props) {
-      const tracking = useContext(ReactTrackingContext);
+      const { tracking } = useContext(ReactTrackingContext);
 
       const getProcessFn = useCallback(() => tracking && tracking.process, []);
 
@@ -100,9 +100,11 @@ export default function withTrackingComponentDecorator(
 
       const contextValue = useMemo(
         () => ({
-          dispatch: getTrackingDispatcher(),
-          getTrackingData: getTrackingDataFn(),
-          process: getProcessFn() || process,
+          tracking: {
+            dispatch: getTrackingDispatcher(),
+            getTrackingData: getTrackingDataFn(),
+            process: getProcessFn() || process,
+          },
         }),
         [getTrackingDispatcher, getTrackingDataFn, getProcessFn, process]
       );
