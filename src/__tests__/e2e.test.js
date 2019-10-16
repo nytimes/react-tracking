@@ -1,6 +1,7 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -631,6 +632,56 @@ describe('e2e', () => {
     wrapper.find('button').simulate('click');
 
     expect(innerRenderCount).toEqual(1);
+  });
+
+  it('does not prevent components using the legacy context API from receiving updates', () => {
+    class Top extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @track({ page: 'Page' }, { dispatchOnMount: true })
+    class Page extends React.Component {
+      static contextTypes = { theme: PropTypes.string };
+
+      render() {
+        return <span>{this.context.theme}</span>;
+      }
+    }
+
+    class App extends React.Component {
+      static childContextTypes = { theme: PropTypes.string };
+
+      constructor(props) {
+        super(props);
+        this.state = { theme: 'light' };
+      }
+
+      getChildContext() {
+        return { theme: this.state.theme };
+      }
+
+      render() {
+        return (
+          <div>
+            <button
+              type="button"
+              onClick={() => this.setState({ theme: 'dark' })}
+            />
+            <Top>
+              <Page />
+            </Top>
+          </div>
+        );
+      }
+    }
+
+    const wrapper = mount(<App />);
+    expect(wrapper.find('span').text()).toBe('light');
+
+    wrapper.find('button').simulate('click');
+    expect(wrapper.find('span').text()).toBe('dark');
   });
 
   it('root context items are accessible to children', () => {
