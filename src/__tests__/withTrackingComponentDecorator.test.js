@@ -1,4 +1,4 @@
-/* eslint-disable react/destructuring-assignment react/prop-types */
+/* eslint-disable react/destructuring-assignment,react/prop-types,react/jsx-props-no-spreading */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
