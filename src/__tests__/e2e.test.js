@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
+import hoistNonReactStatics from 'hoist-non-react-statics';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -635,21 +636,41 @@ describe('e2e', () => {
   });
 
   it('does not prevent components using the legacy context API from receiving updates', () => {
+    const withLegacyContext = DecoratedComponent => {
+      class WithLegacyContext extends React.Component {
+        static contextTypes = { theme: PropTypes.string };
+
+        render() {
+          return (
+            <DecoratedComponent
+              {...this.props} // eslint-disable-line react/jsx-props-no-spreading
+              theme={this.context.theme}
+            />
+          );
+        }
+      }
+
+      hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
+
+      return WithLegacyContext;
+    };
+
+    @track()
     class Top extends React.Component {
       render() {
         return this.props.children;
       }
     }
 
+    @withLegacyContext
     @track({ page: 'Page' }, { dispatchOnMount: true })
     class Page extends React.Component {
-      static contextTypes = { theme: PropTypes.string };
-
       render() {
-        return <span>{this.context.theme}</span>;
+        return <span>{this.props.theme}</span>;
       }
     }
 
+    @track()
     class App extends React.Component {
       static childContextTypes = { theme: PropTypes.string };
 
@@ -662,13 +683,14 @@ describe('e2e', () => {
         return { theme: this.state.theme };
       }
 
+      handleUpdateTheme = () => {
+        this.setState({ theme: 'dark' });
+      };
+
       render() {
         return (
           <div>
-            <button
-              type="button"
-              onClick={() => this.setState({ theme: 'dark' })}
-            />
+            <button type="button" onClick={this.handleUpdateTheme} />
             <Top>
               <Page />
             </Top>
