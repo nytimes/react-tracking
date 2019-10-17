@@ -2,8 +2,8 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import hoistNonReactStatics from 'hoist-non-react-statics';
 import { mount } from 'enzyme';
+import hoistNonReactStatics from './hoist-non-react-statics';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -655,6 +655,27 @@ describe('e2e', () => {
       return WithLegacyContext;
     };
 
+    const CurrentContext = React.createContext({});
+
+    const withCurrentContext = DecoratedComponent => {
+      class WithCurrentContext extends React.Component {
+        static contextType = CurrentContext;
+
+        render() {
+          return (
+            <CurrentContext.Consumer>
+              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+              {value => <DecoratedComponent {...this.props} {...value} />}
+            </CurrentContext.Consumer>
+          );
+        }
+      }
+
+      hoistNonReactStatics(WithCurrentContext, DecoratedComponent);
+
+      return WithCurrentContext;
+    };
+
     @track()
     class Top extends React.Component {
       render() {
@@ -662,6 +683,7 @@ describe('e2e', () => {
       }
     }
 
+    @withCurrentContext
     @withLegacyContext
     @track({ page: 'Page' }, { dispatchOnMount: true })
     class Page extends React.Component {
@@ -689,12 +711,12 @@ describe('e2e', () => {
 
       render() {
         return (
-          <div>
+          <CurrentContext.Provider value={{}}>
             <button type="button" onClick={this.handleUpdateTheme} />
             <Top>
               <Page />
             </Top>
-          </div>
+          </CurrentContext.Provider>
         );
       }
     }
