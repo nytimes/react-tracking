@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
-import hoistNonReactStatics from './hoist-non-react-statics';
+import hoistNonReactStatics from './hoist-non-react-statics@3.0.1';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -650,6 +650,7 @@ describe('e2e', () => {
         }
       }
 
+      // Uses the src file from hoist-non-react-statics v3.0.1
       hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
 
       return WithLegacyContext;
