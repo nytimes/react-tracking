@@ -635,7 +635,7 @@ describe('e2e', () => {
     expect(innerRenderCount).toEqual(1);
   });
 
-  it('does not prevent components using the legacy context API from receiving updates', () => {
+  it('does not prevent components using the legacy context API and hoist-non-react-statics < v3.1.0 from receiving updates', () => {
     const withLegacyContext = DecoratedComponent => {
       class WithLegacyContext extends React.Component {
         static contextTypes = { theme: PropTypes.string };
@@ -655,27 +655,6 @@ describe('e2e', () => {
       return WithLegacyContext;
     };
 
-    const CurrentContext = React.createContext({});
-
-    const withCurrentContext = DecoratedComponent => {
-      class WithCurrentContext extends React.Component {
-        static contextType = CurrentContext;
-
-        render() {
-          return (
-            <CurrentContext.Consumer>
-              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-              {value => <DecoratedComponent {...this.props} {...value} />}
-            </CurrentContext.Consumer>
-          );
-        }
-      }
-
-      hoistNonReactStatics(WithCurrentContext, DecoratedComponent);
-
-      return WithCurrentContext;
-    };
-
     @track()
     class Top extends React.Component {
       render() {
@@ -683,7 +662,6 @@ describe('e2e', () => {
       }
     }
 
-    @withCurrentContext
     @withLegacyContext
     @track({ page: 'Page' }, { dispatchOnMount: true })
     class Page extends React.Component {
@@ -711,12 +689,12 @@ describe('e2e', () => {
 
       render() {
         return (
-          <CurrentContext.Provider value={{}}>
+          <div>
             <button type="button" onClick={this.handleUpdateTheme} />
             <Top>
               <Page />
             </Top>
-          </CurrentContext.Provider>
+          </div>
         );
       }
     }
