@@ -1,9 +1,9 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
-import hoistNonReactStatics from './hoist-non-react-statics@3.0.1';
+import PropTypes from 'prop-types';
+import hoistNonReactStatics from 'hoist-non-react-statics';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -650,8 +650,11 @@ describe('e2e', () => {
         }
       }
 
-      // Uses the src file from hoist-non-react-statics v3.0.1
       hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
+
+      // Explicitly hoist statc contextType to simulate behavior of
+      // hoist-non-react-statics versions older than v3.1.0
+      WithLegacyContext.contextType = DecoratedComponent.contextType;
 
       return WithLegacyContext;
     };
