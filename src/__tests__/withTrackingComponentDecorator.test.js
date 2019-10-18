@@ -1,5 +1,6 @@
+/* eslint-disable react/destructuring-assignment,react/prop-types,react/jsx-props-no-spreading */
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
@@ -16,108 +17,42 @@ describe('withTrackingComponentDecorator', () => {
     expect(typeof decorated).toBe('function');
   });
 
-  describe('with a function trackingContext', () => {
-    const props = { props: 1 };
-    const context = { context: 1 };
-    const trackingContext = jest.fn(() => {});
-
-    @withTrackingComponentDecorator(trackingContext)
-    class TestComponent {
-      static displayName = 'TestComponent';
-    }
-
-    const myTC = new TestComponent(props, context);
-
-    beforeEach(() => {
-      mockDispatchTrackingEvent.mockClear();
-    });
-
-    it('defines the expected static properties', () => {
-      expect(TestComponent.displayName).toBe('WithTracking(TestComponent)');
-      expect(TestComponent.contextType).toBeDefined();
-    });
-
-    it('calls trackingContext() in getContextForProvider', () => {
-      expect(myTC.contextValueForProvider.tracking.getTrackingData()).toEqual(
-        {}
-      );
-      expect(trackingContext).toHaveBeenCalledTimes(1);
-    });
-
-    it('dispatches event in trackEvent', () => {
-      const data = { data: 1 };
-      myTC.trackEvent({ data });
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({ data });
-    });
-
-    it('does not dispatch event in componentDidMount', () => {
-      myTC.componentDidMount();
-      expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
-    });
-
-    it('renders', () => {
-      expect(myTC.render()).toBeDefined();
-    });
-  });
-
-  describe('with an object trackingContext', () => {
-    const props = { props: 1 };
-    const context = { context: 1 };
-    const trackingContext = { page: 1 };
-
-    @withTrackingComponentDecorator(trackingContext, {
-      dispatchOnMount: true,
-    })
-    class TestComponent {
-      static displayName = 'TestComponent';
-    }
-
-    const myTC = new TestComponent(props, context);
-
-    beforeEach(() => {
-      mockDispatchTrackingEvent.mockClear();
-    });
-
-    // We'll only test what differs from the functional trackingContext variation
-
-    it('returns the proper object in getContextForProvider', () => {
-      expect(Object.keys(myTC.contextValueForProvider.tracking)).toEqual([
-        'dispatch',
-        'getTrackingData',
-        'process',
-      ]);
-    });
-
-    it('dispatches event in componentDidMount', () => {
-      myTC.componentDidMount();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(trackingContext);
-    });
-  });
-
   describe('with process option', () => {
     const props = { props: 1 };
     const trackingContext = { page: 1 };
-    const process = jest.fn(() => ({ event: 'pageView' }));
-    const context = { context: 1, tracking: { process } };
+    const process = jest.fn(() => null);
 
-    @withTrackingComponentDecorator(trackingContext)
-    class TestComponent {
-      static displayName = 'TestComponent';
+    @withTrackingComponentDecorator({}, { process })
+    class ParentTestComponent extends React.Component {
+      static displayName = 'ParentTestComponent';
+
+      render() {
+        return this.props.children;
+      }
     }
 
-    const myTC = new TestComponent(props, context);
+    @withTrackingComponentDecorator(trackingContext)
+    class TestComponent extends React.Component {
+      static displayName = 'TestComponent';
+
+      render() {
+        return null;
+      }
+    }
 
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
     });
 
     it('process function gets called', () => {
-      myTC.componentDidMount();
+      mount(
+        <ParentTestComponent {...props}>
+          <TestComponent />
+        </ParentTestComponent>
+      );
+
       expect(process).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        page: 1,
-        event: 'pageView',
-      });
+      expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -125,24 +60,86 @@ describe('withTrackingComponentDecorator', () => {
     const props = { props: 1 };
     const trackingContext = { page: 1 };
     const process = jest.fn(() => ({ event: 'pageView' }));
-    const context = { context: 1, tracking: { process } };
     const dispatchOnMount = jest.fn(() => ({ specificEvent: true }));
 
-    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
-    class TestComponent {
-      static displayName = 'TestComponent';
+    @withTrackingComponentDecorator({}, { process })
+    class ParentTestComponent extends React.Component {
+      static displayName = 'ParentTestComponent';
+
+      render() {
+        return this.props.children;
+      }
     }
 
-    const myTC = new TestComponent(props, context);
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
+    class TestComponent extends React.Component {
+      static displayName = 'TestComponent';
+
+      render() {
+        return null;
+      }
+    }
 
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
     });
 
     it('dispatches only once when process and dispatchOnMount functions are passed', () => {
-      myTC.componentDidMount();
+      mount(
+        <ParentTestComponent {...props}>
+          <TestComponent />
+        </ParentTestComponent>
+      );
+
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+        page: 1,
+        event: 'pageView',
+        specificEvent: true,
+      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('with function trackingContext', () => {
+    const props = { page: 1 };
+    const trackingContext = jest.fn(p => ({ page: p.page }));
+    const process = jest.fn(() => ({ event: 'pageView' }));
+    const dispatchOnMount = jest.fn(() => ({ specificEvent: true }));
+
+    @withTrackingComponentDecorator({}, { process })
+    class ParentTestComponent extends React.Component {
+      static displayName = 'ParentTestComponent';
+
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
+    class TestComponent extends React.Component {
+      static displayName = 'TestComponent';
+
+      render() {
+        return null;
+      }
+    }
+
+    beforeEach(() => {
+      mockDispatchTrackingEvent.mockClear();
+    });
+
+    it('dispatches only once when process and dispatchOnMount functions are passed', () => {
+      mount(
+        <ParentTestComponent>
+          <TestComponent {...props} />
+        </ParentTestComponent>
+      );
+
+      expect(process).toHaveBeenCalled();
+      expect(dispatchOnMount).toHaveBeenCalled();
+      expect(trackingContext).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
         page: 1,
         event: 'pageView',
@@ -156,22 +153,37 @@ describe('withTrackingComponentDecorator', () => {
     const props = { props: 1 };
     const trackingContext = { page: 1 };
     const process = jest.fn(() => null);
-    const context = { context: 1, tracking: { process } };
     const dispatchOnMount = true;
 
-    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
-    class TestComponent {
-      static displayName = 'TestComponent';
+    @withTrackingComponentDecorator({}, { process })
+    class ParentTestComponent extends React.Component {
+      static displayName = 'ParentTestComponent';
+
+      render() {
+        return this.props.children;
+      }
     }
 
-    const myTC = new TestComponent(props, context);
+    @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
+    class TestComponent extends React.Component {
+      static displayName = 'TestComponent';
+
+      render() {
+        return null;
+      }
+    }
 
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
     });
 
     it('dispatches only once when process and dispatchOnMount functions are passed', () => {
-      myTC.componentDidMount();
+      mount(
+        <ParentTestComponent {...props}>
+          <TestComponent />
+        </ParentTestComponent>
+      );
+
       expect(process).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
         page: 1,

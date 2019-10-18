@@ -2,6 +2,8 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext } from 'react';
 import { mount } from 'enzyme';
+import PropTypes from 'prop-types';
+import hoistNonReactStatics from 'hoist-non-react-statics';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -631,6 +633,81 @@ describe('e2e', () => {
     wrapper.find('button').simulate('click');
 
     expect(innerRenderCount).toEqual(1);
+  });
+
+  it('does not prevent components using the legacy context API and hoist-non-react-statics < v3.1.0 from receiving updates', () => {
+    const withLegacyContext = DecoratedComponent => {
+      class WithLegacyContext extends React.Component {
+        static contextTypes = { theme: PropTypes.string };
+
+        render() {
+          return (
+            <DecoratedComponent
+              {...this.props} // eslint-disable-line react/jsx-props-no-spreading
+              theme={this.context.theme}
+            />
+          );
+        }
+      }
+
+      hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
+
+      // Explicitly hoist statc contextType to simulate behavior of
+      // hoist-non-react-statics versions older than v3.1.0
+      WithLegacyContext.contextType = DecoratedComponent.contextType;
+
+      return WithLegacyContext;
+    };
+
+    @track()
+    class Top extends React.Component {
+      render() {
+        return this.props.children;
+      }
+    }
+
+    @withLegacyContext
+    @track({ page: 'Page' }, { dispatchOnMount: true })
+    class Page extends React.Component {
+      render() {
+        return <span>{this.props.theme}</span>;
+      }
+    }
+
+    @track()
+    class App extends React.Component {
+      static childContextTypes = { theme: PropTypes.string };
+
+      constructor(props) {
+        super(props);
+        this.state = { theme: 'light' };
+      }
+
+      getChildContext() {
+        return { theme: this.state.theme };
+      }
+
+      handleUpdateTheme = () => {
+        this.setState({ theme: 'dark' });
+      };
+
+      render() {
+        return (
+          <div>
+            <button type="button" onClick={this.handleUpdateTheme} />
+            <Top>
+              <Page />
+            </Top>
+          </div>
+        );
+      }
+    }
+
+    const wrapper = mount(<App />);
+    expect(wrapper.find('span').text()).toBe('light');
+
+    wrapper.find('button').simulate('click');
+    expect(wrapper.find('span').text()).toBe('dark');
   });
 
   it('root context items are accessible to children', () => {
