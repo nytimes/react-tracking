@@ -25,7 +25,9 @@ export default function withTrackingComponentDecorator(
     function WithTracking(props) {
       const { tracking } = useContext(ReactTrackingContext);
 
-      const getProcessFn = useCallback(() => tracking && tracking.process, []);
+      // statically extract tracking.process for hook dependency
+      const trkProcess = tracking && tracking.process;
+      const getProcessFn = useCallback(() => trkProcess, [trkProcess]);
 
       const getOwnTrackingData = useCallback(() => {
         const ownTrackingData =
@@ -33,22 +35,31 @@ export default function withTrackingComponentDecorator(
             ? trackingData(props)
             : trackingData;
         return ownTrackingData || {};
-      }, [trackingData, props]);
+      }, [props]);
 
-      const getTrackingDataFn = useCallback(() => {
-        const contextGetTrackingData =
-          (tracking && tracking.getTrackingData) || getOwnTrackingData;
+      const getTrackingDataFn = useCallback(
+        () => {
+          const contextGetTrackingData =
+            (tracking && tracking.getTrackingData) || getOwnTrackingData;
 
-        return () =>
-          contextGetTrackingData === getOwnTrackingData
-            ? getOwnTrackingData()
-            : merge(contextGetTrackingData(), getOwnTrackingData());
-      }, [getOwnTrackingData]);
+          return () =>
+            contextGetTrackingData === getOwnTrackingData
+              ? getOwnTrackingData()
+              : merge(contextGetTrackingData(), getOwnTrackingData());
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [getOwnTrackingData] // we don't include `tracking` to avoid unnecessary re-renders
+      );
 
-      const getTrackingDispatcher = useCallback(() => {
-        const contextDispatch = (tracking && tracking.dispatch) || dispatch;
-        return data => contextDispatch(merge(getOwnTrackingData(), data || {}));
-      }, [dispatch, getOwnTrackingData]);
+      const getTrackingDispatcher = useCallback(
+        () => {
+          const contextDispatch = (tracking && tracking.dispatch) || dispatch;
+          return data =>
+            contextDispatch(merge(getOwnTrackingData(), data || {}));
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [getOwnTrackingData] // we don't include `tracking` to avoid unnecessary re-renders
+      );
 
       const trackEvent = useCallback(
         (data = {}) => {
@@ -88,7 +99,7 @@ export default function withTrackingComponentDecorator(
         } else if (dispatchOnMount === true) {
           trackEvent();
         }
-      }, []);
+      }, [getOwnTrackingData, getProcessFn, getTrackingDataFn, trackEvent]);
 
       const trackingProp = useMemo(
         () => ({
@@ -106,7 +117,7 @@ export default function withTrackingComponentDecorator(
             process: getProcessFn() || process,
           },
         }),
-        [getTrackingDispatcher, getTrackingDataFn, getProcessFn, process]
+        [getTrackingDispatcher, getTrackingDataFn, getProcessFn]
       );
 
       return useMemo(
@@ -115,7 +126,7 @@ export default function withTrackingComponentDecorator(
             <DecoratedComponent {...props} tracking={trackingProp} />
           </ReactTrackingContext.Provider>
         ),
-        [contextValue, trackingProp]
+        [contextValue, props, trackingProp]
       );
     }
 
