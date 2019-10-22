@@ -33,6 +33,9 @@ export default function withTrackingComponentDecorator(
       const latestProps = useRef(props);
 
       useEffect(() => {
+        // keep the latest props in a mutable ref object to avoid creating
+        // additional dependency that could cause unnecessary re-renders
+        // see https://reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often
         latestProps.current = props;
       });
 
