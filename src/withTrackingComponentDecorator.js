@@ -1,5 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import hoistNonReactStatic from 'hoist-non-react-statics';
@@ -24,6 +30,14 @@ export default function withTrackingComponentDecorator(
 
     function WithTracking(props) {
       const { tracking } = useContext(ReactTrackingContext);
+      const latestProps = useRef(props);
+
+      useEffect(() => {
+        // keep the latest props in a mutable ref object to avoid creating
+        // additional dependency that could cause unnecessary re-renders
+        // see https://reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often
+        latestProps.current = props;
+      });
 
       // statically extract tracking.process for hook dependency
       const trkProcess = tracking && tracking.process;
@@ -32,34 +46,25 @@ export default function withTrackingComponentDecorator(
       const getOwnTrackingData = useCallback(() => {
         const ownTrackingData =
           typeof trackingData === 'function'
-            ? trackingData(props)
+            ? trackingData(latestProps.current)
             : trackingData;
         return ownTrackingData || {};
-      }, [props]);
+      }, []);
 
-      const getTrackingDataFn = useCallback(
-        () => {
-          const contextGetTrackingData =
-            (tracking && tracking.getTrackingData) || getOwnTrackingData;
+      const getTrackingDataFn = useCallback(() => {
+        const contextGetTrackingData =
+          (tracking && tracking.getTrackingData) || getOwnTrackingData;
 
-          return () =>
-            contextGetTrackingData === getOwnTrackingData
-              ? getOwnTrackingData()
-              : merge(contextGetTrackingData(), getOwnTrackingData());
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [getOwnTrackingData] // we don't include `tracking` to avoid unnecessary re-renders
-      );
+        return () =>
+          contextGetTrackingData === getOwnTrackingData
+            ? getOwnTrackingData()
+            : merge(contextGetTrackingData(), getOwnTrackingData());
+      }, [getOwnTrackingData, tracking]);
 
-      const getTrackingDispatcher = useCallback(
-        () => {
-          const contextDispatch = (tracking && tracking.dispatch) || dispatch;
-          return data =>
-            contextDispatch(merge(getOwnTrackingData(), data || {}));
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [getOwnTrackingData] // we don't include `tracking` to avoid unnecessary re-renders
-      );
+      const getTrackingDispatcher = useCallback(() => {
+        const contextDispatch = (tracking && tracking.dispatch) || dispatch;
+        return data => contextDispatch(merge(getOwnTrackingData(), data || {}));
+      }, [getOwnTrackingData, tracking]);
 
       const trackEvent = useCallback(
         (data = {}) => {
