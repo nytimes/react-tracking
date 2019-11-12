@@ -11,8 +11,8 @@ describe('react-tracking', () => {
   it('exports trackEvent', () => {
     expect(index.trackEvent).toBeDefined();
   });
-  it('exports TrackingContextType', () => {
-    expect(index.TrackingContextType).toBeDefined();
+  it('exports useTracking', () => {
+    expect(index.useTracking).toBeDefined();
   });
   it('exports TrackingPropType', () => {
     expect(index.TrackingPropType).toBeDefined();

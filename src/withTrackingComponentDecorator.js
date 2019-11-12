@@ -6,17 +6,10 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 
 import dispatchTrackingEvent from './dispatchTrackingEvent';
-
-export const TrackingContextType = PropTypes.shape({
-  data: PropTypes.object,
-  dispatch: PropTypes.func,
-  process: PropTypes.func,
-});
 
 export const ReactTrackingContext = React.createContext({});
 
