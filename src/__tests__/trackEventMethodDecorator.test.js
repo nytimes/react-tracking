@@ -70,7 +70,8 @@ describe('trackEventMethodDecorator', () => {
     const dummyData = {};
     const trackingData = jest.fn(() => dummyData);
     const trackEvent = jest.fn();
-    const spyTestEvent = jest.fn();
+    const eventData = 'eventData';
+    const spyTestEvent = jest.fn(() => eventData);
     const dummyArgument = 'x';
 
     class TestClass {
@@ -90,11 +91,12 @@ describe('trackEventMethodDecorator', () => {
     }
 
     const myTC = new TestClass();
-    myTC.handleTestEvent(dummyArgument);
+    const result = myTC.handleTestEvent(dummyArgument);
 
     // Access the trackingData arguments
     const trackingDataArguments = trackingData.mock.calls[0];
 
+    expect(result).toEqual(eventData);
     expect(trackingData).toHaveBeenCalledTimes(1);
     expect(trackingDataArguments[0]).toEqual(myTC.props);
     expect(trackingDataArguments[1]).toEqual(myTC.state);
@@ -131,11 +133,12 @@ describe('trackEventMethodDecorator', () => {
     }
 
     const myTC = new TestClass();
-    await myTC.handleTestEvent(dummyArgument);
+    const result = await myTC.handleTestEvent(dummyArgument);
 
     // Access the trackingData arguments
     const trackingDataArguments = trackingData.mock.calls[0];
 
+    expect(result).toEqual(dummyResolve);
     expect(trackingData).toHaveBeenCalledTimes(1);
     expect(trackingDataArguments[0]).toEqual(myTC.props);
     expect(trackingDataArguments[1]).toEqual(myTC.state);
