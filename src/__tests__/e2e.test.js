@@ -769,4 +769,51 @@ describe('e2e', () => {
       event: 'buttonClick',
     });
   });
+
+  it('dispatches tracking event from async function', async () => {
+    const message = { value: 'test' };
+
+    @track()
+    class Page extends React.Component {
+      constructor() {
+        super();
+        this.message = message;
+        this.state = {};
+      }
+
+      async executeAction() {
+        const data = await this.handleAsyncAction();
+        this.setState({ data });
+      }
+
+      @track((props, state, methodArgs, [{ value }, err]) => {
+        return (
+          !err && {
+            label: 'async action',
+            status: 'success',
+            value,
+          }
+        );
+      })
+      handleAsyncAction() {
+        return Promise.resolve(this.message);
+      }
+
+      render() {
+        return <div>{this.state.data && this.state.data.value}</div>;
+      }
+    }
+
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
+    await page.instance().executeAction();
+
+    expect(page.state().data).toEqual(message);
+    expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
+      label: 'async action',
+      status: 'success',
+      ...message,
+    });
+  });
 });

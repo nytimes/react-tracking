@@ -24,9 +24,7 @@ export default function trackEventMethodDecorator(trackingData = {}) {
         if (Promise && Promise.resolve(fn) === fn) {
           return fn
             .then(trackEvent.bind(this))
-            .then(() => {
-              return fn;
-            })
+            .then(() => fn)
             .catch(error => {
               trackEvent(null, error);
               throw error;
