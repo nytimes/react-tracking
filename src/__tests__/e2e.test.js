@@ -816,4 +816,54 @@ describe('e2e', () => {
       ...message,
     });
   });
+
+  it('handles rejected async function', async () => {
+    const message = { value: 'error' };
+
+    @track()
+    class Page extends React.Component {
+      constructor() {
+        super();
+        this.message = message;
+        this.state = {};
+      }
+
+      async executeAction() {
+        try {
+          const data = await this.handleAsyncAction();
+          this.setState({ data });
+        } catch (error) {
+          this.setState({ data: error });
+        }
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      @track((props, state, methodArgs, [{ value }, err]) => {
+        return (
+          err && {
+            label: 'async action',
+            status: 'failed',
+          }
+        );
+      })
+      handleAsyncAction() {
+        return Promise.reject(this.message);
+      }
+
+      render() {
+        return <div>{this.state.data && this.state.data.value}</div>;
+      }
+    }
+
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
+    await page.instance().executeAction();
+
+    expect(page.state().data).toEqual(message);
+    expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
+      label: 'async action',
+      status: 'failed',
+    });
+  });
 });

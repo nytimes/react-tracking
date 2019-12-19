@@ -26,7 +26,7 @@ export default function trackEventMethodDecorator(trackingData = {}) {
             .then(trackEvent.bind(this))
             .then(() => fn)
             .catch(error => {
-              trackEvent(null, error);
+              trackEvent({}, error);
               throw error;
             });
         }

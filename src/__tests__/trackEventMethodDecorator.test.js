@@ -244,7 +244,7 @@ describe('trackEventMethodDecorator', () => {
       expect(trackEvent).toHaveBeenCalledWith(dummyData);
       const trackingDataArguments = trackingData.mock.calls[0];
       // the resulting error should be passed to the tracking data
-      expect(trackingDataArguments[3]).toEqual([null, error]);
+      expect(trackingDataArguments[3]).toEqual([{}, error]);
       expect(error).toBeInstanceOf(Error);
     }
   });
