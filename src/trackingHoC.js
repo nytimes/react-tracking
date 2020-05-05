@@ -5,9 +5,10 @@ export default function hoc(trackingInfo, options) {
   return function decorator(...toDecorate) {
     if (toDecorate.length === 1) {
       // decorating a class
-      return withTrackingComponentDecorator(trackingInfo, options)(
-        ...toDecorate
-      );
+      return withTrackingComponentDecorator(
+        trackingInfo,
+        options
+      )(...toDecorate);
     }
 
     // decorating a method
