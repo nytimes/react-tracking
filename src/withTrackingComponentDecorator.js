@@ -15,13 +15,18 @@ export const ReactTrackingContext = React.createContext({});
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
+  {
+    dispatch = dispatchTrackingEvent,
+    dispatchOnMount = false,
+    process,
+    forwardRef = true,
+  } = {}
 ) {
   return DecoratedComponent => {
     const decoratedComponentName =
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    function WithTracking(props) {
+    function WithTracking({ rtFwdRef, ...props }) {
       const { tracking } = useContext(ReactTrackingContext);
       const latestProps = useRef(props);
 
@@ -121,17 +126,28 @@ export default function withTrackingComponentDecorator(
       return useMemo(
         () => (
           <ReactTrackingContext.Provider value={contextValue}>
-            <DecoratedComponent {...props} tracking={trackingProp} />
+            <DecoratedComponent
+              ref={rtFwdRef}
+              {...props}
+              tracking={trackingProp}
+            />
           </ReactTrackingContext.Provider>
         ),
-        [contextValue, props, trackingProp]
+        [contextValue, props, trackingProp, rtFwdRef]
       );
     }
 
+    if (forwardRef) {
+      const forwrded = React.forwardRef((props, ref) => (
+        <WithTracking {...props} rtFwdRef={ref} />
+      ));
+      forwrded.displayName = `WithTracking(${decoratedComponentName})`;
+      hoistNonReactStatic(forwrded, DecoratedComponent);
+      return forwrded;
+    }
+
     WithTracking.displayName = `WithTracking(${decoratedComponentName})`;
-
     hoistNonReactStatic(WithTracking, DecoratedComponent);
-
     return WithTracking;
   };
 }

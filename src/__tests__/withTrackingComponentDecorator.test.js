@@ -200,7 +200,9 @@ describe('withTrackingComponentDecorator', () => {
       static displayName = 'TestComponent';
     }
 
-    const component = shallow(<TestComponent />).children();
+    const component = shallow(<TestComponent />)
+      .dive() // https://stackoverflow.com/questions/51172450/enzyme-wrapper-instance-is-null-for-connected-component
+      .children();
 
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
