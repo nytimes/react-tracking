@@ -32,7 +32,7 @@ import track, { useTracking } from 'react-tracking';
   - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` later in this document.
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called on componentDidMount with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
-  - `forwardRef`, when set to `true`, adding a ref to the connected wrapper component will actually return the instance of the wrapped component.
+  - `forwardRef`, when set to `true`, adding a ref to the wrapped component will actually return the instance of the underlying component. Default is `false`.
 
 #### `tracking` prop
 

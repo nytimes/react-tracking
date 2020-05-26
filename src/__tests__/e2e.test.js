@@ -804,11 +804,8 @@ describe('e2e', () => {
       }
     }
 
-    // https://github.com/enzymejs/enzyme/issues/1928
-    // Get the first child's first child, since the page is wrapped with the WithTracking component and React.forward
-    const page = await mount(<Page />)
-      .childAt(0)
-      .childAt(0);
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);
@@ -858,11 +855,8 @@ describe('e2e', () => {
       }
     }
 
-    // https://github.com/enzymejs/enzyme/issues/1928
-    // Get the first child's first child, since the page is wrapped with the WithTracking component and React.forward
-    const page = await mount(<Page />)
-      .childAt(0)
-      .childAt(0);
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);
@@ -873,9 +867,9 @@ describe('e2e', () => {
     });
   });
 
-  it('can access wrappered component by ref', async () => {
+  it('can access wrapped component by ref', async () => {
     const focusFn = jest.fn();
-    @track({})
+    @track({}, { forwardRef: true })
     class Child extends React.Component {
       focus = focusFn;
 
