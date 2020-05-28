@@ -15,13 +15,18 @@ export const ReactTrackingContext = React.createContext({});
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
-  { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
+  {
+    dispatch = dispatchTrackingEvent,
+    dispatchOnMount = false,
+    process,
+    forwardRef = false,
+  } = {}
 ) {
   return DecoratedComponent => {
     const decoratedComponentName =
       DecoratedComponent.displayName || DecoratedComponent.name || 'Component';
 
-    function WithTracking(props) {
+    function WithTracking({ rtFwdRef, ...props }) {
       const { tracking } = useContext(ReactTrackingContext);
       const latestProps = useRef(props);
 
@@ -118,20 +123,32 @@ export default function withTrackingComponentDecorator(
         [getTrackingDispatcher, getTrackingDataFn, getProcessFn]
       );
 
+      const propsToBePassed = useMemo(
+        () => (forwardRef ? { ...props, ref: rtFwdRef } : props),
+        [props, rtFwdRef]
+      );
+
       return useMemo(
         () => (
           <ReactTrackingContext.Provider value={contextValue}>
-            <DecoratedComponent {...props} tracking={trackingProp} />
+            <DecoratedComponent {...propsToBePassed} tracking={trackingProp} />
           </ReactTrackingContext.Provider>
         ),
-        [contextValue, props, trackingProp]
+        [contextValue, trackingProp, propsToBePassed]
       );
     }
 
+    if (forwardRef) {
+      const forwarded = React.forwardRef((props, ref) => (
+        <WithTracking {...props} rtFwdRef={ref} />
+      ));
+      forwarded.displayName = `WithTracking(${decoratedComponentName})`;
+      hoistNonReactStatic(forwarded, DecoratedComponent);
+      return forwarded;
+    }
+
     WithTracking.displayName = `WithTracking(${decoratedComponentName})`;
-
     hoistNonReactStatic(WithTracking, DecoratedComponent);
-
     return WithTracking;
   };
 }

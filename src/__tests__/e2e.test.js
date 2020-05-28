@@ -866,4 +866,37 @@ describe('e2e', () => {
       status: 'failed',
     });
   });
+
+  it('can access wrapped component by ref', async () => {
+    const focusFn = jest.fn();
+    @track({}, { forwardRef: true })
+    class Child extends React.Component {
+      focus = focusFn;
+
+      render() {
+        return 'child';
+      }
+    }
+
+    class Parent extends React.Component {
+      componentDidMount() {
+        this.child.focus();
+      }
+
+      render() {
+        return (
+          <Child
+            ref={el => {
+              this.child = el;
+            }}
+          />
+        );
+      }
+    }
+
+    const parent = await mount(<Parent />);
+
+    expect(parent.instance().child).not.toBeNull();
+    expect(focusFn).toHaveBeenCalledTimes(1);
+  });
 });
