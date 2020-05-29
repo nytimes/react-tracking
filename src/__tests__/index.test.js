@@ -3,7 +3,7 @@ jest.mock('../trackEventMethodDecorator');
 
 describe('react-tracking', () => {
   // eslint-disable-next-line global-require
-  const index = require('../');
+  const index = require('..');
 
   it('exports withTracking', () => {
     expect(index.withTracking).toBeDefined();
