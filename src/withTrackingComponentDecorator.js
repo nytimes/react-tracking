@@ -61,7 +61,11 @@ export default function withTrackingComponentDecorator(
 
       const getTrackingDispatcher = useCallback(() => {
         const contextDispatch = (tracking && tracking.dispatch) || dispatch;
-        return data => contextDispatch(merge(getOwnTrackingData(), data || {}), latestProps.current);
+        return data =>
+          contextDispatch(
+            merge(getOwnTrackingData(), data || {}),
+            latestProps.current
+          );
       }, [getOwnTrackingData, tracking]);
 
       const trackEvent = useCallback(
