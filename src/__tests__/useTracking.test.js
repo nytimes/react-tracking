@@ -48,9 +48,12 @@ describe('useTracking', () => {
 
     const wrapper = mount(<App />);
     wrapper.simulate('click');
-    expect(dispatch).toHaveBeenCalledWith({
-      ...outerTrackingData,
-      event: 'buttonClick',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        ...outerTrackingData,
+        event: 'buttonClick',
+      },
+      {}
+    );
   });
 });

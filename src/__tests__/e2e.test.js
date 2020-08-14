@@ -47,7 +47,10 @@ describe('e2e', () => {
     );
 
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
-    expect(dispatchTrackingEvent).toHaveBeenCalledWith({ test: true });
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith(
+      { test: true },
+      { children: expect.anything() }
+    );
   });
 
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
@@ -62,9 +65,12 @@ describe('e2e', () => {
 
     mount(<TestPage />);
 
-    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      ...testPageData,
-    });
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith(
+      {
+        ...testPageData,
+      },
+      {}
+    );
   });
 
   it('accepts a dispatch function in options', () => {
@@ -82,10 +88,13 @@ describe('e2e', () => {
     mount(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
-    expect(dispatch).toHaveBeenCalledWith({
-      ...testDataContext,
-      ...testData,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        ...testDataContext,
+        ...testData,
+      },
+      {}
+    );
   });
 
   it('will use dispatch fn passed in from further up in context', () => {
@@ -111,10 +120,13 @@ describe('e2e', () => {
       </TestOptions>
     );
 
-    expect(dispatch).toHaveBeenCalledWith({
-      ...testDataContext,
-      ...testChildData,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        ...testDataContext,
+        ...testChildData,
+      },
+      { children: expect.anything() }
+    );
   });
 
   it('will deep-merge tracking data', () => {
@@ -140,10 +152,15 @@ describe('e2e', () => {
       </TestData1>
     );
 
-    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      page: 'TestDeepMerge',
-      key: { x: 3, y: 3, z: 2 },
-    });
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith(
+      {
+        page: 'TestDeepMerge',
+        key: { x: 3, y: 3, z: 2 },
+      },
+      {
+        children: expect.anything(),
+      }
+    );
   });
 
   it('will call dispatchOnMount as a function', () => {
@@ -160,7 +177,7 @@ describe('e2e', () => {
     mount(<TestComponent />);
 
     expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
-    expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true });
+    expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true }, {});
   });
 
   it('will dispatch a pageview event on mount on class component', () => {
@@ -192,11 +209,14 @@ describe('e2e', () => {
       </App>
     );
 
-    expect(dispatch).toHaveBeenCalledWith({
-      topLevel: true,
-      event: 'pageView',
-      page: 'Page',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        topLevel: true,
+        event: 'pageView',
+        page: 'Page',
+      },
+      { children: expect.anything() }
+    );
   });
 
   it('will dispatch a pageview event on mount on functional component', () => {
@@ -223,11 +243,14 @@ describe('e2e', () => {
       </App>
     );
 
-    expect(dispatch).toHaveBeenCalledWith({
-      topLevel: true,
-      event: 'pageView',
-      page: 'Page',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        topLevel: true,
+        event: 'pageView',
+        page: 'Page',
+      },
+      { children: expect.anything() }
+    );
   });
 
   it("should not dispatch a pageview event on mount if there's no page property on tracking object", () => {
@@ -316,17 +339,23 @@ describe('e2e', () => {
     );
 
     expect(dispatch).toHaveBeenCalledTimes(2);
-    expect(dispatch).toHaveBeenCalledWith({
-      page: 'Page1',
-      event: 'pageView',
-      topLevel: true,
-    });
-    expect(dispatch).toHaveBeenCalledWith({
-      page: 'Page2',
-      event: 'pageView',
-      topLevel: true,
-      page2specific: true,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        page: 'Page1',
+        event: 'pageView',
+        topLevel: true,
+      },
+      { children: expect.anything() }
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        page: 'Page2',
+        event: 'pageView',
+        topLevel: true,
+        page2specific: true,
+      },
+      { children: expect.anything() }
+    );
   });
 
   it('process works with trackingData as a function', () => {
@@ -358,12 +387,15 @@ describe('e2e', () => {
       </App>
     );
 
-    expect(dispatch).toHaveBeenCalledWith({
-      event: 'pageView',
-      page: 'Page',
-      runtimeData: true,
-      topLevel: true,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        event: 'pageView',
+        page: 'Page',
+        runtimeData: true,
+        topLevel: true,
+      },
+      { children: expect.anything() }
+    );
   });
 
   it("doesn't dispatch pageview for nested components without page tracking data", () => {
@@ -422,18 +454,24 @@ describe('e2e', () => {
 
     wrappedApp.find('Button').simulate('click');
 
-    expect(dispatch).toHaveBeenCalledWith({
-      event: 'pageView',
-      page: 'Page',
-      topLevel: true,
-    });
-    expect(dispatch).toHaveBeenCalledWith({
-      event: 'buttonClick',
-      page: 'Page',
-      region: 'Button',
-      view: 'View',
-      topLevel: true,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        event: 'pageView',
+        page: 'Page',
+        topLevel: true,
+      },
+      { children: expect.anything() }
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        event: 'buttonClick',
+        page: 'Page',
+        region: 'Button',
+        view: 'View',
+        topLevel: true,
+      },
+      { children: expect.anything() }
+    );
     expect(dispatch).toHaveBeenCalledTimes(2); // pageview event and simulated button click
   });
 
@@ -459,10 +497,13 @@ describe('e2e', () => {
     mount(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
-    expect(dispatch).toHaveBeenCalledWith({
-      ...testDataContext,
-      ...testState,
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        ...testDataContext,
+        ...testState,
+      },
+      {}
+    );
   });
 
   it('can read tracking data from props.tracking.getTrackingData()', () => {
@@ -575,19 +616,25 @@ describe('e2e', () => {
     const wrappedApp = mount(<App />);
 
     wrappedApp.find('span').simulate('click');
-    expect(dispatch).toHaveBeenCalledWith({
-      data: 1,
-      event: 'buttonClick',
-      page: 'Page',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        data: 1,
+        event: 'buttonClick',
+        page: 'Page',
+      },
+      {}
+    );
 
     wrappedApp.find('button').simulate('click');
     wrappedApp.find('span').simulate('click');
-    expect(dispatch).toHaveBeenCalledWith({
-      data: 2,
-      event: 'buttonClick',
-      page: 'Page',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        data: 2,
+        event: 'buttonClick',
+        page: 'Page',
+      },
+      {}
+    );
   });
 
   it('does not cause unnecessary updates due to context changes', () => {
@@ -764,10 +811,13 @@ describe('e2e', () => {
 
     wrappedApp.find('button').simulate('click');
 
-    expect(dispatch).toHaveBeenCalledWith({
-      ...outerTrackingData,
-      event: 'buttonClick',
-    });
+    expect(dispatch).toHaveBeenCalledWith(
+      {
+        ...outerTrackingData,
+        event: 'buttonClick',
+      },
+      { children: expect.anything() }
+    );
   });
 
   it('dispatches tracking event from async function', async () => {
@@ -810,11 +860,14 @@ describe('e2e', () => {
 
     expect(page.state().data).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
-    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      label: 'async action',
-      status: 'success',
-      ...message,
-    });
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith(
+      {
+        label: 'async action',
+        status: 'success',
+        ...message,
+      },
+      {}
+    );
   });
 
   it('handles rejected async function', async () => {
@@ -861,10 +914,13 @@ describe('e2e', () => {
 
     expect(page.state().data).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
-    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
-      label: 'async action',
-      status: 'failed',
-    });
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith(
+      {
+        label: 'async action',
+        status: 'failed',
+      },
+      {}
+    );
   });
 
   it('can access wrapped component by ref', async () => {

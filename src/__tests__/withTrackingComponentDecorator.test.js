@@ -93,11 +93,17 @@ describe('withTrackingComponentDecorator', () => {
 
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        page: 1,
-        event: 'pageView',
-        specificEvent: true,
-      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(
+        {
+          page: 1,
+          event: 'pageView',
+          specificEvent: true,
+        },
+        {
+          props: 1,
+          children: expect.anything(),
+        }
+      );
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
     });
   });
@@ -140,11 +146,14 @@ describe('withTrackingComponentDecorator', () => {
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
       expect(trackingContext).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        page: 1,
-        event: 'pageView',
-        specificEvent: true,
-      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(
+        {
+          page: 1,
+          event: 'pageView',
+          specificEvent: true,
+        },
+        { children: expect.anything() }
+      );
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
     });
   });
@@ -185,9 +194,12 @@ describe('withTrackingComponentDecorator', () => {
       );
 
       expect(process).toHaveBeenCalled();
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
-        page: 1,
-      });
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(
+        {
+          page: 1,
+        },
+        { children: expect.anything(), props: 1 }
+      );
       expect(mockDispatchTrackingEvent).toHaveBeenCalledTimes(1);
     });
   });
@@ -220,7 +232,7 @@ describe('withTrackingComponentDecorator', () => {
     it('when trackEvent is called, from props, it will dispatch event in trackEvent', () => {
       expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
       component.props().tracking.trackEvent(dummyData);
-      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData);
+      expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData, {});
     });
 
     it('prop named getTrackingData is a function', () => {
