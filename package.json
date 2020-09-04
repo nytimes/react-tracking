@@ -51,7 +51,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "babel --out-dir build src --ignore src/__tests__ && cp index.d.ts ./build",
+    "build": "babel --out-dir build src --ignore src/__tests__ --copy-files --no-copy-ignored",
     "build:watch": "npm run build -- --watch",
     "lint": "eslint ./src",
     "prepare": "npm run test && npm run build",
