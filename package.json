@@ -1,6 +1,6 @@
 {
-  "name": "react-tracking",
-  "version": "8.0.0",
+  "name": "@spotim/react-tracking",
+  "version": "8.0.1",
   "description": "Declarative tracking for React apps.",
   "keywords": [
     "declarative",
@@ -49,11 +49,12 @@
   ],
   "sideEffects": false,
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "build": "babel --out-dir build src --ignore src/__tests__",
+    "build": "babel --out-dir build src --ignore src/__tests__ && cp index.d.ts ./build",
     "build:watch": "npm run build -- --watch",
     "lint": "eslint ./src",
-    "prepare": "npm run lint && npm run test && npm run build",
+    "prepare": "npm run test && npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch"
@@ -80,9 +81,10 @@
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-decorators": "7.6.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
-    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
+    "@babel/preset-typescript": "^7.10.4",
     "babel-eslint": "^10.0.3",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "enzyme": "^3.10.0",
