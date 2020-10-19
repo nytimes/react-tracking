@@ -256,12 +256,7 @@ describe.skip('hooks', () => {
         { topLevel: true },
         {
           dispatch,
-          process: data => {
-            if (data.page) {
-              return { event: 'pageView' };
-            }
-            return null;
-          },
+          process: () => null,
         }
       );
 
