@@ -4,8 +4,6 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
 import { mount } from 'enzyme';
-// import PropTypes from 'prop-types';
-// import hoistNonReactStatics from 'hoist-non-react-statics';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -662,89 +660,97 @@ describe.skip('hooks', () => {
     expect(innerRenderCount).toEqual(1);
   });
 
-  // it('does not prevent components using the legacy context API and hoist-non-react-statics < v3.1.0 from receiving updates', () => {
-  //   const withLegacyContext = DecoratedComponent => {
-  //     class WithLegacyContext extends React.Component {
-  //       static contextTypes = { theme: PropTypes.string };
+  it('can interop with the HoC (where HoC is top-level)', () => {
+    const mockDispatchTrackingEvent = jest.fn();
+    const testData1 = { key: { x: 1, y: 1, topLevel: 'hoc' } };
+    const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
-  //       render() {
-  //         return (
-  //           <DecoratedComponent
-  //             {...this.props} // eslint-disable-line react/jsx-props-no-spreading
-  //             theme={this.context.theme}
-  //           />
-  //         );
-  //       }
-  //     }
+    // functional wrapper hoc
+    const TestData1 = track(testData1, { dispatch: mockDispatchTrackingEvent })(
+      ({ children }) => children
+    );
 
-  //     hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
+    // hook nested
+    const TestData3 = () => {
+      const { Track } = useTracking(
+        { key: { x: 3, y: 3 } },
+        { dispatchOnMount: true }
+      );
 
-  //     // Explicitly hoist statc contextType to simulate behavior of
-  //     // hoist-non-react-statics versions older than v3.1.0
-  //     WithLegacyContext.contextType = DecoratedComponent.contextType;
+      return (
+        <Track>
+          <div />
+        </Track>
+      );
+    };
 
-  //     return WithLegacyContext;
-  //   };
+    // hook nested
+    const TestData2 = () => {
+      const { Track } = useTracking(testData2);
 
-  //   @track()
-  //   class Top extends React.Component {
-  //     render() {
-  //       return this.props.children;
-  //     }
-  //   }
+      return (
+        <Track>
+          <TestData3 />
+        </Track>
+      );
+    };
 
-  //   @withLegacyContext
-  //   @track({ page: 'Page' }, { dispatchOnMount: true })
-  //   class Page extends React.Component {
-  //     render() {
-  //       return <span>{this.props.theme}</span>;
-  //     }
-  //   }
+    mount(
+      <TestData1>
+        <TestData2 />
+      </TestData1>
+    );
 
-  //   @track()
-  //   class App extends React.Component {
-  //     static childContextTypes = { theme: PropTypes.string };
+    expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+      topLevel: 'hoc',
+      page: 'TestDeepMerge',
+      key: { x: 3, y: 3, z: 2 },
+    });
+  });
 
-  //     constructor(props) {
-  //       super(props);
-  //       this.state = { theme: 'light' };
-  //     }
+  it('can interop with HoC (where Hook is top-level', () => {
+    const mockDispatchTrackingEvent = jest.fn();
+    const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hook' };
+    const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
-  //     getChildContext() {
-  //       return { theme: this.state.theme };
-  //     }
+    // hook top-level
+    const TestData1 = ({ children }) => {
+      const { Track } = useTracking(testData1, {
+        dispatch: mockDispatchTrackingEvent,
+      });
+      return <Track>{children}</Track>;
+    };
 
-  //     handleUpdateTheme = () => {
-  //       this.setState({ theme: 'dark' });
-  //     };
+    // functional wrapper hoc
+    const TestData3 = track({ key: { x: 3, y: 3 } }, { dispatchOnMount: true })(
+      () => <div />
+    );
 
-  //     render() {
-  //       return (
-  //         <div>
-  //           <button type="button" onClick={this.handleUpdateTheme} />
-  //           <Top>
-  //             <Page />
-  //           </Top>
-  //         </div>
-  //       );
-  //     }
-  //   }
+    // decorator hoc
+    @track(testData2)
+    class TestData2 extends React.Component {
+      render() {
+        return <TestData3 />;
+      }
+    }
 
-  //   const wrapper = mount(<App />);
-  //   expect(wrapper.find('span').text()).toBe('light');
+    mount(
+      <TestData1>
+        <TestData2 />
+      </TestData1>
+    );
 
-  //   wrapper.find('button').simulate('click');
-  //   expect(wrapper.find('span').text()).toBe('dark');
-  // });
+    expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
+      topLevel: 'hook',
+      page: 'TestDeepMerge',
+      key: { x: 3, y: 3, z: 2 },
+    });
+  });
 
   it('root context items are accessible to children', () => {
     const {
       ReactTrackingContext,
     } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
-
-    const App = track()(() => {
-      return <Child />;
-    });
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
@@ -754,6 +760,16 @@ describe.skip('hooks', () => {
         'process',
       ]);
       return <div />;
+    };
+
+    const App = () => {
+      const { Track } = useTracking();
+
+      return (
+        <Track>
+          <Child />
+        </Track>
+      );
     };
 
     mount(<App />);
