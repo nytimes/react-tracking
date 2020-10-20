@@ -50,7 +50,7 @@
   "sideEffects": false,
   "main": "build/index.js",
   "scripts": {
-    "build": "babel --out-dir build src --ignore src/__tests__",
+    "build": "babel --out-dir build src --ignore src/__tests__ --source-maps --delete-dir-on-start --minified --no-comments",
     "build:watch": "npm run build -- --watch",
     "lint": "eslint ./src",
     "prepare": "npm run lint && npm run test && npm run build",
@@ -70,12 +70,11 @@
     ]
   },
   "dependencies": {
-    "core-js": "^3.3.2",
     "deepmerge": "^4.1.1",
     "hoist-non-react-statics": "^3.3.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.4",
+    "@babel/cli": "^7.12.1",
     "@babel/core": "7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-decorators": "7.6.0",
@@ -103,7 +102,8 @@
     "raf-polyfill": "^1.0.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
-    "react-test-renderer": "^16.10.2"
+    "react-test-renderer": "^16.10.2",
+    "regenerator-runtime": "^0.13.7"
   },
   "peerDependencies": {
     "prop-types": "^15.x",

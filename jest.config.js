@@ -1,3 +1,3 @@
 module.exports = {
-  setupFiles: ['raf/polyfill', './setup/enzymeAdapter.js'],
+  setupFiles: ['raf/polyfill', './jest.setup.js', './setup/enzymeAdapter.js'],
 };
