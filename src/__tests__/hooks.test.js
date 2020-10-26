@@ -13,7 +13,7 @@ const testData = { testData: true };
 const dispatch = jest.fn();
 const testState = { booleanState: true };
 
-describe.skip('hooks', () => {
+describe('hooks', () => {
   // eslint-disable-next-line global-require
   const { default: track, useTracking } = require('../');
 
@@ -416,12 +416,12 @@ describe.skip('hooks', () => {
       return <Track>{children}</Track>;
     };
     const Page = ({ children }) => {
-      const Track = useTracking({ page: 'Page' });
+      const { Track } = useTracking({ page: 'Page' });
       return <Track>{children}</Track>;
     };
 
     const Nested = ({ children }) => {
-      const Track = useTracking({ view: 'View' });
+      const { Track } = useTracking({ view: 'View' });
       return <Track>{children}</Track>;
     };
 
