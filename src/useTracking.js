@@ -1,8 +1,9 @@
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import merge from 'deepmerge';
 
-import { ReactTrackingContext } from './withTrackingComponentDecorator';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
+
+export const ReactTrackingContext = React.createContext({});
 
 export default function useTracking(
   trackingData = {},
@@ -93,15 +94,22 @@ export default function useTracking(
     process,
   ]);
 
+  const nextDispatch = useMemo(() => getTrackingDispatcher(), [
+    getTrackingDispatcher,
+  ]);
+  const nextGetTrackingData = useMemo(() => getTrackingDataFn(), [
+    getTrackingDataFn,
+  ]);
+
   const contextValue = useMemo(
     () => ({
       tracking: {
-        dispatch: getTrackingDispatcher(),
-        getTrackingData: getTrackingDataFn(),
+        dispatch: nextDispatch,
+        getTrackingData: nextGetTrackingData,
         process: getProcessFn() || process,
       },
     }),
-    [getTrackingDispatcher, getTrackingDataFn, getProcessFn, process]
+    [nextDispatch, nextGetTrackingData, getProcessFn, process]
   );
 
   const TrackingProvider = useCallback(
@@ -115,10 +123,10 @@ export default function useTracking(
 
   return useMemo(
     () => ({
-      getTrackingData: tracking.getTrackingData,
-      trackEvent: tracking.dispatch,
+      getTrackingData: nextGetTrackingData,
+      trackEvent: nextDispatch,
       Track: TrackingProvider,
     }),
-    [tracking.getTrackingData, tracking.dispatch, TrackingProvider]
+    [nextDispatch, nextGetTrackingData, TrackingProvider]
   );
 }

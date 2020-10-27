@@ -52,7 +52,7 @@ describe('hooks', () => {
     const testPageData = { page: 'TestPage' };
 
     const TestPage = () => {
-      const { Track } = useTracking({}, { dispatchOnMount: true });
+      const { Track } = useTracking(testPageData, { dispatchOnMount: true });
 
       return <Track>{null}</Track>; // TODO: what does it mean for the API if this was <Track dispatchOnMount /> instead of useTracking({ dispatchOnMount: true }) above?
     };
@@ -89,13 +89,9 @@ describe('hooks', () => {
     const testChildData = { page: 'TestChild' };
 
     const TestOptions = ({ children }) => {
-      const { Track } = useTracking();
+      const { Track } = useTracking(testDataContext, { dispatch });
 
-      return (
-        <Track data={testDataContext} dispatch={dispatch}>
-          {children}
-        </Track>
-      );
+      return <Track>{children}</Track>;
     };
 
     const TestChild = () => {
@@ -491,8 +487,8 @@ describe('hooks', () => {
   it('can read tracking data from props.tracking.getTrackingData()', () => {
     const mockReader = jest.fn();
 
-    const TestOptions = ({ onProps, children }) => {
-      const { Track } = useTracking({ onProps, ...testDataContext });
+    const TestOptions = ({ onProps, child, children }) => {
+      const { Track } = useTracking({ onProps, child, ...testDataContext });
       return <Track>{children}</Track>;
     };
 
@@ -503,7 +499,7 @@ describe('hooks', () => {
     };
 
     mount(
-      <TestOptions onProps="yes">
+      <TestOptions onProps="yes" child>
         <TestChild />
       </TestOptions>
     );
@@ -657,7 +653,7 @@ describe('hooks', () => {
 
   it('can interop with the HoC (where HoC is top-level)', () => {
     const mockDispatchTrackingEvent = jest.fn();
-    const testData1 = { key: { x: 1, y: 1, topLevel: 'hoc' } };
+    const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hoc' };
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
     // functional wrapper hoc
@@ -743,9 +739,7 @@ describe('hooks', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const {
-      ReactTrackingContext,
-    } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
+    const { ReactTrackingContext } = require('../useTracking'); // eslint-disable-line global-require
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
