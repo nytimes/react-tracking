@@ -11,14 +11,6 @@ export default function useTracking(
 ) {
   const trackingContext = useContext(ReactTrackingContext);
 
-  // if (!(trackingContext && trackingContext.tracking)) {
-  //   throw new Error(
-  //     'Attempting to call `useTracking` ' +
-  //       'without a ReactTrackingContext present. Did you forget to wrap the top of ' +
-  //       'your component tree with `track`?'
-  //   );
-  // }
-
   // statically extract tracking.process for hook dependency
   const tracking = useMemo(() => trackingContext.tracking || {}, [
     trackingContext.tracking,
