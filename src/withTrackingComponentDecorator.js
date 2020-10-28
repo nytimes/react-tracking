@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 
 import useTracking from './useTracking';
@@ -22,8 +22,16 @@ export default function withTrackingComponentDecorator(
         latestProps.current = props;
       });
 
+      const trackingDataFn = useCallback(
+        () =>
+          typeof trackingData === 'function'
+            ? trackingData(latestProps.current)
+            : trackingData,
+        []
+      );
+
       const { getTrackingData, trackEvent, Track } = useTracking(
-        trackingData,
+        trackingDataFn,
         options
       );
 

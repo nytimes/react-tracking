@@ -802,8 +802,10 @@ describe('e2e', () => {
       }
     }
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
+    // Get the children's children since Page is wrapped with the WithTracking & Track components.
+    const page = await mount(<Page />)
+      .children()
+      .children();
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);
@@ -853,8 +855,10 @@ describe('e2e', () => {
       }
     }
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
+    // Get the children's children since Page is wrapped with the WithTracking & Track components.
+    const page = await mount(<Page />)
+      .children()
+      .children();
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);

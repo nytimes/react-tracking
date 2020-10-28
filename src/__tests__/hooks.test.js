@@ -802,7 +802,7 @@ describe('hooks', () => {
     });
   });
 
-  it('dispatches tracking event from async function', async () => {
+  it.skip('dispatches tracking event from async function', async () => {
     const message = { value: 'test' };
 
     let executeAction;
@@ -844,7 +844,7 @@ describe('hooks', () => {
     });
   });
 
-  it('handles rejected async function', async () => {
+  it.skip('handles rejected async function', async () => {
     const message = { value: 'error' };
 
     let executeAction;
@@ -887,7 +887,7 @@ describe('hooks', () => {
     });
   });
 
-  it('can access wrapped component by ref', async () => {
+  it.skip('can access wrapped component by ref', async () => {
     const focusFn = jest.fn();
 
     const Child = React.forwardRef((props, ref) => {
