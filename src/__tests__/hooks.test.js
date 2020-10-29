@@ -802,8 +802,8 @@ describe('hooks', () => {
     });
   });
 
-  it.skip('dispatches tracking event from async function', async () => {
-    const message = { value: 'test' };
+  it('dispatches tracking event from async function', async () => {
+    const message = 'test';
 
     let executeAction;
     const Page = () => {
@@ -829,23 +829,20 @@ describe('hooks', () => {
       return <div>{state && state.data}</div>;
     };
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction(); // TODO: this probably doesn't work (how well does Enzyme support hooks?)
-    // TODO: maybe have to just call executeAction(); here
-    executeAction();
+    const page = await mount(<Page />);
+    await executeAction();
 
-    expect(page.state().data).toEqual(message);
+    expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
       status: 'success',
-      ...message,
+      value: message,
     });
   });
 
-  it.skip('handles rejected async function', async () => {
-    const message = { value: 'error' };
+  it('handles rejected async function', async () => {
+    const message = 'error';
 
     let executeAction;
     const Page = () => {
@@ -873,13 +870,11 @@ describe('hooks', () => {
       return <div>{state && state.data}</div>;
     };
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction();
+    const page = await mount(<Page />);
     // TODO: redundant with previous test perhaps, but here for posterity. Similarly we may need to call executeAction(); directly
-    executeAction();
+    await executeAction();
 
-    expect(page.state().data).toEqual(message);
+    expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
