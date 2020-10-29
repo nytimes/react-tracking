@@ -1,6 +1,6 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import hoistNonReactStatic from 'hoist-non-react-statics';
+import PropTypes from 'prop-types';
 
 import useTracking from './useTracking';
 
@@ -50,21 +50,32 @@ export default function withTrackingComponentDecorator(
 
       return (
         <Track>
-          <DecoratedComponent {...propsToBePassed} tracking={trackingProp} />
+          {React.createElement(DecoratedComponent, {
+            ...propsToBePassed,
+            tracking: trackingProp,
+          })}
         </Track>
       );
     }
 
     if (forwardRef) {
-      const forwarded = React.forwardRef((props, ref) => (
-        <WithTracking {...props} rtFwdRef={ref} />
-      ));
+      const forwarded = React.forwardRef((props, ref) =>
+        React.createElement(WithTracking, { ...props, rtFwdRef: ref })
+      );
       forwarded.displayName = `WithTracking(${decoratedComponentName})`;
       hoistNonReactStatic(forwarded, DecoratedComponent);
       return forwarded;
     }
 
     WithTracking.displayName = `WithTracking(${decoratedComponentName})`;
+    WithTracking.propTypes = {
+      rtFwdRef: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.shape({ current: PropTypes.any }),
+      ]),
+    };
+    WithTracking.defaultProps = { rtFwdRef: undefined };
+
     hoistNonReactStatic(WithTracking, DecoratedComponent);
     return WithTracking;
   };
