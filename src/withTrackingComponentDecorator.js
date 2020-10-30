@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import hoistNonReactStatic from 'hoist-non-react-statics';
+import hoistNonReactStatics from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
 
 import useTracking from './useTracking';
@@ -63,7 +63,7 @@ export default function withTrackingComponentDecorator(
         React.createElement(WithTracking, { ...props, rtFwdRef: ref })
       );
       forwarded.displayName = `WithTracking(${decoratedComponentName})`;
-      hoistNonReactStatic(forwarded, DecoratedComponent);
+      hoistNonReactStatics(forwarded, DecoratedComponent);
       return forwarded;
     }
 
@@ -76,7 +76,7 @@ export default function withTrackingComponentDecorator(
     };
     WithTracking.defaultProps = { rtFwdRef: undefined };
 
-    hoistNonReactStatic(WithTracking, DecoratedComponent);
+    hoistNonReactStatics(WithTracking, DecoratedComponent);
     return WithTracking;
   };
 }

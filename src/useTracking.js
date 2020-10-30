@@ -9,14 +9,11 @@ export default function useTracking(
   trackingData = {},
   { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
 ) {
-  const trackingContext = useContext(ReactTrackingContext);
+  const { tracking } = useContext(ReactTrackingContext);
 
-  // statically extract tracking.process for hook dependency
-  const tracking = useMemo(() => trackingContext.tracking || {}, [
-    trackingContext.tracking,
+  const getProcessFn = useCallback(() => tracking && tracking.process, [
+    tracking,
   ]);
-  const trkProcess = tracking.process;
-  const getProcessFn = useCallback(() => trkProcess, [trkProcess]);
 
   const getOwnTrackingData = useCallback(() => {
     const ownTrackingData =
