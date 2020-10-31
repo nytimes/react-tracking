@@ -739,7 +739,7 @@ describe('hooks', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const { ReactTrackingContext } = require('../useTracking'); // eslint-disable-line global-require
+    const { ReactTrackingContext } = require('../useTrackingImpl'); // eslint-disable-line global-require
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
@@ -880,35 +880,5 @@ describe('hooks', () => {
       label: 'async action',
       status: 'failed',
     });
-  });
-
-  it.skip('can access wrapped component by ref', async () => {
-    const focusFn = jest.fn();
-
-    const Child = React.forwardRef((props, ref) => {
-      const { Track } = useTracking({});
-
-      return (
-        <Track>
-          <button ref={ref} onFocus={focusFn} type="button">
-            child
-          </button>
-        </Track>
-      );
-    });
-
-    const ref = React.createRef();
-    const Parent = () => {
-      useEffect(() => {
-        ref.current.focus();
-      }, []);
-
-      return <Child ref={ref} />;
-    };
-
-    const parent = await mount(<Parent />);
-
-    expect(parent.instance().child).not.toBeNull(); // TODO: probably need to rethink how this test works
-    expect(focusFn).toHaveBeenCalledTimes(1);
   });
 });

@@ -711,7 +711,7 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const { ReactTrackingContext } = require('../useTracking'); // eslint-disable-line global-require
+    const { ReactTrackingContext } = require('../useTrackingImpl'); // eslint-disable-line global-require
 
     const App = track()(() => {
       return <Child />;
@@ -802,10 +802,8 @@ describe('e2e', () => {
       }
     }
 
-    // Get the children's children since Page is wrapped with the WithTracking & Track components.
-    const page = await mount(<Page />)
-      .children()
-      .children();
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);
@@ -855,10 +853,8 @@ describe('e2e', () => {
       }
     }
 
-    // Get the children's children since Page is wrapped with the WithTracking & Track components.
-    const page = await mount(<Page />)
-      .children()
-      .children();
+    // Get the first child since the page is wrapped with the WithTracking component.
+    const page = await mount(<Page />).childAt(0);
     await page.instance().executeAction();
 
     expect(page.state().data).toEqual(message);

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
 
-import useTracking from './useTracking';
+import useTrackingImpl, { ReactTrackingContext } from './useTrackingImpl';
 
 export default function withTrackingComponentDecorator(
   trackingData = {},
@@ -30,17 +30,14 @@ export default function withTrackingComponentDecorator(
         []
       );
 
-      const { getTrackingData, trackEvent, Track } = useTracking(
-        trackingDataFn,
-        options
-      );
+      const contextValue = useTrackingImpl(trackingDataFn, options);
 
       const trackingProp = useMemo(
         () => ({
-          trackEvent,
-          getTrackingData,
+          trackEvent: contextValue.tracking.dispatch,
+          getTrackingData: contextValue.tracking.getTrackingData,
         }),
-        [trackEvent, getTrackingData]
+        [contextValue]
       );
 
       const propsToBePassed = useMemo(
@@ -49,12 +46,12 @@ export default function withTrackingComponentDecorator(
       );
 
       return (
-        <Track>
+        <ReactTrackingContext.Provider value={contextValue}>
           {React.createElement(DecoratedComponent, {
             ...propsToBePassed,
             tracking: trackingProp,
           })}
-        </Track>
+        </ReactTrackingContext.Provider>
       );
     }
 
