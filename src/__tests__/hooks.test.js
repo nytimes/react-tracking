@@ -54,7 +54,7 @@ describe('hooks', () => {
     const TestPage = () => {
       const { Track } = useTracking(testPageData, { dispatchOnMount: true });
 
-      return <Track>{null}</Track>; // TODO: what does it mean for the API if this was <Track dispatchOnMount /> instead of useTracking({ dispatchOnMount: true }) above?
+      return <Track>{null}</Track>;
     };
 
     mount(<TestPage />);
@@ -66,7 +66,7 @@ describe('hooks', () => {
 
   it('accepts a dispatch function in options', () => {
     const TestOptions = () => {
-      const { trackEvent } = useTracking(testDataContext, { dispatch }); // TODO: should we accept top-level config options here?
+      const { trackEvent } = useTracking(testDataContext, { dispatch });
 
       const blah = () => {
         trackEvent(testData);
@@ -95,7 +95,7 @@ describe('hooks', () => {
     };
 
     const TestChild = () => {
-      useTracking(testChildData, { dispatchOnMount: true }); // TODO: Should these properties instead be on the <Track /> component and we require the user to "render" it?
+      useTracking(testChildData, { dispatchOnMount: true });
       return <div />;
     };
 
@@ -163,7 +163,7 @@ describe('hooks', () => {
     const dispatchOnMount = jest.fn(() => ({ dom: true }));
 
     const TestComponent = () => {
-      useTracking(testDispatchOnMount, { dispatch, dispatchOnMount }); // TODO: potential recipe here is if a component does not render children, it doesn't need to include <Track /> in the tree!
+      useTracking(testDispatchOnMount, { dispatch, dispatchOnMount });
       return null;
     };
 
@@ -192,7 +192,7 @@ describe('hooks', () => {
     };
 
     const Page = () => {
-      useTracking({ page: 'Page' }); // TODO: Does this pass? It doesn't render children so we should still get all the proper tracking context dispatched on mount according to "process" fn above
+      useTracking({ page: 'Page' });
       return <div>Page</div>;
     };
 
@@ -210,7 +210,6 @@ describe('hooks', () => {
   });
 
   it('will dispatch a pageview event on mount on functional component', () => {
-    // TODO: Using purely hooks API, this test is redundant with above, but we will keep it for parity
     const App = ({ children }) => {
       const { Track } = useTracking(
         { topLevel: true },
@@ -376,7 +375,7 @@ describe('hooks', () => {
     };
 
     const Page = ({ runtimeData }) => {
-      useTracking({ page: 'Page', runtimeData }); // TODO: in this case we were able to derive props.runtimeData "statically" from within the component, does this still work as expected?
+      useTracking({ page: 'Page', runtimeData });
       return <div>Page</div>;
     };
 
@@ -805,7 +804,6 @@ describe('hooks', () => {
   it('dispatches tracking event from async function', async () => {
     const message = 'test';
 
-    let executeAction;
     const Page = () => {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
@@ -821,16 +819,22 @@ describe('hooks', () => {
         return value;
       };
 
-      executeAction = async () => {
+      const executeAction = async () => {
         const data = await handleAsyncAction();
         setState({ data });
       };
 
-      return <div>{state && state.data}</div>;
+      return (
+        <>
+          <button type="button" onClick={executeAction} />
+          <div>{state && state.data}</div>
+        </>
+      );
     };
 
     const page = await mount(<Page />);
-    await executeAction();
+    await page.find('button').simulate('click');
+    await new Promise(resolve => setTimeout(resolve));
 
     expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
@@ -844,7 +848,6 @@ describe('hooks', () => {
   it('handles rejected async function', async () => {
     const message = 'error';
 
-    let executeAction;
     const Page = () => {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
@@ -853,7 +856,7 @@ describe('hooks', () => {
         return Promise.reject(message);
       };
 
-      executeAction = async () => {
+      const executeAction = async () => {
         try {
           const data = await handleAsyncAction();
           setState({ data });
@@ -867,12 +870,16 @@ describe('hooks', () => {
         }
       };
 
-      return <div>{state && state.data}</div>;
+      return (
+        <>
+          <button type="button" onClick={executeAction} />
+          <div>{state && state.data}</div>
+        </>
+      );
     };
 
     const page = await mount(<Page />);
-    // TODO: redundant with previous test perhaps, but here for posterity. Similarly we may need to call executeAction(); directly
-    await executeAction();
+    await page.find('button').simulate('click');
 
     expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
