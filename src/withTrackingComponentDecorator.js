@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
 
-import useTrackingImpl, { ReactTrackingContext } from './useTrackingImpl';
+import ReactTrackingContext from './ReactTrackingContext';
+import useTrackingImpl from './useTrackingImpl';
 
 export default function withTrackingComponentDecorator(
   trackingData = {},

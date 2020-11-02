@@ -1,9 +1,8 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import merge from 'deepmerge';
 
+import ReactTrackingContext from './ReactTrackingContext';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
-
-export const ReactTrackingContext = React.createContext({});
 
 export default function useTrackingImpl(
   trackingData = {},

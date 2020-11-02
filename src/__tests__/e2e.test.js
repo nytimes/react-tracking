@@ -711,7 +711,7 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const { ReactTrackingContext } = require('../useTrackingImpl'); // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
     const App = track()(() => {
       return <Child />;

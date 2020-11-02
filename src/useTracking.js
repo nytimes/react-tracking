@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 
-import useTrackingImpl, { ReactTrackingContext } from './useTrackingImpl';
+import ReactTrackingContext from './ReactTrackingContext';
+import useTrackingImpl from './useTrackingImpl';
 
 export default function useTracking(trackingData, options) {
   const contextValue = useTrackingImpl(trackingData, options);

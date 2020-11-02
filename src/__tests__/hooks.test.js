@@ -738,7 +738,7 @@ describe('hooks', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const { ReactTrackingContext } = require('../useTrackingImpl'); // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
