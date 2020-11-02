@@ -3,6 +3,7 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
+import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -833,8 +834,9 @@ describe('hooks', () => {
     };
 
     const page = await mount(<Page />);
-    await page.find('button').simulate('click');
-    await new Promise(resolve => setTimeout(resolve));
+    await act(() => {
+      page.find('button').simulate('click');
+    });
 
     expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
