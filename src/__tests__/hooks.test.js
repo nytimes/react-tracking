@@ -515,7 +515,9 @@ describe('hooks', () => {
   });
 
   it('logs a console error when there is already a process defined on context', () => {
-    global.console.error = jest.fn();
+    const consoleError = jest
+      .spyOn(global.console, 'error')
+      .mockImplementation(() => {});
     const process = () => {};
 
     const NestedComponent = () => {
@@ -546,10 +548,12 @@ describe('hooks', () => {
 
     mount(<TestComponent />);
 
-    expect(global.console.error).toHaveBeenCalledTimes(1);
-    expect(global.console.error).toHaveBeenCalledWith(
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(consoleError).toHaveBeenCalledWith(
       '[react-tracking] options.process should be defined once on a top-level component'
     );
+
+    consoleError.mockRestore();
   });
 
   it('will dispatch different data if props changed', () => {
@@ -834,8 +838,8 @@ describe('hooks', () => {
     };
 
     const page = await mount(<Page />);
-    await act(() => {
-      page.find('button').simulate('click');
+    await act(async () => {
+      await page.find('button').simulate('click');
     });
 
     expect(page.text()).toEqual(message);
@@ -881,7 +885,9 @@ describe('hooks', () => {
     };
 
     const page = await mount(<Page />);
-    await page.find('button').simulate('click');
+    await act(async () => {
+      await page.find('button').simulate('click');
+    });
 
     expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
