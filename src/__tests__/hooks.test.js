@@ -53,8 +53,7 @@ describe('hooks', () => {
     const testPageData = { page: 'TestPage' };
 
     const TestPage = () => {
-      const { Track } = useTracking(testPageData, { dispatchOnMount: true });
-
+      useTracking(testPageData, { dispatchOnMount: true });
       return null;
     };
 
