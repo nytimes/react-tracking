@@ -54,7 +54,7 @@ describe('hooks', () => {
     const TestPage = () => {
       const { Track } = useTracking(testPageData, { dispatchOnMount: true });
 
-      return <Track>{null}</Track>;
+      return null;
     };
 
     mount(<TestPage />);
