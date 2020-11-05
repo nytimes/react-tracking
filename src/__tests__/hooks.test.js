@@ -654,6 +654,78 @@ describe('hooks', () => {
     expect(innerRenderCount).toEqual(1);
   });
 
+  it('does not cause unnecessary dispatches due to object literals passed to useTracking', () => {
+    let dispatchCount = 0;
+
+    const App = () => {
+      const [state, setState] = React.useState({});
+
+      useTracking(
+        {},
+        {
+          dispatchOnMount: () => {
+            dispatchCount += 1;
+          },
+        }
+      );
+
+      return (
+        <div className="App">
+          <h1>
+            Extra dispatches caused by new object literals passed on re-render
+          </h1>
+          <button
+            onClick={() => setState({ count: state.count + 1 })}
+            type="button"
+          >
+            Update trackingData and options objects
+          </button>
+        </div>
+      );
+    };
+
+    const wrapper = mount(<App />);
+
+    wrapper.find('button').simulate('click');
+
+    expect(dispatchCount).toEqual(1);
+  });
+
+  it('dispatches the correct data if props change', () => {
+    const App = props => {
+      const { trackEvent } = useTracking(
+        { data: props.data || '' },
+        {
+          dispatch,
+          dispatchOnMount: true,
+        }
+      );
+
+      const handleClick = () => {
+        trackEvent({ event: 'click' });
+      };
+
+      return (
+        <div className="App">
+          <button onClick={handleClick} type="button" />
+        </div>
+      );
+    };
+
+    const wrapper = mount(<App />);
+
+    expect(dispatch).toHaveBeenCalledWith({ data: '' });
+
+    wrapper.setProps({ data: 'Updated data prop' });
+    wrapper.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenLastCalledWith({
+      event: 'click',
+      data: 'Updated data prop',
+    });
+  });
+
   it('can interop with the HoC (where HoC is top-level)', () => {
     const mockDispatchTrackingEvent = jest.fn();
     const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hoc' };
@@ -702,7 +774,7 @@ describe('hooks', () => {
     });
   });
 
-  it('can interop with HoC (where Hook is top-level', () => {
+  it('can interop with HoC (where Hook is top-level)', () => {
     const mockDispatchTrackingEvent = jest.fn();
     const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hook' };
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };

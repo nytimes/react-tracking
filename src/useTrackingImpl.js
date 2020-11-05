@@ -1,24 +1,34 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import merge from 'deepmerge';
 
 import ReactTrackingContext from './ReactTrackingContext';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
-export default function useTrackingImpl(
-  trackingData = {},
-  { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } = {}
-) {
+export default function useTrackingImpl(trackingData, options) {
   const { tracking } = useContext(ReactTrackingContext);
+  const latestData = useRef(trackingData);
+  const latestOptions = useRef(options);
+
+  useEffect(() => {
+    // store the latest data & options in a mutable ref to prevent
+    // dependencies from changing when the consumer passes in non-memoized objects
+    // same approach that we use for props in withTrackingComponentDecorator
+    latestData.current = trackingData;
+    latestOptions.current = options;
+  });
+
+  const { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } =
+    latestOptions.current || {};
 
   const getProcessFn = useCallback(() => tracking && tracking.process, [
     tracking,
   ]);
 
   const getOwnTrackingData = useCallback(() => {
-    const ownTrackingData =
-      typeof trackingData === 'function' ? trackingData() : trackingData;
+    const data = latestData.current;
+    const ownTrackingData = typeof data === 'function' ? data() : data;
     return ownTrackingData || {};
-  }, [trackingData]);
+  }, []);
 
   const getTrackingDataFn = useCallback(() => {
     const contextGetTrackingData =
