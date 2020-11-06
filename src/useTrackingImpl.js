@@ -17,8 +17,11 @@ export default function useTrackingImpl(trackingData, options) {
     latestOptions.current = options;
   });
 
-  const { dispatch = dispatchTrackingEvent, dispatchOnMount = false, process } =
-    latestOptions.current || {};
+  const {
+    dispatch = dispatchTrackingEvent,
+    dispatchOnMount = false,
+    process,
+  } = useMemo(() => latestOptions.current || {}, []);
 
   const getProcessFn = useCallback(() => tracking && tracking.process, [
     tracking,

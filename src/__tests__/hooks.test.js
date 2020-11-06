@@ -627,18 +627,15 @@ describe('hooks', () => {
     });
 
     const App = track()(() => {
-      const [state, setState] = React.useState({});
+      const [count, setCount] = useState(0);
 
       return (
         <div className="App">
           <h1>Extra renders of InnerComponent caused by new context API</h1>
-          <button
-            onClick={() => setState({ count: state.count + 1 })}
-            type="button"
-          >
+          <button onClick={() => setCount(c => c + 1)} type="button">
             Update Props
           </button>
-          <OuterComponent trackedProp={state}>
+          <OuterComponent trackedProp={count}>
             <MiddleComponent middleProp={1}>
               <InnerComponent innerProps="a" />
             </MiddleComponent>
@@ -655,10 +652,16 @@ describe('hooks', () => {
   });
 
   it('does not cause unnecessary dispatches due to object literals passed to useTracking', () => {
-    let dispatchCount = 0;
+    const trackRenders = jest.fn();
 
     const App = () => {
-      const [state, setState] = React.useState({});
+      // eslint-disable-next-line no-unused-vars
+      const [clickCount, setClickCount] = useState(0);
+
+      useEffect(() => {
+        // use mock function to ensure that we are counting renders, not clicks
+        trackRenders();
+      });
 
       useTracking(
         {},
@@ -675,10 +678,7 @@ describe('hooks', () => {
           <h1>
             Extra dispatches caused by new object literals passed on re-render
           </h1>
-          <button
-            onClick={() => setState({ count: state.count + 1 })}
-            type="button"
-          >
+          <button onClick={() => setClickCount(c => c + 1)} type="button">
             Update trackingData and options objects
           </button>
         </div>
@@ -687,9 +687,16 @@ describe('hooks', () => {
 
     const wrapper = mount(<App />);
 
-    wrapper.find('button').simulate('click');
+    const button = wrapper.find('button');
+    button.simulate('click');
+    button.simulate('click');
+    button.simulate('click');
 
-    expect(dispatchCount).toEqual(1);
+    expect(trackRenders).toHaveBeenCalledTimes(4);
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenLastCalledWith({
+      test: true,
+    });
   });
 
   it('dispatches the correct data if props change', () => {
