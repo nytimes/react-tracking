@@ -663,8 +663,9 @@ describe('hooks', () => {
       useTracking(
         {},
         {
+          dispatch,
           dispatchOnMount: () => {
-            dispatchCount += 1;
+            return { test: true };
           },
         }
       );
