@@ -609,44 +609,83 @@ describe('hooks', () => {
     });
   });
 
+  it('provides passed in tracking data immediately', () => {
+    const Foo = () => {
+      const { getTrackingData } = useTracking({ seeMe: true });
+
+      expect(getTrackingData()).toStrictEqual({ seeMe: true });
+
+      return null;
+    };
+
+    mount(<Foo />);
+  });
+
   it('does not cause unnecessary updates due to context changes', () => {
     let innerRenderCount = 0;
+    let getLatestTrackingData;
 
-    const OuterComponent = track()(props => props.children);
+    const OuterComponent = ({ children, trackedProp }) => {
+      const { Track } = useTracking({ trackedProp });
+      return <Track>{children}</Track>;
+    };
 
-    const MiddleComponent = track()(
-      React.memo(
-        props => props.children,
-        (props, prevProps) => props.middleProp === prevProps.middleProp
-      )
+    const MiddleComponent = React.memo(
+      ({ children, middleProp }) => {
+        const { Track } = useTracking({ middleProp });
+        return <Track>{children}</Track>;
+      },
+      (props, prevProps) => props.middleProp === prevProps.middleProp
     );
 
-    const InnerComponent = track()(() => {
+    const InnerComponent = ({ innerProps }) => {
+      const { Track, getTrackingData } = useTracking({ innerProps });
       innerRenderCount += 1;
-      return null;
-    });
 
-    const App = track()(() => {
+      // expose for test assertion later
+      getLatestTrackingData = getTrackingData;
+
+      return <Track>{innerProps}</Track>;
+    };
+
+    const App = () => {
       const [count, setCount] = useState(0);
 
+      const { Track } = useTracking({ count });
+
       return (
-        <div className="App">
-          <h1>Extra renders of InnerComponent caused by new context API</h1>
-          <button onClick={() => setCount(c => c + 1)} type="button">
-            Update Props
-          </button>
-          <OuterComponent trackedProp={count}>
-            <MiddleComponent middleProp={1}>
-              <InnerComponent innerProps="a" />
-            </MiddleComponent>
-          </OuterComponent>
-        </div>
+        <Track>
+          <div className="App">
+            <h1>Extra renders of InnerComponent caused by new context API</h1>
+            <button
+              onClick={() => {
+                setCount(c => c + 1);
+              }}
+              type="button"
+            >
+              Update Props
+            </button>
+            <OuterComponent trackedProp={count}>
+              <MiddleComponent middleProp="middleProp">
+                <InnerComponent innerProps="a" />
+              </MiddleComponent>
+            </OuterComponent>
+          </div>
+        </Track>
       );
-    });
+    };
 
     const wrapper = mount(<App />);
 
     wrapper.find('button').simulate('click');
+    wrapper.find('button').simulate('click');
+
+    expect(getLatestTrackingData()).toStrictEqual({
+      count: 2,
+      trackedProp: 2,
+      middleProp: 'middleProp',
+      innerProps: 'a',
+    });
 
     expect(innerRenderCount).toEqual(1);
   });
