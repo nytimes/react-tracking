@@ -29,9 +29,9 @@ Both `@track()` and `useTracking()` expect two arguments, `trackingData` and `op
 
 - `trackingData` represents the data to be tracked (or a function returning that data)
 - `options` is an optional object that accepts three properties (the object passed to the decorator only also accepts a fourth `forwardRef` property):
-  - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` later in this document.
+  - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` [below](https://github.com/nytimes/react-tracking#custom-optionsdispatch-for-tracking-data).
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called in a useEffect on the component's initial render with all of the tracking context data as the only argument.
-  - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details later in this document.
+  - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details [below](https://github.com/nytimes/react-tracking#top-level-optionsprocess).
   - `forwardRef` (decorator/HoC only), when set to `true`, adding a ref to the wrapped component will actually return the instance of the underlying component. Default is `false`.
 
 #### `tracking` prop
@@ -125,7 +125,7 @@ const FooPage = () => {
 };
 ```
 
-The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that's provided as `props.tracking` when wrapping with the `@track()` decorator/HoC. It also returns an additional property on that object: a `Track` component that can be returned as the root of your component's sub-tree to pass any new contextual data to its children.
+The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that are provided as `props.tracking` when wrapping with the `@track()` decorator/HoC. It also returns an additional property on that object: a `Track` component that can be returned as the root of your component's sub-tree to pass any new contextual data to its children.
 
 > Note that if you need contextual tracking data to be passed to child components, you need to wrap the markup returned by your component with `Track`. This will create a new context with the new tracking data merged in, and pass it to all child components:
 
@@ -221,6 +221,17 @@ To dispatch tracking data when a component mounts, you can pass in `{ dispatchOn
 class FooPage extends Component { ... }
 ```
 
+<details>
+<summary>Example using hooks</summary>
+
+```js
+function FooPage() {
+  useTracking({ page: 'FooPage' }, { dispatchOnMount: true });
+}
+```
+
+</details>
+
 Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
 
 ```
@@ -244,6 +255,17 @@ A use case for this would be that you want to provide extra tracking data withou
 class FooPage extends Component { ... }
 ```
 
+<details>
+<summary>Example using hooks</summary>
+
+```js
+function FooPage() {
+  useTracking({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) });
+}
+```
+
+</details>
+
 Will dispatch the following data (assuming no other tracking data in context from the rest of the app):
 
 ```
@@ -260,12 +282,12 @@ When there's a need to implicitly dispatch an event with some data for _every_ c
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
 ```js
-@track({}, { process: (ownTrackingData) => ownTrackingData.page ? {event: 'pageview'} : null })
+@track({}, { process: (ownTrackingData) => ownTrackingData.page ? { event: 'pageview' } : null })
 class App extends Component {...}
 
 ...
 
-@track({page: 'Page1'})
+@track({ page: 'Page1' })
 class Page1 extends Component {...}
 
 @track({})
@@ -274,6 +296,37 @@ class Page2 extends Component {...}
 
 When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
 When `Page2` mounts, nothing will be dispatched.
+
+<details>
+<summary>Example using hooks</summary>
+
+```js
+function App() {
+  const { Track } = useTracking(
+    {},
+    {
+      process: (ownTrackingData) => ownTrackingData.page ? { event: 'pageview' } : null,
+    }
+  );
+
+  return (
+    <Track>
+      <Page1 />
+      <Page2 />
+    </Track>
+  );
+}
+
+function Page1() {
+  useTracking({ page: 'Page1' });
+}
+
+function Page2() {
+  useTracking({});
+}
+```
+
+</details>
 
 ### Tracking Asynchronous Methods
 
@@ -428,7 +481,7 @@ export default function AdComponent() {
 
 ### Tracking Data
 
-Note that there are no restrictions on the objects that are passed in to the decorator.
+Note that there are no restrictions on the objects that are passed in to the decorator or hook.
 
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
