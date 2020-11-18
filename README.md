@@ -294,9 +294,6 @@ class Page1 extends Component {...}
 class Page2 extends Component {...}
 ```
 
-When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
-When `Page2` mounts, nothing will be dispatched.
-
 <details>
 <summary>Example using hooks</summary>
 
@@ -327,6 +324,9 @@ function Page2() {
 ```
 
 </details>
+
+When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
+When `Page2` mounts, nothing will be dispatched.
 
 ### Tracking Asynchronous Methods
 
