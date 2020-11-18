@@ -1,25 +1,26 @@
-import { useContext, useMemo } from 'react';
-import { ReactTrackingContext } from './withTrackingComponentDecorator';
+import React, { useCallback, useMemo } from 'react';
 
-export default function useTracking() {
-  const trackingContext = useContext(ReactTrackingContext);
+import ReactTrackingContext from './ReactTrackingContext';
+import useTrackingImpl from './useTrackingImpl';
 
-  if (!(trackingContext && trackingContext.tracking)) {
-    throw new Error(
-      'Attempting to call `useTracking` ' +
-        'without a ReactTrackingContext present. Did you forget to wrap the top of ' +
-        'your component tree with `track`?'
-    );
-  }
+export default function useTracking(trackingData, options) {
+  const contextValue = useTrackingImpl(trackingData, options);
+
+  const Track = useCallback(
+    ({ children }) => (
+      <ReactTrackingContext.Provider value={contextValue}>
+        {children}
+      </ReactTrackingContext.Provider>
+    ),
+    [contextValue]
+  );
 
   return useMemo(
     () => ({
-      getTrackingData: trackingContext.tracking.getTrackingData,
-      trackEvent: trackingContext.tracking.dispatch,
+      Track,
+      getTrackingData: contextValue.tracking.getTrackingData,
+      trackEvent: contextValue.tracking.dispatch,
     }),
-    [
-      trackingContext.tracking.getTrackingData,
-      trackingContext.tracking.dispatch,
-    ]
+    [contextValue, Track]
   );
 }

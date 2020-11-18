@@ -3,6 +3,7 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
+import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -13,7 +14,7 @@ const testData = { testData: true };
 const dispatch = jest.fn();
 const testState = { booleanState: true };
 
-describe.skip('hooks', () => {
+describe('hooks', () => {
   // eslint-disable-next-line global-require
   const { default: track, useTracking } = require('../');
 
@@ -52,9 +53,8 @@ describe.skip('hooks', () => {
     const testPageData = { page: 'TestPage' };
 
     const TestPage = () => {
-      const { Track } = useTracking({}, { dispatchOnMount: true });
-
-      return <Track>{null}</Track>; // TODO: what does it mean for the API if this was <Track dispatchOnMount /> instead of useTracking({ dispatchOnMount: true }) above?
+      useTracking(testPageData, { dispatchOnMount: true });
+      return null;
     };
 
     mount(<TestPage />);
@@ -66,7 +66,7 @@ describe.skip('hooks', () => {
 
   it('accepts a dispatch function in options', () => {
     const TestOptions = () => {
-      const { trackEvent } = useTracking(testDataContext, { dispatch }); // TODO: should we accept top-level config options here?
+      const { trackEvent } = useTracking(testDataContext, { dispatch });
 
       const blah = () => {
         trackEvent(testData);
@@ -89,17 +89,13 @@ describe.skip('hooks', () => {
     const testChildData = { page: 'TestChild' };
 
     const TestOptions = ({ children }) => {
-      const { Track } = useTracking();
+      const { Track } = useTracking(testDataContext, { dispatch });
 
-      return (
-        <Track data={testDataContext} dispatch={dispatch}>
-          {children}
-        </Track>
-      );
+      return <Track>{children}</Track>;
     };
 
     const TestChild = () => {
-      useTracking(testChildData, { dispatchOnMount: true }); // TODO: Should these properties instead be on the <Track /> component and we require the user to "render" it?
+      useTracking(testChildData, { dispatchOnMount: true });
       return <div />;
     };
 
@@ -167,7 +163,7 @@ describe.skip('hooks', () => {
     const dispatchOnMount = jest.fn(() => ({ dom: true }));
 
     const TestComponent = () => {
-      useTracking(testDispatchOnMount, { dispatch, dispatchOnMount }); // TODO: potential recipe here is if a component does not render children, it doesn't need to include <Track /> in the tree!
+      useTracking(testDispatchOnMount, { dispatch, dispatchOnMount });
       return null;
     };
 
@@ -196,7 +192,7 @@ describe.skip('hooks', () => {
     };
 
     const Page = () => {
-      useTracking({ page: 'Page' }); // TODO: Does this pass? It doesn't render children so we should still get all the proper tracking context dispatched on mount according to "process" fn above
+      useTracking({ page: 'Page' });
       return <div>Page</div>;
     };
 
@@ -214,7 +210,6 @@ describe.skip('hooks', () => {
   });
 
   it('will dispatch a pageview event on mount on functional component', () => {
-    // TODO: Using purely hooks API, this test is redundant with above, but we will keep it for parity
     const App = ({ children }) => {
       const { Track } = useTracking(
         { topLevel: true },
@@ -380,7 +375,7 @@ describe.skip('hooks', () => {
     };
 
     const Page = ({ runtimeData }) => {
-      useTracking({ page: 'Page', runtimeData }); // TODO: in this case we were able to derive props.runtimeData "statically" from within the component, does this still work as expected?
+      useTracking({ page: 'Page', runtimeData });
       return <div>Page</div>;
     };
 
@@ -416,12 +411,12 @@ describe.skip('hooks', () => {
       return <Track>{children}</Track>;
     };
     const Page = ({ children }) => {
-      const Track = useTracking({ page: 'Page' });
+      const { Track } = useTracking({ page: 'Page' });
       return <Track>{children}</Track>;
     };
 
     const Nested = ({ children }) => {
-      const Track = useTracking({ view: 'View' });
+      const { Track } = useTracking({ view: 'View' });
       return <Track>{children}</Track>;
     };
 
@@ -491,8 +486,8 @@ describe.skip('hooks', () => {
   it('can read tracking data from props.tracking.getTrackingData()', () => {
     const mockReader = jest.fn();
 
-    const TestOptions = ({ onProps, children }) => {
-      const { Track } = useTracking({ onProps, ...testDataContext });
+    const TestOptions = ({ onProps, child, children }) => {
+      const { Track } = useTracking({ onProps, child, ...testDataContext });
       return <Track>{children}</Track>;
     };
 
@@ -503,7 +498,7 @@ describe.skip('hooks', () => {
     };
 
     mount(
-      <TestOptions onProps="yes">
+      <TestOptions onProps="yes" child>
         <TestChild />
       </TestOptions>
     );
@@ -519,7 +514,9 @@ describe.skip('hooks', () => {
   });
 
   it('logs a console error when there is already a process defined on context', () => {
-    global.console.error = jest.fn();
+    const consoleError = jest
+      .spyOn(global.console, 'error')
+      .mockImplementation(() => {});
     const process = () => {};
 
     const NestedComponent = () => {
@@ -550,10 +547,12 @@ describe.skip('hooks', () => {
 
     mount(<TestComponent />);
 
-    expect(global.console.error).toHaveBeenCalledTimes(1);
-    expect(global.console.error).toHaveBeenCalledWith(
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(consoleError).toHaveBeenCalledWith(
       '[react-tracking] options.process should be defined once on a top-level component'
     );
+
+    consoleError.mockRestore();
   });
 
   it('will dispatch different data if props changed', () => {
@@ -610,54 +609,173 @@ describe.skip('hooks', () => {
     });
   });
 
+  it('provides passed in tracking data immediately', () => {
+    const Foo = () => {
+      const { getTrackingData } = useTracking({ seeMe: true });
+
+      expect(getTrackingData()).toStrictEqual({ seeMe: true });
+
+      return null;
+    };
+
+    mount(<Foo />);
+  });
+
   it('does not cause unnecessary updates due to context changes', () => {
     let innerRenderCount = 0;
+    let getLatestTrackingData;
 
-    const OuterComponent = track()(props => props.children);
+    const OuterComponent = ({ children, trackedProp }) => {
+      const { Track } = useTracking({ trackedProp });
+      return <Track>{children}</Track>;
+    };
 
-    const MiddleComponent = track()(
-      React.memo(
-        props => props.children,
-        (props, prevProps) => props.middleProp === prevProps.middleProp
-      )
+    const MiddleComponent = React.memo(
+      ({ children, middleProp }) => {
+        const { Track } = useTracking({ middleProp });
+        return <Track>{children}</Track>;
+      },
+      (props, prevProps) => props.middleProp === prevProps.middleProp
     );
 
-    const InnerComponent = track()(() => {
+    const InnerComponent = ({ innerProps }) => {
+      const { Track, getTrackingData } = useTracking({ innerProps });
       innerRenderCount += 1;
-      return null;
-    });
 
-    const App = track()(() => {
-      const [state, setState] = React.useState({});
+      // expose for test assertion later
+      getLatestTrackingData = getTrackingData;
+
+      return <Track>{innerProps}</Track>;
+    };
+
+    const App = () => {
+      const [count, setCount] = useState(0);
+
+      const { Track } = useTracking({ count });
 
       return (
-        <div className="App">
-          <h1>Extra renders of InnerComponent caused by new context API</h1>
-          <button
-            onClick={() => setState({ count: state.count + 1 })}
-            type="button"
-          >
-            Update Props
-          </button>
-          <OuterComponent trackedProp={state}>
-            <MiddleComponent middleProp={1}>
-              <InnerComponent innerProps="a" />
-            </MiddleComponent>
-          </OuterComponent>
-        </div>
+        <Track>
+          <div className="App">
+            <h1>Extra renders of InnerComponent caused by new context API</h1>
+            <button
+              onClick={() => {
+                setCount(c => c + 1);
+              }}
+              type="button"
+            >
+              Update Props
+            </button>
+            <OuterComponent trackedProp={count}>
+              <MiddleComponent middleProp="middleProp">
+                <InnerComponent innerProps="a" />
+              </MiddleComponent>
+            </OuterComponent>
+          </div>
+        </Track>
       );
-    });
+    };
 
     const wrapper = mount(<App />);
 
     wrapper.find('button').simulate('click');
+    wrapper.find('button').simulate('click');
+
+    expect(getLatestTrackingData()).toStrictEqual({
+      count: 2,
+      trackedProp: 2,
+      middleProp: 'middleProp',
+      innerProps: 'a',
+    });
 
     expect(innerRenderCount).toEqual(1);
   });
 
+  it('does not cause unnecessary dispatches due to object literals passed to useTracking', () => {
+    const trackRenders = jest.fn();
+
+    const App = () => {
+      // eslint-disable-next-line no-unused-vars
+      const [clickCount, setClickCount] = useState(0);
+
+      useEffect(() => {
+        // use mock function to ensure that we are counting renders, not clicks
+        trackRenders();
+      });
+
+      useTracking(
+        {},
+        {
+          dispatch,
+          dispatchOnMount: () => {
+            return { test: true };
+          },
+        }
+      );
+
+      return (
+        <div className="App">
+          <h1>
+            Extra dispatches caused by new object literals passed on re-render
+          </h1>
+          <button onClick={() => setClickCount(c => c + 1)} type="button">
+            Update trackingData and options objects
+          </button>
+        </div>
+      );
+    };
+
+    const wrapper = mount(<App />);
+
+    const button = wrapper.find('button');
+    button.simulate('click');
+    button.simulate('click');
+    button.simulate('click');
+
+    expect(trackRenders).toHaveBeenCalledTimes(4);
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenLastCalledWith({
+      test: true,
+    });
+  });
+
+  it('dispatches the correct data if props change', () => {
+    const App = props => {
+      const { trackEvent } = useTracking(
+        { data: props.data || '' },
+        {
+          dispatch,
+          dispatchOnMount: true,
+        }
+      );
+
+      const handleClick = () => {
+        trackEvent({ event: 'click' });
+      };
+
+      return (
+        <div className="App">
+          <button onClick={handleClick} type="button" />
+        </div>
+      );
+    };
+
+    const wrapper = mount(<App />);
+
+    expect(dispatch).toHaveBeenCalledWith({ data: '' });
+
+    wrapper.setProps({ data: 'Updated data prop' });
+    wrapper.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenLastCalledWith({
+      event: 'click',
+      data: 'Updated data prop',
+    });
+  });
+
   it('can interop with the HoC (where HoC is top-level)', () => {
     const mockDispatchTrackingEvent = jest.fn();
-    const testData1 = { key: { x: 1, y: 1, topLevel: 'hoc' } };
+    const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hoc' };
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
     // functional wrapper hoc
@@ -703,7 +821,7 @@ describe.skip('hooks', () => {
     });
   });
 
-  it('can interop with HoC (where Hook is top-level', () => {
+  it('can interop with HoC (where Hook is top-level)', () => {
     const mockDispatchTrackingEvent = jest.fn();
     const testData1 = { key: { x: 1, y: 1 }, topLevel: 'hook' };
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
@@ -743,9 +861,7 @@ describe.skip('hooks', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const {
-      ReactTrackingContext,
-    } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
     const Child = () => {
       const trackingContext = useContext(ReactTrackingContext);
@@ -809,9 +925,8 @@ describe.skip('hooks', () => {
   });
 
   it('dispatches tracking event from async function', async () => {
-    const message = { value: 'test' };
+    const message = 'test';
 
-    let executeAction;
     const Page = () => {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
@@ -827,33 +942,36 @@ describe.skip('hooks', () => {
         return value;
       };
 
-      executeAction = async () => {
+      const executeAction = async () => {
         const data = await handleAsyncAction();
         setState({ data });
       };
 
-      return <div>{state && state.data}</div>;
+      return (
+        <>
+          <button type="button" onClick={executeAction} />
+          <div>{state && state.data}</div>
+        </>
+      );
     };
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction(); // TODO: this probably doesn't work (how well does Enzyme support hooks?)
-    // TODO: maybe have to just call executeAction(); here
-    executeAction();
+    const page = await mount(<Page />);
+    await act(async () => {
+      await page.find('button').simulate('click');
+    });
 
-    expect(page.state().data).toEqual(message);
+    expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
       status: 'success',
-      ...message,
+      value: message,
     });
   });
 
   it('handles rejected async function', async () => {
-    const message = { value: 'error' };
+    const message = 'error';
 
-    let executeAction;
     const Page = () => {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
@@ -862,7 +980,7 @@ describe.skip('hooks', () => {
         return Promise.reject(message);
       };
 
-      executeAction = async () => {
+      const executeAction = async () => {
         try {
           const data = await handleAsyncAction();
           setState({ data });
@@ -876,50 +994,24 @@ describe.skip('hooks', () => {
         }
       };
 
-      return <div>{state && state.data}</div>;
+      return (
+        <>
+          <button type="button" onClick={executeAction} />
+          <div>{state && state.data}</div>
+        </>
+      );
     };
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction();
-    // TODO: redundant with previous test perhaps, but here for posterity. Similarly we may need to call executeAction(); directly
-    executeAction();
+    const page = await mount(<Page />);
+    await act(async () => {
+      await page.find('button').simulate('click');
+    });
 
-    expect(page.state().data).toEqual(message);
+    expect(page.text()).toEqual(message);
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
       status: 'failed',
     });
-  });
-
-  it('can access wrapped component by ref', async () => {
-    const focusFn = jest.fn();
-
-    const Child = React.forwardRef((props, ref) => {
-      const { Track } = useTracking({});
-
-      return (
-        <Track>
-          <button ref={ref} onFocus={focusFn} type="button">
-            child
-          </button>
-        </Track>
-      );
-    });
-
-    const ref = React.createRef();
-    const Parent = () => {
-      useEffect(() => {
-        ref.current.focus();
-      }, []);
-
-      return <Child ref={ref} />;
-    };
-
-    const parent = await mount(<Parent />);
-
-    expect(parent.instance().child).not.toBeNull(); // TODO: probably need to rethink how this test works
-    expect(focusFn).toHaveBeenCalledTimes(1);
   });
 });
