@@ -28,7 +28,7 @@ import track, { useTracking } from 'react-tracking';
 Both `@track()` and `useTracking()` expect two arguments, `trackingData` and `options`.
 
 - `trackingData` represents the data to be tracked (or a function returning that data)
-- `options` is an optional object that accepts three properties (the object passed to the decorator only also accepts a fourth `forwardRef` property):
+- `options` is an optional object that accepts three properties (the object passed to the decorator also accepts a fourth `forwardRef` property):
   - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` [below](https://github.com/nytimes/react-tracking#custom-optionsdispatch-for-tracking-data).
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called in a useEffect on the component's initial render with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details [below](https://github.com/nytimes/react-tracking#top-level-optionsprocess).
@@ -51,11 +51,83 @@ The `@track()` decorator will expose a `tracking` prop on the component it wraps
 }
 ```
 
-The `useTracking` hook returns an object with this same shape, plus a `Track` wrapper that can be used to pass contextual data to child components (more information about this can be found [below](https://github.com/nytimes/react-tracking#usage-with-react-hooks)).
+The `useTracking` hook returns an object with this same shape, plus a `<Track />` component that you use to wrap your returned markup to pass contextual data to child components.
+
+### Usage with React Hooks
+
+We can access the `trackEvent` method via the `useTracking` hook from anywhere in the tree:
+
+```js
+import { useTracking } from 'react-tracking';
+
+const FooPage = () => {
+  const { Track, trackEvent } = useTracking({ page: 'FooPage' });
+
+  return (
+    <Track>
+      <div
+        onClick={() => {
+          trackEvent({ action: 'click' });
+        }}
+      />
+    </Track>
+  );
+};
+```
+
+The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that are provided as `props.tracking` when wrapping with the `@track()` decorator/HoC (more info about the decorator can be found [below](https://github.com/nytimes/react-tracking#usage-as-a-decorator)). It also returns an additional property on that object: a `<Track />` component that can be returned as the root of your component's sub-tree to pass any new contextual data to its children.
+
+> Note that in most cases you would wrap the markup returned by your component with `<Track />`. This will merge a new tracking context and make it available to all child components. The only time you _wouldn't_ wrap your returned markup with `<Track />` is if you're on some leaf component and don't have any more child components that need tracking info.
+
+```js
+import { useTracking } from 'react-tracking';
+
+const Child = () => {
+  const { trackEvent } = useTracking();
+
+  return (
+    <div
+      onClick={() => {
+        trackEvent({ action: 'childClick' });
+      }}
+    />
+  );
+};
+
+const FooPage = () => {
+  const { Track, trackEvent } = useTracking({ page: 'FooPage' });
+
+  return (
+    <Track>
+      <Child />
+      <div
+        onClick={() => {
+          trackEvent({ action: 'click' });
+        }}
+      />
+    </Track>
+  );
+};
+```
+
+In the example above, the click event in the `FooPage` component will dispatch the following data:
+```
+{
+  page: 'FooPage',
+  action: 'click',
+}
+```
+Because we wrapped the sub-tree returned by `FooPage` in `<Track />`, the click event in the `Child` component will dispatch:
+```
+{
+  page: 'FooPage',
+  action: 'childClick',
+}
+```
 
 ### Usage as a Decorator
 
-`react-tracking` is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
+The default `track()` export is best used as a `@decorator()` using the [babel decorators plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy).
 
 The decorator can be used on React Classes and on methods within those classes. If you use it on methods within these classes, make sure to decorate the class as well.
 
@@ -104,76 +176,6 @@ export default track({
 ```
 
 _This is also how you would use this module without `@decorator` syntax, although this is obviously awkward and the decorator syntax is recommended._
-
-### Usage with React Hooks
-
-Following the example above, we can also access the `trackEvent` method via the `useTracking` hook from anywhere in the tree:
-
-```js
-import { useTracking } from 'react-tracking';
-
-const FooPage = () => {
-  const { trackEvent } = useTracking({ page: 'FooPage' });
-
-  return (
-    <div
-      onClick={() => {
-        trackEvent({ action: 'click' });
-      }}
-    />
-  );
-};
-```
-
-The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that are provided as `props.tracking` when wrapping with the `@track()` decorator/HoC. It also returns an additional property on that object: a `Track` component that can be returned as the root of your component's sub-tree to pass any new contextual data to its children.
-
-> Note that if you need contextual tracking data to be passed to child components, you need to wrap the markup returned by your component with `Track`. This will create a new context with the new tracking data merged in, and pass it to all child components:
-
-```js
-import { useTracking } from 'react-tracking';
-
-const Child = () => {
-  const { trackEvent } = useTracking();
-
-  return (
-    <div
-      onClick={() => {
-        trackEvent({ action: 'childClick' });
-      }}
-    />
-  );
-};
-
-const FooPage = () => {
-  const { Track, trackEvent } = useTracking({ page: 'FooPage' });
-
-  return (
-    <Track>
-      <Child />
-      <div
-        onClick={() => {
-          trackEvent({ action: 'click' });
-        }}
-      />
-    </Track>
-  );
-};
-```
-
-In the example above, the click event in the `FooPage` component will dispatch the following data:
-```
-{
-  page: 'FooPage',
-  action: 'click',
-}
-```
-Because we wrapped the sub-tree returned by `FooPage` in `Track`, the click event in the `Child` component will dispatch:
-```
-{
-  page: 'FooPage',
-  action: 'childClick',
-}
-```
 
 ### Custom `options.dispatch()` for tracking data
 
