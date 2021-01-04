@@ -712,9 +712,7 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const {
-      ReactTrackingContext,
-    } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
     const App = track()(() => {
       return <Child />;
@@ -866,5 +864,38 @@ describe('e2e', () => {
       label: 'async action',
       status: 'failed',
     });
+  });
+
+  it('can access wrapped component by ref', async () => {
+    const focusFn = jest.fn();
+    @track({}, { forwardRef: true })
+    class Child extends React.Component {
+      focus = focusFn;
+
+      render() {
+        return 'child';
+      }
+    }
+
+    class Parent extends React.Component {
+      componentDidMount() {
+        this.child.focus();
+      }
+
+      render() {
+        return (
+          <Child
+            ref={el => {
+              this.child = el;
+            }}
+          />
+        );
+      }
+    }
+
+    const parent = await mount(<Parent />);
+
+    expect(parent.instance().child).not.toBeNull();
+    expect(focusFn).toHaveBeenCalledTimes(1);
   });
 });
