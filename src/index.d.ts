@@ -84,7 +84,10 @@ export const ReactTrackingContext: TrackingContext;
 /**
  * A React hook used to tap into the tracking context.
  */
-export function useTracking<P = {}>(): TrackingProp<P>;
+export function useTracking<K extends keyof T, T = any, P = {}, S = any>(
+  trackingInfo?: TrackingInfo<Pick<T, K>, P, S>,
+  options?: Options<Partial<T>>
+): TrackingProp<P>;
 
 /**
  * This is the type of the `track` function. It’s declared as an interface so that consumers can extend the typing and
