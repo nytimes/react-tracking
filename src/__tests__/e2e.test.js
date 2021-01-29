@@ -128,9 +128,10 @@ describe('e2e', () => {
       }
     }
 
-    const TestData3 = track({ key: { x: 3, y: 3 } }, { dispatchOnMount: true })(
-      () => <div />
-    );
+    const TestData3 = track(
+      { key: { x: 3, y: 3 } },
+      { dispatchOnMount: true }
+    )(() => <div />);
 
     const TestData2 = track(testData2)(() => <TestData3 />);
 
@@ -711,9 +712,7 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const {
-      ReactTrackingContext,
-    } = require('../withTrackingComponentDecorator'); // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
     const App = track()(() => {
       return <Child />;
