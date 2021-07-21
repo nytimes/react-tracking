@@ -1,0 +1,61 @@
+kind: pipeline
+type: docker
+name: build node 14
+
+steps:
+  - name: install
+    pull: if-not-exists
+    image: node:14
+    commands:
+      - npm ci
+  
+  - name: prepare
+    image: node:14
+    commands:
+      - npm run prepare
+
+trigger:
+  event:
+    - push
+
+---
+kind: pipeline
+type: docker
+name: build node 12
+
+steps:
+  - name: install
+    pull: if-not-exists
+    image: node:12
+    commands:
+      - npm ci
+
+  - name: prepare
+    image: node:12
+    commands:
+      - npm run prepare
+
+trigger:
+  event:
+    - push
+
+---
+kind: pipeline
+type: docker
+name: build node 10
+
+steps:
+  - name: install
+    pull: if-not-exists
+    image: node:10
+    commands:
+      - npm ci
+
+  - name: prepare
+    image: node:10
+    commands:
+      - npm run prepare
+
+trigger:
+  event:
+    - push
