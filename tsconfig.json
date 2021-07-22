@@ -1,7 +1,20 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "allowJs": true
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": false,
+    "jsx": "react",
+    "module": "es6",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es5"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "build"],
+  "include": ["src/**/*", "global.d.ts"]
 }

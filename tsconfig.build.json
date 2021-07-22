@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "noEmitOnError": true,
+    "outDir": "./build/"
+  },
+  "extends": "./tsconfig.json",
+  "exclude": ["**/__tests__/**/*"]
+}

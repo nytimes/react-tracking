@@ -15,7 +15,7 @@ const testState = { booleanState: true };
 
 describe('e2e', () => {
   // eslint-disable-next-line global-require
-  const { default: track, useTracking } = require('../');
+  const { default: track, useTracking } = require('..');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -128,9 +128,10 @@ describe('e2e', () => {
       }
     }
 
-    const TestData3 = track({ key: { x: 3, y: 3 } }, { dispatchOnMount: true })(
-      () => <div />
-    );
+    const TestData3 = track(
+      { key: { x: 3, y: 3 } },
+      { dispatchOnMount: true }
+    )(() => <div />);
 
     const TestData2 = track(testData2)(() => <TestData3 />);
 
