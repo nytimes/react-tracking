@@ -16,7 +16,7 @@ const testState = { booleanState: true };
 
 describe('hooks', () => {
   // eslint-disable-next-line global-require
-  const { default: track, useTracking } = require('../');
+  const { default: track, useTracking } = require('..');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -835,9 +835,10 @@ describe('hooks', () => {
     };
 
     // functional wrapper hoc
-    const TestData3 = track({ key: { x: 3, y: 3 } }, { dispatchOnMount: true })(
-      () => <div />
-    );
+    const TestData3 = track(
+      { key: { x: 3, y: 3 } },
+      { dispatchOnMount: true }
+    )(() => <div />);
 
     // decorator hoc
     @track(testData2)

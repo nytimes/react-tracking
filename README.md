@@ -493,7 +493,7 @@ This library simply merges the tracking data objects together (as it flows throu
 
 You can get the type definitions for React Tracking from DefinitelyTyped using `@types/react-tracking`. For an always up-to-date example of syntax, you should consult [the react-tracking type tests](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-tracking/test/react-tracking-with-types-tests.tsx).
 
-### PropType support
+### PropType Support
 
 The `props.tracking` PropType is exported for use, if desired:
 
@@ -510,3 +510,7 @@ Alternatively, if you want to just silence proptype errors when using [eslint re
   }
 }
 ```
+
+### Old Browsers Support
+
+Going forward from version `9.x`, we do not bundle `core-js` (ES6 polyfills) anymore. To support old browsers, please add [`core-js`](https://github.com/zloirock/core-js) to your project.

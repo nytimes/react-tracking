@@ -15,8 +15,8 @@ steps:
       - npm run prepare
 
 trigger:
-  event:
-    - push
+  branch:
+    - master
 
 ---
 kind: pipeline
@@ -36,8 +36,8 @@ steps:
       - npm run prepare
 
 trigger:
-  event:
-    - push
+  branch:
+    - master
 
 ---
 kind: pipeline
@@ -57,5 +57,5 @@ steps:
       - npm run prepare
 
 trigger:
-  event:
-    - push
+  branch:
+    - master

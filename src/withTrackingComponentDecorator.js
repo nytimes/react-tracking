@@ -69,6 +69,7 @@ export default function withTrackingComponentDecorator(
     WithTracking.propTypes = {
       rtFwdRef: PropTypes.oneOfType([
         PropTypes.func,
+        // eslint-disable-next-line react/forbid-prop-types
         PropTypes.shape({ current: PropTypes.any }),
       ]),
     };
