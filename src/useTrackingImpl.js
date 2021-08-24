@@ -40,12 +40,23 @@ export default function useTrackingImpl(trackingData, options) {
     return () =>
       contextGetTrackingData === getOwnTrackingData
         ? getOwnTrackingData()
-        : merge(contextGetTrackingData(), getOwnTrackingData());
+        : merge(
+            contextGetTrackingData(),
+            getOwnTrackingData(),
+            (latestOptions.current || {}).mergeOptions
+          );
   }, [getOwnTrackingData, tracking]);
 
   const getTrackingDispatcher = useCallback(() => {
     const contextDispatch = (tracking && tracking.dispatch) || dispatch;
-    return data => contextDispatch(merge(getOwnTrackingData(), data || {}));
+    return data =>
+      contextDispatch(
+        merge(
+          getOwnTrackingData(),
+          data || {},
+          (latestOptions.current || {}).mergeOptions
+        )
+      );
   }, [getOwnTrackingData, tracking, dispatch]);
 
   const trackEvent = useCallback(
@@ -73,7 +84,8 @@ export default function useTrackingImpl(trackingData, options) {
       trackEvent(
         merge(
           contextProcess(getOwnTrackingData()) || {},
-          dispatchOnMount(getTrackingData()) || {}
+          dispatchOnMount(getTrackingData()) || {},
+          (latestOptions.current || {}).mergeOptions
         )
       );
     } else if (typeof contextProcess === 'function') {
