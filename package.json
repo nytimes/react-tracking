@@ -78,7 +78,8 @@
   "dependencies": {
     "core-js": "^3.3.2",
     "deepmerge": "^4.1.1",
-    "hoist-non-react-statics": "^3.3.0"
+    "hoist-non-react-statics": "^3.3.0",
+    "prop-types": "^15.7.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",
@@ -106,7 +107,6 @@
     "jest": "^24.9.0",
     "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
-    "prop-types": "^15.7.2",
     "raf-polyfill": "^1.0.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
