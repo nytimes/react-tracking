@@ -330,6 +330,8 @@ function Page2() {
 When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
 When `Page2` mounts, nothing will be dispatched.
 
+_**Note:** The `options.process` function does not currently take single-page app (SPA) navigation into account. If the example above were implemented as an SPA, navigating back to `Page1`, with no page reload, would **not** cause `options.process` to fire a second time even if the `Page1` component remounts._
+
 ### Tracking Asynchronous Methods
 
 Asynchronous methods (methods that return promises) can also be tracked when the method has resolved or rejects a promise. This is handled transparently, so simply decorating an asynchronous method the same way as a normal method will make the tracking call _after_ the promise is resolved or rejected.
