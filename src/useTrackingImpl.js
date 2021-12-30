@@ -102,7 +102,7 @@ export default function useTrackingImpl(trackingData, options) {
     process,
   ]);
 
-  useDebugValue('Tracking Data', getTrackingDataFn());
+  useDebugValue(getTrackingDataFn(), getTrackingData => getTrackingData());
 
   return useMemo(
     () => ({

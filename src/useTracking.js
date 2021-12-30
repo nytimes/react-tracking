@@ -15,7 +15,9 @@ export default function useTracking(trackingData, options) {
     [contextValue]
   );
 
-  useDebugValue('Tracking Data', contextValue.tracking.getTrackingData);
+  useDebugValue(contextValue.tracking.getTrackingData, getTrackingData =>
+    getTrackingData()
+  );
 
   return useMemo(
     () => ({
