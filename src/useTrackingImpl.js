@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import {
+  useCallback,
+  useContext,
+  useDebugValue,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import merge from 'deepmerge';
 
 import ReactTrackingContext from './ReactTrackingContext';
@@ -94,6 +101,8 @@ export default function useTrackingImpl(trackingData, options) {
     dispatchOnMount,
     process,
   ]);
+
+  useDebugValue('Tracking Data', getTrackingDataFn());
 
   return useMemo(
     () => ({
