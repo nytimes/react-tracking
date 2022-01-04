@@ -330,7 +330,7 @@ function Page2() {
 When `Page1` mounts, event with data `{page: 'Page1', event: 'pageview'}` will be dispatched.
 When `Page2` mounts, nothing will be dispatched.
 
-_**Note:** The `options.process` function does not currently take single-page app (SPA) navigation into account. If the example above were implemented as an SPA, navigating back to `Page1`, with no page reload, would **not** cause `options.process` to fire a second time even if the `Page1` component remounts._
+_**Note:** The `options.process` function does not currently take single-page app (SPA) navigation into account. If the example above were implemented as an SPA, navigating back to `Page1`, with no page reload, would **not** cause `options.process` to fire a second time even if the `Page1` component remounts. The recommended workaround for now is to call `trackEvent` manually in a `React.useEffect` callback in child components where you want the data to fire (see [this code sandbox](https://codesandbox.io/s/flamboyant-keldysh-g3xt9?file=/src/App.tsx) for an example). Follow [issue #189](https://github.com/nytimes/react-tracking/issues/189) to monitor progress on a fix._
 
 ### Tracking Asynchronous Methods
 
