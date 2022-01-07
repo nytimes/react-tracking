@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useDebugValue, useMemo } from 'react';
 
 import ReactTrackingContext from './ReactTrackingContext';
 import useTrackingImpl from './useTrackingImpl';
@@ -13,6 +13,10 @@ export default function useTracking(trackingData, options) {
       </ReactTrackingContext.Provider>
     ),
     [contextValue]
+  );
+
+  useDebugValue(contextValue.tracking.getTrackingData, getTrackingData =>
+    getTrackingData()
   );
 
   return useMemo(
