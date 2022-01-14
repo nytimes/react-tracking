@@ -1,10 +1,28 @@
-import React, { useCallback, useDebugValue, useMemo } from 'react';
+import React, {
+  useCallback,
+  useDebugValue,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import ReactTrackingContext from './ReactTrackingContext';
 import useTrackingImpl from './useTrackingImpl';
 
 export default function useTracking(trackingData, options) {
-  const contextValue = useTrackingImpl(trackingData, options);
+  const isFirstRender = useRef(true);
+  const contextValue = useTrackingImpl(
+    trackingData,
+    isFirstRender.current,
+    options
+  );
+
+  useEffect(() => {
+    isFirstRender.current = false;
+    return () => {
+      isFirstRender.current = true;
+    };
+  }, []);
 
   const Track = useCallback(
     ({ children }) => (

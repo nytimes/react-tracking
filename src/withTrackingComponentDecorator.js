@@ -15,6 +15,7 @@ export default function withTrackingComponentDecorator(
 
     function WithTracking({ rtFwdRef, ...props }) {
       const latestProps = useRef(props);
+      const isFirstRender = useRef(true);
 
       useEffect(() => {
         // keep the latest props in a mutable ref object to avoid creating
@@ -31,7 +32,18 @@ export default function withTrackingComponentDecorator(
         []
       );
 
-      const contextValue = useTrackingImpl(trackingDataFn, options);
+      const contextValue = useTrackingImpl(
+        trackingDataFn,
+        isFirstRender.current,
+        options
+      );
+
+      useEffect(() => {
+        isFirstRender.current = false;
+        return () => {
+          isFirstRender.current = true;
+        };
+      });
 
       const trackingProp = useMemo(
         () => ({

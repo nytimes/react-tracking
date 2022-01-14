@@ -4,6 +4,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
 import { act } from 'react-dom/test-utils';
+import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { mount } from 'enzyme';
 
 const dispatchTrackingEvent = jest.fn();
@@ -459,6 +460,95 @@ describe('hooks', () => {
       topLevel: true,
     });
     expect(dispatch).toHaveBeenCalledTimes(2); // pageview event and simulated button click
+  });
+
+  it('dispatches pageview when components remount', async () => {
+    const App = ({ children }) => {
+      const { Track } = useTracking(
+        { topLevel: true },
+        {
+          dispatch,
+          process: data => {
+            if (data.page) {
+              return { event: 'pageView' };
+            }
+            return null;
+          },
+        }
+      );
+
+      return <Track>{children}</Track>;
+    };
+
+    const Page1 = () => {
+      useTracking({ page: 'Page1' });
+
+      const navigate = useNavigate();
+      function handleClick() {
+        navigate('foo');
+      }
+
+      return (
+        <button type="button" onClick={handleClick}>
+          Page
+        </button>
+      );
+    };
+
+    const Page2 = () => {
+      useTracking(
+        { page: 'Page2' },
+        { dispatchOnMount: () => ({ page2specific: true }) }
+      );
+
+      const navigate = useNavigate();
+      function handleClick() {
+        navigate('/');
+      }
+
+      return (
+        <button type="button" onClick={handleClick}>
+          Page
+        </button>
+      );
+    };
+
+    const wrappedApp = mount(
+      <MemoryRouter>
+        <App>
+          <Routes>
+            <Route path="/" element={<Page1 />} />
+            <Route path="foo" element={<Page2 />} />
+          </Routes>
+        </App>
+      </MemoryRouter>
+    );
+
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'Page1',
+      event: 'pageView',
+      topLevel: true,
+    });
+
+    wrappedApp.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(dispatch).toHaveBeenLastCalledWith({
+      page: 'Page2',
+      event: 'pageView',
+      topLevel: true,
+      page2specific: true,
+    });
+
+    wrappedApp.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledTimes(3);
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'Page1',
+      event: 'pageView',
+      topLevel: true,
+    });
   });
 
   it('dispatches state data when components contain state', () => {

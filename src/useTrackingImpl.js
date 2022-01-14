@@ -4,7 +4,7 @@ import merge from 'deepmerge';
 import ReactTrackingContext from './ReactTrackingContext';
 import dispatchTrackingEvent from './dispatchTrackingEvent';
 
-export default function useTrackingImpl(trackingData, options) {
+export default function useTrackingImpl(trackingData, isFirstRender, options) {
   const { tracking } = useContext(ReactTrackingContext);
   const latestData = useRef(trackingData);
   const latestOptions = useRef(options);
@@ -56,35 +56,37 @@ export default function useTrackingImpl(trackingData, options) {
   );
 
   useEffect(() => {
-    const contextProcess = getProcessFn();
-    const getTrackingData = getTrackingDataFn();
+    if (isFirstRender) {
+      const contextProcess = getProcessFn();
+      const getTrackingData = getTrackingDataFn();
 
-    if (contextProcess && process) {
-      // eslint-disable-next-line
-      console.error(
-        '[react-tracking] options.process should be defined once on a top-level component'
-      );
-    }
-
-    if (
-      typeof contextProcess === 'function' &&
-      typeof dispatchOnMount === 'function'
-    ) {
-      trackEvent(
-        merge(
-          contextProcess(getOwnTrackingData()) || {},
-          dispatchOnMount(getTrackingData()) || {}
-        )
-      );
-    } else if (typeof contextProcess === 'function') {
-      const processed = contextProcess(getOwnTrackingData());
-      if (processed || dispatchOnMount === true) {
-        trackEvent(processed);
+      if (contextProcess && process) {
+        // eslint-disable-next-line
+        console.error(
+          '[react-tracking] options.process should be defined once on a top-level component'
+        );
       }
-    } else if (typeof dispatchOnMount === 'function') {
-      trackEvent(dispatchOnMount(getTrackingData()));
-    } else if (dispatchOnMount === true) {
-      trackEvent();
+
+      if (
+        typeof contextProcess === 'function' &&
+        typeof dispatchOnMount === 'function'
+      ) {
+        trackEvent(
+          merge(
+            contextProcess(getOwnTrackingData()) || {},
+            dispatchOnMount(getTrackingData()) || {}
+          )
+        );
+      } else if (typeof contextProcess === 'function') {
+        const processed = contextProcess(getOwnTrackingData());
+        if (processed || dispatchOnMount === true) {
+          trackEvent(processed);
+        }
+      } else if (typeof dispatchOnMount === 'function') {
+        trackEvent(dispatchOnMount(getTrackingData()));
+      } else if (dispatchOnMount === true) {
+        trackEvent();
+      }
     }
   }, [
     getOwnTrackingData,
@@ -93,6 +95,7 @@ export default function useTrackingImpl(trackingData, options) {
     trackEvent,
     dispatchOnMount,
     process,
+    isFirstRender,
   ]);
 
   return useMemo(
