@@ -77,7 +77,7 @@ const FooPage = () => {
 
 The `useTracking` hook returns an object with the same `getTrackingData()` and `trackEvent()` methods that are provided as `props.tracking` when wrapping with the `@track()` decorator/HoC (more info about the decorator can be found [below](https://github.com/nytimes/react-tracking#usage-as-a-decorator)). It also returns an additional property on that object: a `<Track />` component that can be returned as the root of your component's sub-tree to pass any new contextual data to its children.
 
-> Note that in most cases you would wrap the markup returned by your component with `<Track />`. This will merge a new tracking context and make it available to all child components. The only time you _wouldn't_ wrap your returned markup with `<Track />` is if you're on some leaf component and don't have any more child components that need tracking info.
+> Note that in most cases you would wrap the markup returned by your component with `<Track />`. This will [deepmerge] a new tracking context and make it available to all child components. The only time you _wouldn't_ wrap your returned markup with `<Track />` is if you're on some leaf component and don't have any more child components that need tracking info.
 
 ```js
 import { useTracking } from 'react-tracking';
@@ -111,13 +111,16 @@ const FooPage = () => {
 ```
 
 In the example above, the click event in the `FooPage` component will dispatch the following data:
+
 ```
 {
   page: 'FooPage',
   action: 'click',
 }
 ```
+
 Because we wrapped the sub-tree returned by `FooPage` in `<Track />`, the click event in the `Child` component will dispatch:
+
 ```
 {
   page: 'FooPage',
@@ -139,7 +142,6 @@ import track from 'react-tracking';
 
 @track({ page: 'FooPage' })
 export default class FooPage extends React.Component {
-
   @track({ action: 'click' })
   handleClick = () => {
     // ... other stuff
@@ -202,7 +204,10 @@ import React from 'react';
 import { useTracking } from 'react-tracking';
 
 export default function App({ children }) {
-  const { Track } = useTracking({}, { dispatch: data => window.myCustomDataLayer.push(data) });
+  const { Track } = useTracking(
+    {},
+    { dispatch: data => window.myCustomDataLayer.push(data) }
+  );
 
   return <Track>{children}</Track>;
 }
@@ -248,7 +253,7 @@ _Note: this is only in effect when decorating a Class or stateless functional co
 
 #### Using `options.dispatchOnMount` as a function
 
-If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. The object returned from this function call will be merged with the context data and then dispatched.
+If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. The object returned from this function call will [deepmerge] with the context data and then dispatched.
 
 A use case for this would be that you want to provide extra tracking data without adding it to the context.
 
@@ -262,7 +267,10 @@ class FooPage extends Component { ... }
 
 ```js
 function FooPage() {
-  useTracking({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) });
+  useTracking(
+    { page: 'FooPage' },
+    { dispatchOnMount: contextData => ({ event: 'pageDataReady' }) }
+  );
 }
 ```
 
@@ -279,7 +287,7 @@ Will dispatch the following data (assuming no other tracking data in context fro
 
 ### Top level `options.process`
 
-When there's a need to implicitly dispatch an event with some data for _every_ component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will be merged with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
+When there's a need to implicitly dispatch an event with some data for _every_ component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will [deepmerge] with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
 
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
 
@@ -304,7 +312,8 @@ function App() {
   const { Track } = useTracking(
     {},
     {
-      process: (ownTrackingData) => ownTrackingData.page ? { event: 'pageview' } : null,
+      process: ownTrackingData =>
+        ownTrackingData.page ? { event: 'pageview' } : null,
     }
   );
 
@@ -489,7 +498,7 @@ Note that there are no restrictions on the objects that are passed in to the dec
 
 **The format for the tracking data object is a contract between your app and the ultimate consumer of the tracking data.**
 
-This library simply merges the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking agent (such as Google Tag Manager).
+This library simply merges (using [deepmerge]) the tracking data objects together (as it flows through your app's React component hierarchy) into a single object that's ultimately sent to the tracking agent (such as Google Tag Manager).
 
 ### TypeScript Support
 
@@ -513,6 +522,18 @@ Alternatively, if you want to just silence proptype errors when using [eslint re
 }
 ```
 
+### Deepmerge
+
+The merging strategy is the default [deepmerge] merging strategy. We do not yet support extending the deepmerge options. If you're interested/have a need for that, please consider contributing: https://github.com/nytimes/react-tracking/issues/186
+
+You can also use/reference the copy of deepmerge that react-tracking uses, as it's re-exported for convenience:
+
+```js
+import { deepmerge } from 'react-tracking';
+```
+
 ### Old Browsers Support
 
 Going forward from version `9.x`, we do not bundle `core-js` (ES6 polyfills) anymore. To support old browsers, please add [`core-js`](https://github.com/zloirock/core-js) to your project.
+
+[deepmerge]: https://www.npmjs.com/package/deepmerge
