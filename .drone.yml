@@ -42,17 +42,17 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: build node 10
+name: build node 16
 
 steps:
   - name: install
     pull: if-not-exists
-    image: node:10
+    image: node:16
     commands:
       - npm ci
 
   - name: prepare
-    image: node:10
+    image: node:16
     commands:
       - npm run prepare
 
