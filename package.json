@@ -17,8 +17,7 @@
   },
   "license": "Apache-2.0",
   "author": "Jeremy Gayed <https://github.com/tizmagik>",
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Nicole Baram",
       "email": "nicole.baram@nytimes.com",
       "url": "https://github.com/nicolehollyNYT"
@@ -114,5 +113,9 @@
   "peerDependencies": {
     "prop-types": "^15.x",
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  },
+  "engines": {
+    "node": ">=16.9.1",
+    "npm": ">=8.0.0"
   }
 }
