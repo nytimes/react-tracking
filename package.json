@@ -17,7 +17,8 @@
   },
   "license": "Apache-2.0",
   "author": "Jeremy Gayed <https://github.com/tizmagik>",
-  "contributors": [{
+  "contributors": [
+    {
       "name": "Nicole Baram",
       "email": "nicole.baram@nytimes.com",
       "url": "https://github.com/nicolehollyNYT"
