@@ -58,20 +58,14 @@
     "build": "babel --out-dir build src --ignore src/__tests__ --source-maps --delete-dir-on-start --minified --no-comments",
     "build:watch": "npm run build -- --watch",
     "lint": "eslint ./src",
-    "prepare": "npm run lint && npm run test && npm run build",
+    "prepare": "husky install && npm run lint && npm run test && npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{js,json}": [
-      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file",
-      "git add"
+      "prettier --write --config ./.prettierrc.json --config-precedence prefer-file"
     ]
   },
   "dependencies": {
@@ -99,10 +93,10 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^2.5.1",
-    "husky": "^3.1.0",
+    "husky": "^8.0.1",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
-    "lint-staged": "^9.5.0",
+    "lint-staged": "^13.0.3",
     "prettier": "^1.19.1",
     "prop-types": "^15.7.2",
     "raf-polyfill": "^1.0.0",
