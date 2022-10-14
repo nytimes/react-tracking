@@ -1,21 +1,24 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
+/* eslint-disable global-require */
 import React, { useContext } from 'react';
 import { mount } from 'enzyme';
 import PropTypes from 'prop-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 
 const dispatchTrackingEvent = jest.fn();
-jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
+window.dataLayer = [];
+window.dataLayer.push = dispatchTrackingEvent;
 
 const testDataContext = { testDataContext: true };
 const testData = { testData: true };
 const dispatch = jest.fn();
 const testState = { booleanState: true };
 
-describe('e2e', () => {
-  // eslint-disable-next-line global-require
-  const { default: track, useTracking } = require('..');
+const runTests = useBuiltLib => {
+  const { default: track, useTracking } = useBuiltLib
+    ? require('../../build')
+    : require('..');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -736,7 +739,10 @@ describe('e2e', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
+    const ReactTrackingContext = (useBuiltLib
+      ? require('../../build/ReactTrackingContext')
+      : require('../ReactTrackingContext')
+    ).default;
 
     const App = track()(() => {
       return <Child />;
@@ -921,5 +927,17 @@ describe('e2e', () => {
 
     expect(parent.instance().child).not.toBeNull();
     expect(focusFn).toHaveBeenCalledTimes(1);
+  });
+};
+
+describe('e2e', () => {
+  if (process.env.SKIP_BUILT_LIB_CHECK !== 'true') {
+    describe('with built lib', () => {
+      runTests(true);
+    });
+  }
+
+  describe('with source lib', () => {
+    runTests(false);
   });
 });
