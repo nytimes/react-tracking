@@ -50,6 +50,30 @@ describe('e2e', () => {
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({ test: true });
   });
 
+  it('allows tracking errors', () => {
+    @track(null, {
+      mergeOptions: {
+        isMergeableObject: obj => !(obj instanceof Error),
+      },
+    })
+    class TestPage extends React.Component {
+      componentDidMount() {
+        this.props.tracking.trackEvent({ test: new Error('my crazy error') });
+      }
+
+      render() {
+        return 'hi';
+      }
+    }
+
+    mount(<TestPage />);
+
+    expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
+    expect(dispatchTrackingEvent).toHaveBeenCalledWith({
+      test: new Error('my crazy error'),
+    });
+  });
+
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
     const testPageData = { page: 'TestPage' };
 
