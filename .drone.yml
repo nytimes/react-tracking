@@ -8,7 +8,7 @@ steps:
     image: node:14
     commands:
       - npm ci
-  
+
   - name: prepare
     image: node:14
     commands:
@@ -21,17 +21,17 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: build node 12
+name: build node 18
 
 steps:
   - name: install
     pull: if-not-exists
-    image: node:12
+    image: node:18
     commands:
       - npm ci
 
   - name: prepare
-    image: node:12
+    image: node:18
     commands:
       - npm run prepare
 
