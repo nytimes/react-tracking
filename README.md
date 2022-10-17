@@ -33,7 +33,7 @@ Both `@track()` and `useTracking()` expect two arguments, `trackingData` and `op
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called in a useEffect on the component's initial render with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details [below](https://github.com/nytimes/react-tracking#top-level-optionsprocess).
   - `forwardRef` (decorator/HoC only), when set to `true`, adding a ref to the wrapped component will actually return the instance of the underlying component. Default is `false`.
-  - `mergeOptions` optionally provide deepmerge options, check [deepmerge options API](deepmerge-options) for details.
+  - `mergeOptions` optionally provide deepmerge options, check [deepmerge options API](https://github.com/TehShrike/deepmerge#options) for details.
 
 #### `tracking` prop
 
@@ -538,4 +538,3 @@ import { deepmerge } from 'react-tracking';
 Going forward from version `9.x`, we do not bundle `core-js` (ES6 polyfills) anymore. To support old browsers, please add [`core-js`](https://github.com/zloirock/core-js) to your project.
 
 [deepmerge]: https://www.npmjs.com/package/deepmerge
-[deepmerge-options]: https://github.com/TehShrike/deepmerge#options
