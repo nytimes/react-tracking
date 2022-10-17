@@ -23,11 +23,11 @@ describe('hooks', () => {
   });
 
   it('defaults mostly everything', () => {
-    const TestDefaults = ({ children }) => {
+    function TestDefaults({ children }) {
       const { Track } = useTracking({}, { process: () => null });
 
       return <Track>{children}</Track>;
-    };
+    }
 
     const Child = () => {
       const { trackEvent } = useTracking();
@@ -52,10 +52,10 @@ describe('hooks', () => {
   it('defaults to dispatchTrackingEvent when no dispatch function passed in to options', () => {
     const testPageData = { page: 'TestPage' };
 
-    const TestPage = () => {
+    function TestPage() {
       useTracking(testPageData, { dispatchOnMount: true });
       return null;
-    };
+    }
 
     mount(<TestPage />);
 
@@ -65,7 +65,7 @@ describe('hooks', () => {
   });
 
   it('accepts a dispatch function in options', () => {
-    const TestOptions = () => {
+    function TestOptions() {
       const { trackEvent } = useTracking(testDataContext, { dispatch });
 
       const blah = () => {
@@ -74,7 +74,7 @@ describe('hooks', () => {
 
       blah();
       return <div />;
-    };
+    }
 
     mount(<TestOptions />);
 
@@ -88,16 +88,16 @@ describe('hooks', () => {
   it('will use dispatch fn passed in from further up in context', () => {
     const testChildData = { page: 'TestChild' };
 
-    const TestOptions = ({ children }) => {
+    function TestOptions({ children }) {
       const { Track } = useTracking(testDataContext, { dispatch });
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const TestChild = () => {
+    function TestChild() {
       useTracking(testChildData, { dispatchOnMount: true });
       return <div />;
-    };
+    }
 
     mount(
       <TestOptions>
@@ -116,14 +116,14 @@ describe('hooks', () => {
     const testData1 = { key: { x: 1, y: 1 } };
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
-    const TestData1 = ({ children }) => {
+    function TestData1({ children }) {
       const { Track } = useTracking(testData1, {
         dispatch: mockDispatchTrackingEvent,
       });
       return <Track>{children}</Track>;
-    };
+    }
 
-    const TestData3 = () => {
+    function TestData3() {
       const { Track } = useTracking(
         { key: { x: 3, y: 3 } },
         { dispatchOnMount: true }
@@ -134,9 +134,9 @@ describe('hooks', () => {
           <div />
         </Track>
       );
-    };
+    }
 
-    const TestData2 = () => {
+    function TestData2() {
       const { Track } = useTracking(testData2);
 
       return (
@@ -144,7 +144,7 @@ describe('hooks', () => {
           <TestData3 />
         </Track>
       );
-    };
+    }
 
     mount(
       <TestData1>
@@ -162,10 +162,10 @@ describe('hooks', () => {
     const testDispatchOnMount = { test: true };
     const dispatchOnMount = jest.fn(() => ({ dom: true }));
 
-    const TestComponent = () => {
+    function TestComponent() {
       useTracking(testDispatchOnMount, { dispatch, dispatchOnMount });
       return null;
-    };
+    }
 
     mount(<TestComponent />);
 
@@ -174,7 +174,7 @@ describe('hooks', () => {
   });
 
   it('will dispatch a pageview event on mount on class component', () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -189,12 +189,12 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = () => {
+    function Page() {
       useTracking({ page: 'Page' });
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -210,7 +210,7 @@ describe('hooks', () => {
   });
 
   it('will dispatch a pageview event on mount on functional component', () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -225,12 +225,12 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = () => {
+    function Page() {
       useTracking({ page: 'Page' });
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -246,7 +246,7 @@ describe('hooks', () => {
   });
 
   it("should not dispatch a pageview event on mount if there's no page property on tracking object", () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -256,12 +256,12 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = () => {
+    function Page() {
       useTracking({ page: 'Page' });
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -273,7 +273,7 @@ describe('hooks', () => {
   });
 
   it('should not dispatch a pageview event on mount if proccess returns falsy value', () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -288,12 +288,12 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = () => {
+    function Page() {
       useTracking({});
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -305,7 +305,7 @@ describe('hooks', () => {
   });
 
   it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -320,20 +320,20 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page1 = () => {
+    function Page1() {
       useTracking({ page: 'Page1' });
       return <div>Page</div>;
-    };
+    }
 
-    const Page2 = () => {
+    function Page2() {
       useTracking(
         { page: 'Page2' },
         { dispatchOnMount: () => ({ page2specific: true }) }
       );
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -357,7 +357,7 @@ describe('hooks', () => {
   });
 
   it('process works with trackingData as a function', () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -372,12 +372,12 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = ({ runtimeData }) => {
+    function Page({ runtimeData }) {
       useTracking({ page: 'Page', runtimeData });
       return <div>Page</div>;
-    };
+    }
 
     mount(
       <App>
@@ -394,7 +394,7 @@ describe('hooks', () => {
   });
 
   it("doesn't dispatch pageview for nested components without page tracking data", () => {
-    const App = ({ children }) => {
+    function App({ children }) {
       const { Track } = useTracking(
         { topLevel: true },
         {
@@ -409,18 +409,18 @@ describe('hooks', () => {
       );
 
       return <Track>{children}</Track>;
-    };
-    const Page = ({ children }) => {
+    }
+    function Page({ children }) {
       const { Track } = useTracking({ page: 'Page' });
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Nested = ({ children }) => {
+    function Nested({ children }) {
       const { Track } = useTracking({ view: 'View' });
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Button = () => {
+    function Button() {
       const { trackEvent } = useTracking({ region: 'Button' });
 
       const handleClick = () => {
@@ -432,7 +432,7 @@ describe('hooks', () => {
           Click me!
         </button>
       );
-    };
+    }
 
     const wrappedApp = mount(
       <App>
@@ -462,7 +462,7 @@ describe('hooks', () => {
   });
 
   it('dispatches state data when components contain state', () => {
-    const TestOptions = () => {
+    function TestOptions() {
       const [booleanState] = useState(true);
       const { trackEvent } = useTracking(testDataContext, { dispatch });
 
@@ -472,7 +472,7 @@ describe('hooks', () => {
 
       exampleMethod();
       return <div />;
-    };
+    }
 
     mount(<TestOptions />);
 
@@ -486,10 +486,10 @@ describe('hooks', () => {
   it('can read tracking data from props.tracking.getTrackingData()', () => {
     const mockReader = jest.fn();
 
-    const TestOptions = ({ onProps, child, children }) => {
+    function TestOptions({ onProps, child, children }) {
       const { Track } = useTracking({ onProps, child, ...testDataContext });
       return <Track>{children}</Track>;
-    };
+    }
 
     const TestChild = () => {
       const { getTrackingData } = useTracking();
@@ -519,22 +519,24 @@ describe('hooks', () => {
       .mockImplementation(() => {});
     const process = () => {};
 
-    const NestedComponent = () => {
+    function NestedComponent() {
       const { Track } = useTracking({}, { process });
       return (
         <Track>
           <div />
         </Track>
       );
-    };
+    }
 
-    const Intermediate = () => (
-      <div>
-        <NestedComponent />
-      </div>
-    );
+    function Intermediate() {
+      return (
+        <div>
+          <NestedComponent />
+        </div>
+      );
+    }
 
-    const TestComponent = () => {
+    function TestComponent() {
       const { Track } = useTracking({}, { process });
       return (
         <Track>
@@ -543,7 +545,7 @@ describe('hooks', () => {
           </div>
         </Track>
       );
-    };
+    }
 
     mount(<TestComponent />);
 
@@ -556,12 +558,12 @@ describe('hooks', () => {
   });
 
   it('will dispatch different data if props changed', () => {
-    const Top = ({ data, children }) => {
+    function Top({ data, children }) {
       const { Track } = useTracking(() => ({ data }));
       return <Track>{children}</Track>;
-    };
+    }
 
-    const Page = () => {
+    function Page() {
       const { Track, trackEvent } = useTracking({ page: 'Page' });
 
       const handleClick = () => {
@@ -573,9 +575,9 @@ describe('hooks', () => {
           <span onClick={handleClick}>Click Me</span>
         </Track>
       );
-    };
+    }
 
-    const App = () => {
+    function App() {
       const [state, setState] = useState({ data: 1 });
       const { Track } = useTracking({}, { dispatch });
 
@@ -589,7 +591,7 @@ describe('hooks', () => {
           </div>
         </Track>
       );
-    };
+    }
 
     const wrappedApp = mount(<App />);
 
@@ -610,13 +612,13 @@ describe('hooks', () => {
   });
 
   it('provides passed in tracking data immediately', () => {
-    const Foo = () => {
+    function Foo() {
       const { getTrackingData } = useTracking({ seeMe: true });
 
       expect(getTrackingData()).toStrictEqual({ seeMe: true });
 
       return null;
-    };
+    }
 
     mount(<Foo />);
   });
@@ -625,10 +627,10 @@ describe('hooks', () => {
     let innerRenderCount = 0;
     let getLatestTrackingData;
 
-    const OuterComponent = ({ children, trackedProp }) => {
+    function OuterComponent({ children, trackedProp }) {
       const { Track } = useTracking({ trackedProp });
       return <Track>{children}</Track>;
-    };
+    }
 
     const MiddleComponent = React.memo(
       ({ children, middleProp }) => {
@@ -638,7 +640,7 @@ describe('hooks', () => {
       (props, prevProps) => props.middleProp === prevProps.middleProp
     );
 
-    const InnerComponent = ({ innerProps }) => {
+    function InnerComponent({ innerProps }) {
       const { Track, getTrackingData } = useTracking({ innerProps });
       innerRenderCount += 1;
 
@@ -646,9 +648,9 @@ describe('hooks', () => {
       getLatestTrackingData = getTrackingData;
 
       return <Track>{innerProps}</Track>;
-    };
+    }
 
-    const App = () => {
+    function App() {
       const [count, setCount] = useState(0);
 
       const { Track } = useTracking({ count });
@@ -673,7 +675,7 @@ describe('hooks', () => {
           </div>
         </Track>
       );
-    };
+    }
 
     const wrapper = mount(<App />);
 
@@ -693,7 +695,7 @@ describe('hooks', () => {
   it('does not cause unnecessary dispatches due to object literals passed to useTracking', () => {
     const trackRenders = jest.fn();
 
-    const App = () => {
+    function App() {
       // eslint-disable-next-line no-unused-vars
       const [clickCount, setClickCount] = useState(0);
 
@@ -706,9 +708,7 @@ describe('hooks', () => {
         {},
         {
           dispatch,
-          dispatchOnMount: () => {
-            return { test: true };
-          },
+          dispatchOnMount: () => ({ test: true }),
         }
       );
 
@@ -722,7 +722,7 @@ describe('hooks', () => {
           </button>
         </div>
       );
-    };
+    }
 
     const wrapper = mount(<App />);
 
@@ -739,7 +739,7 @@ describe('hooks', () => {
   });
 
   it('dispatches the correct data if props change', () => {
-    const App = props => {
+    function App(props) {
       const { trackEvent } = useTracking(
         { data: props.data || '' },
         {
@@ -757,7 +757,7 @@ describe('hooks', () => {
           <button onClick={handleClick} type="button" />
         </div>
       );
-    };
+    }
 
     const wrapper = mount(<App />);
 
@@ -784,7 +784,7 @@ describe('hooks', () => {
     );
 
     // hook nested
-    const TestData3 = () => {
+    function TestData3() {
       const { Track } = useTracking(
         { key: { x: 3, y: 3 } },
         { dispatchOnMount: true }
@@ -795,10 +795,10 @@ describe('hooks', () => {
           <div />
         </Track>
       );
-    };
+    }
 
     // hook nested
-    const TestData2 = () => {
+    function TestData2() {
       const { Track } = useTracking(testData2);
 
       return (
@@ -806,7 +806,7 @@ describe('hooks', () => {
           <TestData3 />
         </Track>
       );
-    };
+    }
 
     mount(
       <TestData1>
@@ -827,12 +827,12 @@ describe('hooks', () => {
     const testData2 = { key: { x: 2, z: 2 }, page: 'TestDeepMerge' };
 
     // hook top-level
-    const TestData1 = ({ children }) => {
+    function TestData1({ children }) {
       const { Track } = useTracking(testData1, {
         dispatch: mockDispatchTrackingEvent,
       });
       return <Track>{children}</Track>;
-    };
+    }
 
     // functional wrapper hoc
     const TestData3 = track(
@@ -864,7 +864,7 @@ describe('hooks', () => {
   it('root context items are accessible to children', () => {
     const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
 
-    const Child = () => {
+    function Child() {
       const trackingContext = useContext(ReactTrackingContext);
       expect(Object.keys(trackingContext.tracking)).toEqual([
         'dispatch',
@@ -872,9 +872,9 @@ describe('hooks', () => {
         'process',
       ]);
       return <div />;
-    };
+    }
 
-    const App = () => {
+    function App() {
       const { Track } = useTracking();
 
       return (
@@ -882,7 +882,7 @@ describe('hooks', () => {
           <Child />
         </Track>
       );
-    };
+    }
 
     mount(<App />);
   });
@@ -892,11 +892,11 @@ describe('hooks', () => {
       page: 'Page',
     };
 
-    const Page = track(outerTrackingData, { dispatch })(props => {
-      return props.children;
-    });
+    const Page = track(outerTrackingData, { dispatch })(
+      props => props.children
+    );
 
-    const Child = () => {
+    function Child() {
       const tracking = useTracking();
 
       expect(tracking.getTrackingData()).toEqual(outerTrackingData);
@@ -909,7 +909,7 @@ describe('hooks', () => {
           }}
         />
       );
-    };
+    }
 
     const wrappedApp = mount(
       <Page>
@@ -928,7 +928,7 @@ describe('hooks', () => {
   it('dispatches tracking event from async function', async () => {
     const message = 'test';
 
-    const Page = () => {
+    function Page() {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
 
@@ -954,7 +954,7 @@ describe('hooks', () => {
           <div>{state && state.data}</div>
         </>
       );
-    };
+    }
 
     const page = await mount(<Page />);
     await act(async () => {
@@ -973,13 +973,11 @@ describe('hooks', () => {
   it('handles rejected async function', async () => {
     const message = 'error';
 
-    const Page = () => {
+    function Page() {
       const [state, setState] = useState({});
       const { trackEvent } = useTracking();
 
-      const handleAsyncAction = () => {
-        return Promise.reject(message);
-      };
+      const handleAsyncAction = () => Promise.reject(message);
 
       const executeAction = async () => {
         try {
@@ -1001,7 +999,7 @@ describe('hooks', () => {
           <div>{state && state.data}</div>
         </>
       );
-    };
+    }
 
     const page = await mount(<Page />);
     await act(async () => {

@@ -1,7 +1,7 @@
 describe('trackEventMethodDecorator', () => {
   // eslint-disable-next-line global-require
-  const trackEventMethodDecorator = require('../trackEventMethodDecorator')
-    .default;
+  const trackEventMethodDecorator =
+    require('../trackEventMethodDecorator').default;
 
   it('is a decorator (exports a function, that returns a function)', () => {
     expect(typeof trackEventMethodDecorator).toBe('function');

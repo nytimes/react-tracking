@@ -7,8 +7,8 @@ jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
 describe('withTrackingComponentDecorator', () => {
   // eslint-disable-next-line global-require
-  const withTrackingComponentDecorator = require('../withTrackingComponentDecorator')
-    .default;
+  const withTrackingComponentDecorator =
+    require('../withTrackingComponentDecorator').default;
 
   it('is a decorator (exports a function, that returns a function)', () => {
     expect(typeof withTrackingComponentDecorator).toBe('function');
@@ -263,9 +263,8 @@ describe('withTrackingComponentDecorator', () => {
         static someVar = 'test';
       }
 
-      const DecoratedComponent = withTrackingComponentDecorator(dummyData)(
-        StaticComponent
-      );
+      const DecoratedComponent =
+        withTrackingComponentDecorator(dummyData)(StaticComponent);
 
       expect(DecoratedComponent.someMethod).toBeDefined();
       expect(DecoratedComponent.someMethod()).toEqual('test');

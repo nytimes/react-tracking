@@ -192,7 +192,9 @@ const runTests = useBuiltLib => {
   });
 
   it('will dispatch a pageview event on mount on class component', () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
 
     const App = track(
       { topLevel: true },
@@ -228,7 +230,9 @@ const runTests = useBuiltLib => {
   });
 
   it('will dispatch a pageview event on mount on functional component', () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
 
     const App = track(
       { topLevel: true },
@@ -259,7 +263,9 @@ const runTests = useBuiltLib => {
   });
 
   it("should not dispatch a pageview event on mount if there's no page property on tracking object", () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
     const App = track(
       { topLevel: true },
       {
@@ -279,7 +285,9 @@ const runTests = useBuiltLib => {
   });
 
   it('should not dispatch a pageview event on mount if proccess returns falsy value', () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
     const App = track(
       { topLevel: true },
       {
@@ -304,7 +312,9 @@ const runTests = useBuiltLib => {
   });
 
   it('will dispatch a top level pageview event on every page and component specific event on mount', () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
 
     const App = track(
       { topLevel: true },
@@ -358,7 +368,9 @@ const runTests = useBuiltLib => {
   });
 
   it('process works with trackingData as a function', () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
 
     const App = track(
       { topLevel: true },
@@ -395,7 +407,9 @@ const runTests = useBuiltLib => {
   });
 
   it("doesn't dispatch pageview for nested components without page tracking data", () => {
-    const RawApp = ({ children }) => <div>{children}</div>;
+    function RawApp({ children }) {
+      return <div>{children}</div>;
+    }
 
     const App = track(
       { topLevel: true },
@@ -538,11 +552,13 @@ const runTests = useBuiltLib => {
       }
     }
 
-    const Intermediate = () => (
-      <div>
-        <NestedComponent />
-      </div>
-    );
+    function Intermediate() {
+      return (
+        <div>
+          <NestedComponent />
+        </div>
+      );
+    }
 
     @track({}, { process })
     class TestComponent extends React.Component {
@@ -739,16 +755,15 @@ const runTests = useBuiltLib => {
   });
 
   it('root context items are accessible to children', () => {
-    const ReactTrackingContext = (useBuiltLib
-      ? require('../../build/ReactTrackingContext')
-      : require('../ReactTrackingContext')
+    const ReactTrackingContext = (
+      useBuiltLib
+        ? require('../../build/ReactTrackingContext')
+        : require('../ReactTrackingContext')
     ).default;
 
-    const App = track()(() => {
-      return <Child />;
-    });
+    const App = track()(() => <Child />);
 
-    const Child = () => {
+    function Child() {
       const trackingContext = useContext(ReactTrackingContext);
       expect(Object.keys(trackingContext.tracking)).toEqual([
         'dispatch',
@@ -756,7 +771,7 @@ const runTests = useBuiltLib => {
         'process',
       ]);
       return <div />;
-    };
+    }
 
     mount(<App />);
   });
@@ -766,11 +781,11 @@ const runTests = useBuiltLib => {
       page: 'Page',
     };
 
-    const Page = track(outerTrackingData, { dispatch })(props => {
-      return props.children;
-    });
+    const Page = track(outerTrackingData, { dispatch })(
+      props => props.children
+    );
 
-    const Child = () => {
+    function Child() {
       const tracking = useTracking();
 
       expect(tracking.getTrackingData()).toEqual(outerTrackingData);
@@ -783,7 +798,7 @@ const runTests = useBuiltLib => {
           }}
         />
       );
-    };
+    }
 
     const wrappedApp = mount(
       <Page>
@@ -810,15 +825,14 @@ const runTests = useBuiltLib => {
         this.state = {};
       }
 
-      @track((props, state, methodArgs, [{ value }, err]) => {
-        return (
+      @track(
+        (props, state, methodArgs, [{ value }, err]) =>
           !err && {
             label: 'async action',
             status: 'success',
             value,
           }
-        );
-      })
+      )
       handleAsyncAction() {
         return Promise.resolve(this.message);
       }
@@ -857,15 +871,14 @@ const runTests = useBuiltLib => {
         this.state = {};
       }
 
-      // eslint-disable-next-line no-unused-vars
-      @track((props, state, methodArgs, [{ value }, err]) => {
-        return (
+      @track(
+        // eslint-disable-next-line no-unused-vars
+        (props, state, methodArgs, [{ value }, err]) =>
           err && {
             label: 'async action',
             status: 'failed',
           }
-        );
-      })
+      )
       handleAsyncAction() {
         return Promise.reject(this.message);
       }
