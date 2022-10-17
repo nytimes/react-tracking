@@ -6,10 +6,10 @@ import useTracking from '../useTracking';
 
 describe('useTracking', () => {
   it('does not throw an error if tracking context not present', () => {
-    const ThrowMissingContext = () => {
+    function ThrowMissingContext() {
       useTracking();
       return <div>hi</div>;
-    };
+    }
 
     expect(() => {
       try {
@@ -27,7 +27,7 @@ describe('useTracking', () => {
 
     const dispatch = jest.fn();
 
-    const App = () => {
+    function App() {
       const tracking = useTracking(outerTrackingData, { dispatch });
 
       expect(tracking.getTrackingData()).toEqual({
@@ -44,7 +44,7 @@ describe('useTracking', () => {
           }
         />
       );
-    };
+    }
 
     const wrapper = mount(<App />);
     wrapper.simulate('click');
