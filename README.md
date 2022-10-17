@@ -28,7 +28,7 @@ import track, { useTracking } from 'react-tracking';
 Both `@track()` and `useTracking()` expect two arguments, `trackingData` and `options`.
 
 - `trackingData` represents the data to be tracked (or a function returning that data)
-- `options` is an optional object that accepts three properties (the object passed to the decorator also accepts a fourth `forwardRef` property):
+- `options` is an optional object that accepts the following properties (when decorating/wrapping a component, it also accepts a `forwardRef` property):
   - `dispatch`, which is a function to use instead of the default dispatch behavior. See the section on custom `dispatch()` [below](https://github.com/nytimes/react-tracking#custom-optionsdispatch-for-tracking-data).
   - `dispatchOnMount`, when set to `true`, dispatches the tracking data when the component mounts to the DOM. When provided as a function will be called in a useEffect on the component's initial render with all of the tracking context data as the only argument.
   - `process`, which is a function that can be defined once on some top-level component, used for selectively dispatching tracking events based on each component's tracking data. See more details [below](https://github.com/nytimes/react-tracking#top-level-optionsprocess).
