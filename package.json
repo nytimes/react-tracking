@@ -109,6 +109,9 @@
     "prop-types": "^15.x",
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
+  "optionalDependencies": {
+    "fsevents": "*"
+  },
   "engines": {
     "node": ">=18",
     "npm": ">=8.0.0"
