@@ -58,7 +58,7 @@
     "build": "babel --out-dir build src --ignore src/__tests__ --source-maps --delete-dir-on-start --minified --no-comments",
     "build:watch": "npm run build -- --watch",
     "lint": "eslint ./src",
-    "prepare": "husky install && npm run lint && npm run test && npm run build",
+    "prepare": "husky install && npm run build && npm run lint && npm run test",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch"
