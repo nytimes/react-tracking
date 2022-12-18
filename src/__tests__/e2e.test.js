@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable global-require */
@@ -940,6 +941,49 @@ const runTests = useBuiltLib => {
 
     expect(parent.instance().child).not.toBeNull();
     expect(focusFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('can establish tracking context with only hooks', () => {
+    function MyButton() {
+      const { trackEvent } = useTracking({ element: 'MyButton' });
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            trackEvent({ event: 'buttonClick' });
+          }}
+        >
+          Click me
+        </button>
+      );
+    }
+
+    function App() {
+      const { Track } = useTracking(
+        { page: 'App' },
+        { dispatch, dispatchOnMount: true }
+      );
+      return (
+        <Track>
+          <MyButton />
+        </Track>
+      );
+    }
+
+    const wrappedApp = mount(<App />);
+    wrappedApp.find('button').simulate('click');
+
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    // dispatch on mount
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'App',
+    });
+    // simulated button click
+    expect(dispatch).toHaveBeenCalledWith({
+      page: 'App',
+      event: 'buttonClick',
+      element: 'MyButton',
+    });
   });
 };
 
