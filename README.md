@@ -182,7 +182,9 @@ _This is also how you would use this module without `@decorator` syntax, althoug
 
 ### Custom `options.dispatch()` for tracking data
 
-By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). This is a good default if you use Google Tag Manager. You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
+By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/dispatchTrackingEvent.js](src/dispatchTrackingEvent.js)). This is a good default if you use Google Tag Manager.
+However, please note that in React Native environments, the window object is undefined as it's specific to web browser environments.
+You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
 For example, to push objects to `window.myCustomDataLayer[]` instead, you would decorate your top-level `<App />` component like this:
 
