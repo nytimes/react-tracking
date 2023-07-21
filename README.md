@@ -186,21 +186,7 @@ By default, data tracking objects are pushed to `window.dataLayer[]` (see [src/d
 However, please note that in React Native environments, the window object is undefined as it's specific to web browser environments.
 You can override this by passing in a dispatch function as a second parameter to the tracking decorator `{ dispatch: fn() }` on some top-level component high up in your app (typically some root-level component that wraps your entire app).
 
-For example, to push objects to `window.myCustomDataLayer[]` instead, you would decorate your top-level `<App />` component like this:
-
-```js
-import React, { Component } from 'react';
-import track from 'react-tracking';
-
-@track({}, { dispatch: data => window.myCustomDataLayer.push(data) })
-export default class App extends Component {
-  render() {
-    return this.props.children;
-  }
-}
-```
-
-This can also be done in a functional component using the `useTracking` hook:
+For example, to push objects to `window.myCustomDataLayer[]` instead, you would call the `useTracking` hook in your top-level `<App />` component like this:
 
 ```js
 import React from 'react';
@@ -216,28 +202,42 @@ export default function App({ children }) {
 }
 ```
 
+This can also be done in a class component by using the `track` decorator:
+
+```js
+import React, { Component } from 'react';
+import track from 'react-tracking';
+
+@track({}, { dispatch: data => window.myCustomDataLayer.push(data) })
+export default class App extends Component {
+  render() {
+    return this.props.children;
+  }
+}
+```
+
 NOTE: It is recommended to do this on some top-level component so that you only need to pass in the dispatch function once. Every child component from then on will use this dispatch function.
 
 ### When to use `options.dispatchOnMount`
 
-You can pass in a second parameter to `@track`, `options.dispatchOnMount`. There are two valid types for this, as a boolean or as a function. The use of the two is explained in the next sections:
+You can pass in a second parameter to `useTracking`, `options.dispatchOnMount`. There are two valid types for this, as a boolean or as a function. The use of the two is explained in the next sections:
 
 #### Using `options.dispatchOnMount` as a boolean
 
-To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `@track()`. This is useful for dispatching tracking data on "Page" components, for example.
-
-```js
-@track({ page: 'FooPage' }, { dispatchOnMount: true })
-class FooPage extends Component { ... }
-```
-
-<details>
-<summary>Example using hooks</summary>
+To dispatch tracking data when a component mounts, you can pass in `{ dispatchOnMount: true }` as the second parameter to `useTracking`. This is useful for dispatching tracking data on "Page" components, for example.
 
 ```js
 function FooPage() {
   useTracking({ page: 'FooPage' }, { dispatchOnMount: true });
 }
+```
+
+<details>
+<summary>Example using the decorator</summary>
+
+```js
+@track({ page: 'FooPage' }, { dispatchOnMount: true })
+class FooPage extends Component { ... }
 ```
 
 </details>
@@ -250,23 +250,15 @@ Will dispatch the following data (assuming no other tracking data in context fro
 }
 ```
 
-Of course, you could have achieved this same behavior by just decorating the `componentDidMount()` lifecycle event yourself, but this convenience is here in case the component you're working with would otherwise be a stateless functional component or does not need to define this lifecycle method.
+Of course, you could have achieved this same behavior by just decorating the `componentDidMount()` lifecycle event yourself, but this convenience is here in case the component you're working with is a function component or does not need to define this lifecycle method.
 
-_Note: this is only in effect when decorating a Class or stateless functional component. It is not necessary when decorating class methods since any invocations of those methods will immediately dispatch the tracking data, as expected._
+_Note: this is only in effect when decorating a Class or function component. It is not necessary when decorating class methods since any invocations of those methods will immediately dispatch the tracking data, as expected._
 
 #### Using `options.dispatchOnMount` as a function
 
-If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in `componentDidMount()`. The object returned from this function call will [deepmerge] with the context data and then dispatched.
+If you pass in a function, the function will be called with all of the tracking data from the app's context when the component mounts. The return value of this function will be dispatched in the first render for a function component, or in `componentDidMount()` for a class component. The object returned from this function call will [deepmerge] with the context data and then dispatched.
 
 A use case for this would be that you want to provide extra tracking data without adding it to the context.
-
-```js
-@track({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) })
-class FooPage extends Component { ... }
-```
-
-<details>
-<summary>Example using hooks</summary>
 
 ```js
 function FooPage() {
@@ -275,6 +267,14 @@ function FooPage() {
     { dispatchOnMount: contextData => ({ event: 'pageDataReady' }) }
   );
 }
+```
+
+<details>
+<summary>Example using the decorator</summary>
+
+```js
+@track({ page: 'FooPage' }, { dispatchOnMount: (contextData) => ({ event: 'pageDataReady' }) })
+class FooPage extends Component { ... }
 ```
 
 </details>
@@ -290,25 +290,9 @@ Will dispatch the following data (assuming no other tracking data in context fro
 
 ### Top level `options.process`
 
-When there's a need to implicitly dispatch an event with some data for _every_ component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will [deepmerge] with all the tracking context data and dispatched in `componentDidMount()`. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
+When there's a need to implicitly dispatch an event with some data for _every_ component, you can define an `options.process` function. This function should be declared once, at some top-level component. It will get called with each component's tracking data as the only argument. The returned object from this function will [deepmerge] with all the tracking context data and dispatched on the initial render in a function component, or in `componentDidMount()` in a class component. If a falsy value is returned (`false`, `null`, `undefined`, ...), nothing will be dispatched.
 
 A common use case for this is to dispatch a `pageview` event for every component in the application that has a `page` property on its `trackingData`:
-
-```js
-@track({}, { process: (ownTrackingData) => ownTrackingData.page ? { event: 'pageview' } : null })
-class App extends Component {...}
-
-...
-
-@track({ page: 'Page1' })
-class Page1 extends Component {...}
-
-@track({})
-class Page2 extends Component {...}
-```
-
-<details>
-<summary>Example using hooks</summary>
 
 ```js
 function App() {
@@ -328,6 +312,8 @@ function App() {
   );
 }
 
+...
+
 function Page1() {
   useTracking({ page: 'Page1' });
 }
@@ -335,6 +321,22 @@ function Page1() {
 function Page2() {
   useTracking({});
 }
+```
+
+<details>
+<summary>Example using the decorator</summary>
+
+```js
+@track({}, { process: (ownTrackingData) => ownTrackingData.page ? { event: 'pageview' } : null })
+class App extends Component {...}
+
+...
+
+@track({ page: 'Page1' })
+class Page1 extends Component {...}
+
+@track({})
+class Page2 extends Component {...}
 ```
 
 </details>
